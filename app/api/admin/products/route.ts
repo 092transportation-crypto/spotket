@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { adminClient, seedIfEmpty } from "@/lib/catalog";
+import { isExternalImageUrl, rehostUrls } from "@/lib/rehost";
+
+/** Rehosts a product row's external images and persists the storage URLs. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function rehostProductImages(admin: any, product: any) {
+  const gallery: string[] = product.images ?? [];
+  const all = [product.image, ...gallery].filter(Boolean) as string[];
+  if (!all.some(isExternalImageUrl)) return product;
+  const { urls } = await rehostUrls(admin, product.id, all);
+  const [image, ...images] = urls;
+  const { data } = await admin
+    .from("products")
+    .update({ image: product.image ? image : null, images: product.image ? images : urls })
+    .eq("id", product.id)
+    .select()
+    .single();
+  return data ?? product;
+}
 
 export async function GET(request: Request) {
   const unauthorized = requireAdmin(request);
@@ -57,8 +75,11 @@ export async function POST(request: Request) {
     new_arrival: body.newArrival ?? true,
     date_added: new Date().toISOString().slice(0, 10),
   };
-  const { data, error } = await admin.from("products").insert(row).select().single();
+  const { data: inserted, error } = await admin.from("products").insert(row).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  // Supplier-hosted (alicdn/CJ) images are rehosted immediately — the stored
+  // product only ever exposes Supabase storage URLs.
+  const data = await rehostProductImages(admin, inserted);
   if (body.aliexpressUrl) {
     // Separate update so an older table without the column can't fail the insert.
     await admin
@@ -93,13 +114,14 @@ export async function PUT(request: Request) {
       shipping: body.cj ? { ...(body.shipping ?? {}), cj: body.cj } : body.shipping,
     }),
   };
-  const { data, error } = await admin
+  const { data: updated, error } = await admin
     .from("products")
     .update(update)
     .eq("id", body.id)
     .select()
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  const data = await rehostProductImages(admin, updated);
   // Only overwrite the supplier URL with a real value — a blank form field
   // must never erase it (that's how the Moon Lamp lost its URL).
   if (body.aliexpressUrl) {

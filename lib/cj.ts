@@ -11,8 +11,10 @@ let cached: { token: string; expiresAt: number } | null = null;
 
 export async function getCjToken(): Promise<string> {
   const email = process.env.CJ_EMAIL;
-  const password = process.env.CJ_PASSWORD;
-  if (!email || !password) throw new Error("CJ_EMAIL / CJ_PASSWORD are not set");
+  // CJ's "password" field expects an API key generated in the CJ dashboard
+  // (My CJ -> Authorization -> API), not the account login password.
+  const password = process.env.CJ_API_KEY || process.env.CJ_PASSWORD;
+  if (!email || !password) throw new Error("CJ_EMAIL and CJ_API_KEY (or CJ_PASSWORD) are not set");
 
   if (cached && Date.now() < cached.expiresAt) return cached.token;
 
@@ -22,7 +24,9 @@ export async function getCjToken(): Promise<string> {
     { timeout: 30000 },
   );
   if (!data?.result || !data?.data?.accessToken) {
-    throw new Error(`CJ auth failed: ${data?.message ?? "unknown error"}`);
+    throw new Error(
+      `CJ auth failed: ${data?.message ?? "unknown error"} — make sure CJ_API_KEY holds an API key from CJ dashboard -> My CJ -> Authorization, not your login password.`,
+    );
   }
   // Token is valid ~15 days; refresh well before that.
   cached = { token: data.data.accessToken, expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7 };

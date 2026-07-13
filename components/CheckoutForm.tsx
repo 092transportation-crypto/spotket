@@ -20,7 +20,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "",
 );
 
-type Totals = { subtotal: number; shipping: number; tax: number; total: number };
+type Totals = { subtotal: number; discount: number; shipping: number; tax: number; total: number };
 
 const inputClasses =
   "min-h-12 w-full rounded-xl border border-navy-600 bg-navy-900/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40";
@@ -114,10 +114,12 @@ function OrderSummary({ items, totals }: { items: CartItem[]; totals: Totals | n
 function PaymentForm({
   items,
   totals,
+  promoCode,
   onSuccess,
 }: {
   items: CartItem[];
   totals: Totals;
+  promoCode?: string;
   onSuccess: (orderId: string, customer: CustomerInfo) => void;
 }) {
   const stripe = useStripe();
@@ -179,6 +181,7 @@ function PaymentForm({
       body: JSON.stringify({
         paymentIntentId: paymentIntent.id,
         customer,
+        promoCode,
         items: items.map((item) => ({
           id: item.productId,
           quantity: item.quantity,
@@ -259,6 +262,8 @@ export default function CheckoutForm() {
   const { items, clearCart } = useCart();
   const { user, addOrder, updateProfile } = useAuth();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoCode, setPromoCode] = useState<string | undefined>(undefined);
   const [totals, setTotals] = useState<Totals | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -283,7 +288,7 @@ export default function CheckoutForm() {
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: orderLines }),
+          body: JSON.stringify({ items: orderLines, promoCode }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Checkout failed");
@@ -291,6 +296,7 @@ export default function CheckoutForm() {
         setClientSecret(data.clientSecret);
         setTotals({
           subtotal: data.subtotal,
+          discount: data.discount ?? 0,
           shipping: data.shipping,
           tax: data.tax,
           total: data.total,
@@ -304,8 +310,8 @@ export default function CheckoutForm() {
     return () => {
       cancelled = true;
     };
-    // Refresh the payment intent whenever the order contents change.
-  }, [JSON.stringify(orderLines), orderId]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Refresh the payment intent whenever the order contents or promo change.
+  }, [JSON.stringify(orderLines), orderId, promoCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSuccess = (paymentId: string, customer: CustomerInfo) => {
     setPlacedItems(items);
@@ -403,6 +409,39 @@ export default function CheckoutForm() {
   }
 
   return (
+    <>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          setPromoCode(promoInput.trim() ? promoInput.trim().toUpperCase() : undefined);
+          setClientSecret(null);
+          setTotals(null);
+        }}
+        className="mb-6 flex max-w-md gap-2"
+      >
+        <input
+          type="text"
+          value={promoInput}
+          onChange={(event) => setPromoInput(event.target.value)}
+          placeholder="Discount code (e.g. WELCOME10)"
+          aria-label="Discount code"
+          className="min-h-12 w-full rounded-xl border border-navy-600 bg-navy-900/70 px-4 text-sm text-white placeholder:text-slate-500 focus:border-brand focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="min-h-12 shrink-0 rounded-xl border border-navy-600 px-5 text-sm font-semibold text-slate-200 hover:border-brand hover:text-brand"
+        >
+          Apply
+        </button>
+      </form>
+      {promoCode && totals && totals.discount === 0 && (
+        <p className="mb-4 text-sm text-red-400">Code &ldquo;{promoCode}&rdquo; isn&apos;t valid.</p>
+      )}
+      {promoCode && totals && totals.discount > 0 && (
+        <p className="mb-4 text-sm text-brand">
+          {promoCode} applied — you save {formatPrice(totals.discount)}.
+        </p>
+      )}
     <Elements
       key={clientSecret}
       stripe={stripePromise}
@@ -414,7 +453,8 @@ export default function CheckoutForm() {
         },
       }}
     >
-      <PaymentForm items={items} totals={totals} onSuccess={handleSuccess} />
+      <PaymentForm items={items} totals={totals} promoCode={promoCode} onSuccess={handleSuccess} />
     </Elements>
+    </>
   );
 }

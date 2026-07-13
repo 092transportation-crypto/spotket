@@ -121,3 +121,11 @@ create policy "Anyone can read reviews"
 
 create index if not exists reviews_product_id_created_at_idx
   on public.reviews (product_id, created_at desc);
+
+-- Newsletter signups (service-role writes via /api/newsletter).
+create table if not exists public.newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  created_at timestamptz not null default now()
+);
+alter table public.newsletter_subscribers enable row level security;

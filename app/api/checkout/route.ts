@@ -12,14 +12,15 @@ export async function POST(request: Request) {
   }
 
   let items: OrderLine[];
+  let promoCode: string | undefined;
   try {
-    ({ items } = await request.json());
+    ({ items, promoCode } = await request.json());
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   try {
-    const totals = await priceOrder(items);
+    const totals = await priceOrder(items, promoCode);
     const stripe = new Stripe(secretKey);
     const intent = await stripe.paymentIntents.create({
       amount: totals.amount,
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       clientSecret: intent.client_secret,
       subtotal: totals.subtotal,
+      discount: totals.discount,
       shipping: totals.shipping,
       tax: totals.tax,
       total: totals.total,

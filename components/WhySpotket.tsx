@@ -2,7 +2,7 @@ import { Headphones, Lock, RotateCcw, Truck } from "lucide-react";
 import Reveal from "@/components/Reveal";
 
 const features = [
-  { icon: Truck, title: "Fast Delivery", note: "Ships within 24–48 hours" },
+  { icon: Truck, title: "Worldwide Delivery", note: "We ship worldwide from verified suppliers. Estimated delivery 10-20 business days." },
   { icon: RotateCcw, title: "Easy Returns", note: "30-day hassle-free returns" },
   { icon: Lock, title: "Secure Payment", note: "256-bit SSL encryption" },
   { icon: Headphones, title: "24/7 Support", note: "Always here to help" },

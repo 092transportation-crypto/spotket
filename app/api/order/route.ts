@@ -15,6 +15,7 @@ type OrderRequest = {
   paymentIntentId: string;
   customer: CustomerInfo;
   items: OrderLine[];
+  promoCode?: string;
 };
 
 export async function POST(request: Request) {
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { paymentIntentId, customer, items } = body;
+  const { paymentIntentId, customer, items, promoCode } = body;
   const missing = CUSTOMER_FIELDS.filter(
     (field) => !customer?.[field] || !String(customer[field]).trim(),
   );
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const totals = await priceOrder(items);
+    const totals = await priceOrder(items, promoCode);
 
     // The email only goes out for a payment Stripe confirms succeeded and
     // whose charged amount matches the order being reported.
@@ -132,7 +133,7 @@ Shipping address
 Items
 ${itemLines}
 
-  Subtotal: ${formatPrice(totals.subtotal)}
+  Subtotal: ${formatPrice(totals.subtotal)}${totals.discount > 0 ? `\n  Discount: -${formatPrice(totals.discount)} (${promoCode?.toUpperCase()})` : ""}
   Shipping: ${totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}
   Tax:      ${formatPrice(totals.tax)}
   Total:    ${formatPrice(totals.total)}

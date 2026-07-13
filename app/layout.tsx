@@ -3,6 +3,7 @@ import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import CartDrawer from "@/components/CartDrawer";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
@@ -70,6 +71,7 @@ export default function RootLayout({
             <div className="h-[calc(3.5rem+env(safe-area-inset-bottom))] md:hidden" aria-hidden="true" />
             <BottomNav />
             <CartDrawer />
+            <ExitIntentPopup />
           </CartProvider>
         </AuthProvider>
       </body>

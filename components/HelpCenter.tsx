@@ -25,7 +25,7 @@ const categories = [
 const articles = [
   { category: "Orders", q: "How do I change or cancel my order?", a: "If your order hasn't shipped yet, email us with your order number and the change you need — we can usually update it. Once shipped, use the 30-day return policy instead.", popular: true },
   { category: "Orders", q: "I didn't get a confirmation email", a: "Check your spam folder first. Still nothing after 30 minutes? Email us with the name and email used at checkout and we'll resend it." },
-  { category: "Shipping", q: "How long does delivery take?", a: "Standard delivery takes 5-10 days depending on the product. Every product page shows its own delivery window before you buy.", popular: true },
+  { category: "Shipping", q: "How long does delivery take?", a: "Estimated delivery is 10-20 business days depending on the product and destination. Every product page shows its own delivery window before you buy.", popular: true },
   { category: "Shipping", q: "How do I track my package?", a: "A tracking link arrives by email within 24-48 hours of ordering. Multi-item orders may ship as separate tracked packages.", popular: true },
   { category: "Shipping", q: "My package is late or lost", a: "Every shipment is insured. If tracking looks stuck, contact us — lost packages are reshipped or refunded in full, and some products include an automatic late-delivery coupon." },
   { category: "Returns & Refunds", q: "How do I return an item?", a: "Email us within 30 days of delivery with your order number. We send a prepaid label within 1 business day — full steps on the Returns page.", popular: true },

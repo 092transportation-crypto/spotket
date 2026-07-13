@@ -17,7 +17,7 @@ const columns = [
       { href: "/trending", label: "What's Trending" },
       { href: "/about", label: "Careers" },
       { href: "/about", label: "Press" },
-      { href: "/about", label: "Blog" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
@@ -54,37 +54,20 @@ const columns = [
 const socialLinks = [
   {
     name: "TikTok",
-    href: "#",
+    href: "https://tiktok.com/@spotketllc.5",
     icon: (
       <path d="M16.6 3c.4 2.2 1.8 3.7 4 4v3c-1.6 0-3-.5-4-1.3v6.6c0 3.4-2.5 5.7-5.7 5.7A5.6 5.6 0 0 1 5.4 15c0-3.2 2.6-5.7 6-5.5v3.1c-1.7-.3-3 .8-3 2.4a2.6 2.6 0 0 0 2.6 2.6c1.6 0 2.6-1.1 2.6-2.9V3h3Z" />
     ),
   },
   {
-    name: "Facebook",
-    href: "#",
-    icon: <path d="M14 8h3V4.5h-3c-2.5 0-4.5 2-4.5 4.5v2H7V14.5h2.5V21h3.5v-6.5h3l.5-3.5h-3.5V9c0-.6.4-1 1-1Z" />,
-  },
-  {
     name: "Instagram",
-    href: "#",
+    href: "https://instagram.com/spotket.llc",
     icon: (
       <>
         <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="none" strokeWidth="2" stroke="currentColor" />
         <circle cx="12" cy="12" r="4" fill="none" strokeWidth="2" stroke="currentColor" />
         <circle cx="17.2" cy="6.8" r="1.3" />
       </>
-    ),
-  },
-  {
-    name: "X (Twitter)",
-    href: "#",
-    icon: <path d="M4 4h4.3l4 5.7L17 4h3l-6.3 7.3L20.5 20h-4.3l-4.4-6.2L6.5 20h-3l6.8-7.9L4 4Z" />,
-  },
-  {
-    name: "YouTube",
-    href: "#",
-    icon: (
-      <path d="M21.5 8s-.2-1.4-.8-2c-.7-.8-1.6-.8-2-.9C15.9 4.9 12 4.9 12 4.9s-3.9 0-6.7.2c-.4.1-1.3.1-2 .9-.6.6-.8 2-.8 2S2.3 9.6 2.3 11.3v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.6.2 6.6.2 6.6.2s3.9 0 6.7-.2c.4-.1 1.3-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.7-.2-3.3-.2-3.3ZM10 15V9l5.3 3L10 15Z" />
     ),
   },
 ];
@@ -128,6 +111,8 @@ export default function Footer() {
               <li key={social.name}>
                 <a
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.name}
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-navy-600 text-slate-300 transition-all hover:border-brand hover:bg-brand/10 hover:text-brand"
                 >

@@ -23,6 +23,7 @@ export type PricedLine = {
 export type OrderTotals = {
   lines: PricedLine[];
   subtotal: number;
+  discount: number;
   shipping: number;
   tax: number;
   total: number;
@@ -30,11 +31,19 @@ export type OrderTotals = {
   amount: number;
 };
 
+/** Active promo codes: code -> fraction off the subtotal. */
+export const PROMO_CODES: Record<string, number> = {
+  WELCOME10: 0.1,
+};
+
 /**
  * Prices an order from the catalog. Throws on unknown products or invalid
  * quantities so tampered requests fail loudly.
  */
-export async function priceOrder(lines: OrderLine[]): Promise<OrderTotals> {
+export async function priceOrder(
+  lines: OrderLine[],
+  promoCode?: string,
+): Promise<OrderTotals> {
   if (!Array.isArray(lines) || lines.length === 0) {
     throw new Error("Order has no items");
   }
@@ -55,12 +64,16 @@ export async function priceOrder(lines: OrderLine[]): Promise<OrderTotals> {
     };
   });
   const subtotal = priced.reduce((sum, line) => sum + line.price * line.quantity, 0);
+  const fraction = promoCode ? PROMO_CODES[promoCode.trim().toUpperCase()] ?? 0 : 0;
+  const discount = Math.round(subtotal * fraction * 100) / 100;
+  const discounted = subtotal - discount;
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_COST;
-  const tax = subtotal * ESTIMATED_TAX_RATE;
-  const total = subtotal + shipping + tax;
+  const tax = discounted * ESTIMATED_TAX_RATE;
+  const total = discounted + shipping + tax;
   return {
     lines: priced,
     subtotal,
+    discount,
     shipping,
     tax,
     total,

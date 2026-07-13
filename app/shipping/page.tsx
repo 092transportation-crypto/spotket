@@ -5,11 +5,11 @@ import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_COST } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Shipping Info",
   description:
-    "Spotket shipping: free on orders over $35, flat $4.99 otherwise, 5-10 day standard delivery, and real-time tracking on every order.",
+    "Spotket shipping: free on orders over $35, flat $4.99 otherwise, 10-20 business day estimated delivery, and real-time tracking on every order.",
 };
 
 const faqs = [
-  { q: "How long does delivery take?", a: "Standard delivery takes 5-10 days depending on the product — every product page shows its own delivery window before you buy." },
+  { q: "How long does delivery take?", a: "Estimated delivery is 10-20 business days depending on the product and destination — every product page shows its own delivery window before you buy." },
   { q: "How do I track my order?", a: "You'll get a tracking link by email within 24-48 hours of ordering. Click it any time for live status; if the link hasn't arrived, check spam or email us." },
   { q: "What if my package is late?", a: "Some products include a late-delivery coupon automatically. Either way, if a package looks stuck, contact us and we'll chase the carrier for you." },
   { q: "What if my package is lost or damaged?", a: "Every shipment is insured. Lost packages are reshipped or refunded in full, and damaged items are replaced free — just send a photo within 48 hours." },
@@ -27,7 +27,7 @@ export default function ShippingPage() {
         <div className="rounded-3xl border border-navy-700/60 bg-navy-900 p-6">
           <Truck className="h-6 w-6 text-gold" aria-hidden="true" />
           <h2 className="mt-3 text-lg font-bold text-white">Standard Shipping</h2>
-          <p className="mt-1 text-sm text-slate-400">5-10 days · tracked &amp; insured</p>
+          <p className="mt-1 text-sm text-slate-400">10-20 business days · tracked &amp; insured</p>
           <p className="mt-3 text-2xl font-bold text-white">
             {`$${STANDARD_SHIPPING_COST}`}
             <span className="ml-2 text-sm font-normal text-slate-400">
@@ -52,9 +52,9 @@ export default function ShippingPage() {
           <MapPin className="h-6 w-6 text-gold" aria-hidden="true" />
           <h2 className="mt-3 text-lg font-bold text-white">United States</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-300">
-            We ship to all 50 states. Every product page shows a delivery
-            window (e.g. &ldquo;Jul 19 - 24&rdquo;) computed for US delivery,
-            plus where the item ships from.
+            We ship worldwide from verified suppliers, with estimated delivery of
+            10-20 business days. Every product page shows its own delivery
+            window plus where the item ships from.
           </p>
         </div>
         <div className="rounded-3xl border border-navy-700/60 bg-navy-900 p-6">

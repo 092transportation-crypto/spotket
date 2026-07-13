@@ -4,7 +4,7 @@ import ContactForm from "@/components/ContactForm";
 import { SUPPORT_EMAIL } from "@/lib/site";
 
 const faqs = [
-  { q: "Where is my order?", a: "You'll receive a tracking link by email as soon as your order ships — usually within 24-48 hours. Standard delivery takes 5-10 days depending on the product." },
+  { q: "Where is my order?", a: "You'll receive a tracking link by email as soon as your order ships — usually within 24-48 hours. Estimated delivery is 10-20 business days depending on the product." },
   { q: "How do I return something?", a: "Email us within 30 days of delivery with your order number and we'll send a prepaid return label. Full details on the Returns page." },
   { q: "When will I get my refund?", a: "Refunds are issued to your original payment method within 3-5 business days of the return arriving back to us." },
   { q: "Do you ship internationally?", a: "We currently ship across the United States. International shipping is on the roadmap — join the newsletter to hear when your country is added." },

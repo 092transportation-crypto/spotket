@@ -5,11 +5,27 @@ import { useState, type FormEvent } from "react";
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!email.trim()) return;
-    setSubscribed(true);
+    if (!email.trim() || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Subscription failed");
+      setSubscribed(true);
+    } catch (subscribeError) {
+      setError(subscribeError instanceof Error ? subscribeError.message : "Subscription failed");
+    }
+    setBusy(false);
   };
 
   return (
@@ -30,9 +46,14 @@ export default function Newsletter() {
           drops, and members-only deals. No spam, ever.
         </p>
 
+        {error && (
+          <p className="mx-auto mt-4 max-w-md rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-300">
+            {error}
+          </p>
+        )}
         {subscribed ? (
           <p className="mx-auto mt-8 max-w-md rounded-xl border border-brand/40 bg-brand/10 px-4 py-3 text-sm font-medium text-brand">
-            You&apos;re in! Your 10% welcome code is on its way to your inbox.
+            You&apos;re subscribed! Check your email for your 10% discount code.
           </p>
         ) : (
           <form

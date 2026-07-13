@@ -119,6 +119,13 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
   // The live reviews FK has no ON DELETE CASCADE — clear reviews first.
   await admin.from("reviews").delete().eq("product_id", id);
+  // Remove rehosted images from storage (product-images/{id}/*).
+  const { data: stored } = await admin.storage.from("product-images").list(id);
+  if (stored && stored.length > 0) {
+    await admin.storage
+      .from("product-images")
+      .remove(stored.map((file) => `${id}/${file.name}`));
+  }
   const { error } = await admin.from("products").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });

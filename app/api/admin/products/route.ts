@@ -52,7 +52,8 @@ export async function POST(request: Request) {
     rating: 0,
     review_count: 0,
     stock: Number(body.stock ?? 10),
-    shipping: body.shipping ?? null,
+    // CJ source ids ride inside the shipping jsonb (no schema change needed).
+    shipping: body.cj ? { ...(body.shipping ?? {}), cj: body.cj } : (body.shipping ?? null),
     new_arrival: body.newArrival ?? true,
     date_added: new Date().toISOString().slice(0, 10),
   };
@@ -88,7 +89,9 @@ export async function PUT(request: Request) {
     // rating/review_count intentionally omitted — computed from real
     // reviews; editing a product must never reset them.
     stock: Number(body.stock ?? 10),
-    ...(body.shipping !== undefined && { shipping: body.shipping }),
+    ...(body.shipping !== undefined && {
+      shipping: body.cj ? { ...(body.shipping ?? {}), cj: body.cj } : body.shipping,
+    }),
   };
   const { data, error } = await admin
     .from("products")

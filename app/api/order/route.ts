@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
+import { adminClient } from "@/lib/catalog";
+import { createCjOrder, type CjOrderItem } from "@/lib/cj";
 import {
   CUSTOMER_FIELDS,
   priceOrder,
@@ -62,6 +64,48 @@ export async function POST(request: Request) {
       );
     }
 
+    // Auto-fulfillment: send CJ-sourced items to CJDropshipping. A CJ failure
+    // never fails the customer's order — it's flagged in the owner email.
+    let cjOrderId: string | null = null;
+    let cjNote = "No CJ-sourced items in this order";
+    try {
+      const admin = adminClient();
+      if (admin) {
+        const ids = totals.lines.map((line) => line.id);
+        const { data: rows } = await admin
+          .from("products")
+          .select("id, shipping")
+          .in("id", ids);
+        const cjItems: CjOrderItem[] = [];
+        for (const line of totals.lines) {
+          const row = (rows ?? []).find((candidate) => candidate.id === line.id);
+          const vid = row?.shipping?.cj?.vid;
+          if (vid) cjItems.push({ vid, quantity: line.quantity });
+        }
+        if (cjItems.length > 0) {
+          const country = /united states|usa|^us$/i.test(customer.country.trim())
+            ? "US"
+            : customer.country.trim().slice(0, 2).toUpperCase();
+          const result = await createCjOrder({
+            orderNumber: paymentIntentId,
+            name: customer.name,
+            phone: customer.phone,
+            street: customer.street,
+            city: customer.city,
+            state: customer.state,
+            zip: customer.zip,
+            countryCode: country,
+            items: cjItems,
+          });
+          cjOrderId = result.orderId;
+          cjNote = `CJ order created: ${cjOrderId} (${cjItems.length} item${cjItems.length === 1 ? "" : "s"})`;
+        }
+      }
+    } catch (cjError) {
+      console.error("[/api/order] CJ fulfillment failed:", cjError);
+      cjNote = `CJ FULFILLMENT FAILED — place manually! ${cjError instanceof Error ? cjError.message : ""}`;
+    }
+
     const timestamp = new Date().toLocaleString("en-US", {
       timeZone: "America/New_York",
       dateStyle: "full",
@@ -94,6 +138,7 @@ ${itemLines}
   Total:    ${formatPrice(totals.total)}
 
 Payment: ${paymentIntentId} (Stripe, succeeded)
+Fulfillment: ${cjNote}
 Placed:  ${timestamp}
 `;
 
@@ -109,7 +154,7 @@ Placed:  ${timestamp}
       text,
     });
 
-    return NextResponse.json({ ok: true, orderId: paymentIntentId });
+    return NextResponse.json({ ok: true, orderId: paymentIntentId, cjOrderId });
   } catch (error) {
     console.error("[/api/order] Order notification failed:", error);
     const message = error instanceof Error ? error.message : "Order failed";

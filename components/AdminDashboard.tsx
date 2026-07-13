@@ -78,7 +78,7 @@ const ORDER_STATUSES = ["paid", "processing", "shipped", "delivered", "cancelled
 export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
-  const [tab, setTab] = useState<"products" | "orders">("products");
+  const [tab, setTab] = useState<"products" | "orders" | "cj">("products");
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [form, setForm] = useState<FormState | null>(null);
@@ -97,6 +97,12 @@ export default function AdminDashboard() {
   } | null>(null);
   const [reviewsImportingId, setReviewsImportingId] = useState<string | null>(null);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [cjQuery, setCjQuery] = useState("");
+  const [cjBusy, setCjBusy] = useState(false);
+  const [cjResults, setCjResults] = useState<
+    { pid: string; name: string; image: string; cost: number | null; shippingEstimate: string }[]
+  >([]);
+  const [cjSource, setCjSource] = useState<{ pid: string; vid: string; cost: number | null } | null>(null);
 
   const api = useCallback(
     async (path: string, init?: RequestInit) => {
@@ -134,6 +140,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!authed) return;
+    if (tab === "cj") return;
     (tab === "products" ? loadProducts() : loadOrders()).catch((error) => {
       if (String(error.message).includes("Unauthorized")) {
         sessionStorage.removeItem(PASSWORD_KEY);
@@ -158,6 +165,7 @@ export default function AdminDashboard() {
     setImportCost(null);
     setImportShipping(null);
     setShowImagePicker(false);
+    setCjSource(null);
     setMessage(null);
   };
 
@@ -253,6 +261,7 @@ export default function AdminDashboard() {
         features: form.features.map((feature) => feature.trim()).filter(Boolean),
         images: form.images.filter((imageUrl) => imageUrl !== form.image),
         shipping: importShipping ?? undefined,
+        cj: cjSource ?? undefined,
       };
       await api("/api/admin/products", {
         method: editingId ? "PUT" : "POST",
@@ -279,6 +288,53 @@ export default function AdminDashboard() {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Delete failed");
     }
+  };
+
+  const handleCjSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!cjQuery.trim()) return;
+    setCjBusy(true);
+    setMessage(null);
+    try {
+      const data = await api(`/api/cj/search?q=${encodeURIComponent(cjQuery.trim())}`);
+      setCjResults(data.results);
+      if (data.results.length === 0) setMessage("No CJ products matched that search.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "CJ search failed");
+    }
+    setCjBusy(false);
+  };
+
+  const handleCjImport = async (pid: string) => {
+    setCjBusy(true);
+    setMessage(null);
+    try {
+      const detail = await api(`/api/cj/product?pid=${encodeURIComponent(pid)}`);
+      if (!detail.vid) throw new Error("This CJ product has no orderable variant");
+      setTab("products");
+      setEditingId(null);
+      setImportImages(detail.image ? [detail.image] : []);
+      setImportCost(detail.cost);
+      setImportShipping({ minDays: 7, maxDays: 15, shipsFrom: "China", freeShipping: true });
+      setCjSource({ pid: detail.pid, vid: detail.vid, cost: detail.cost });
+      setShowImagePicker(false);
+      setForm({
+        ...EMPTY_FORM,
+        name: detail.name ?? "",
+        description: detail.description ?? "",
+        features: [""],
+        image: detail.image ?? "",
+        images: [],
+        category: "Electronics",
+      });
+      setMessage(
+        `CJ product loaded${detail.cost ? ` — your cost: $${detail.cost}` : ""}. Set your price, pick a category, and save. Orders for this product will auto-fulfill through CJ.`,
+      );
+      await loadProducts();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "CJ import failed");
+    }
+    setCjBusy(false);
   };
 
   const handleImportReviews = async (product: ProductRow) => {
@@ -352,8 +408,8 @@ export default function AdminDashboard() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-extrabold text-white">Admin Dashboard</h1>
-        <div className="grid grid-cols-2 rounded-xl border border-navy-600 p-1">
-          {(["products", "orders"] as const).map((option) => (
+        <div className="grid grid-cols-3 rounded-xl border border-navy-600 p-1">
+          {(["products", "orders", "cj"] as const).map((option) => (
             <button
               key={option}
               type="button"
@@ -362,7 +418,7 @@ export default function AdminDashboard() {
                 tab === option ? "bg-brand text-white" : "text-slate-300 hover:text-white"
               }`}
             >
-              {option}
+              {option === "cj" ? "Import from CJ" : option}
             </button>
           ))}
         </div>
@@ -847,6 +903,55 @@ export default function AdminDashboard() {
             </li>
           )}
         </ul>
+      )}
+
+      {tab === "cj" && (
+        <div className="mt-6">
+          <form onSubmit={handleCjSearch} className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="search"
+              value={cjQuery}
+              onChange={(event) => setCjQuery(event.target.value)}
+              placeholder="Search CJDropshipping products…"
+              className={inputClasses}
+            />
+            <button type="submit" disabled={cjBusy} className={`${primaryButton} shrink-0`}>
+              {cjBusy ? "Searching…" : "Search CJ"}
+            </button>
+          </form>
+
+          <ul className="mt-6 space-y-3">
+            {cjResults.map((item) => (
+              <li key={item.pid} className={`flex flex-wrap items-center gap-4 p-4 ${cardClasses}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {item.image && (
+                  <img src={item.image} alt="" className="h-16 w-16 rounded-lg object-cover" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-sm font-semibold text-white">{item.name}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {item.cost !== null && <>Cost: <span className="font-semibold text-gold">${item.cost}</span> · </>}
+                    Shipping: {item.shippingEstimate}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCjImport(item.pid)}
+                  disabled={cjBusy}
+                  className={primaryButton}
+                >
+                  Import
+                </button>
+              </li>
+            ))}
+            {cjResults.length === 0 && !cjBusy && (
+              <li className={`p-8 text-center text-sm text-slate-400 ${cardClasses}`}>
+                Search the CJ catalog to import products — cost price, images, and
+                auto-fulfillment wiring come along automatically.
+              </li>
+            )}
+          </ul>
+        </div>
       )}
     </div>
   );

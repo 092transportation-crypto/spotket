@@ -186,10 +186,18 @@ function PaymentForm({
         })),
       }),
     });
+    let cjOrderId: string | null = null;
     if (!response.ok) {
       // Payment went through — never leave the customer thinking it failed.
       console.error("Order notification failed", await response.text());
+    } else {
+      try {
+        cjOrderId = (await response.json()).cjOrderId ?? null;
+      } catch {
+        cjOrderId = null;
+      }
     }
+    if (cjOrderId) window.sessionStorage.setItem("spotket-last-cj-order", cjOrderId);
     onSuccess(paymentIntent.id, customer);
   };
 

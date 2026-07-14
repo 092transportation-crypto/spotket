@@ -100,8 +100,11 @@ export default function ProductDetail({ product }: { product: Product }) {
       </nav>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
-        {/* Gallery */}
-        <div>
+        {/* Gallery — min-w-0 lets the thumbnail strip scroll instead of
+            forcing the grid column (and the whole page) wider than the
+            viewport; grid items otherwise refuse to shrink below their
+            content's min size. */}
+        <div className="min-w-0">
           <div className="relative aspect-square overflow-hidden rounded-3xl border border-navy-700/60 bg-navy-900">
             <div key={selectedImage} className="absolute inset-0 animate-fade-in">
               <ProductImage
@@ -135,7 +138,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         </div>
 
         {/* Info */}
-        <div className="flex flex-col">
+        <div className="min-w-0 flex flex-col">
           {product.brand && (
             <p className="text-sm font-semibold text-brand">{product.brand}</p>
           )}

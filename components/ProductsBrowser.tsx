@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import Stars from "@/components/Stars";
-import { categories, getBrands, type Product } from "@/lib/products";
+import { categories, getBrands, promotedRank, type Product } from "@/lib/products";
 
 const sortOptions = [
   { value: "best-sellers", label: "Best Sellers" },
@@ -99,6 +99,7 @@ export default function ProductsBrowser({
       case "best-sellers":
         result = [...result].sort(
           (a, b) =>
+            promotedRank(a) - promotedRank(b) ||
             Number(b.bestSeller ?? false) - Number(a.bestSeller ?? false) ||
             b.reviewCount - a.reviewCount,
         );

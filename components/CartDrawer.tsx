@@ -54,8 +54,8 @@ export default function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Shopping cart"
-        className={`fixed inset-y-0 right-0 z-[80] flex w-full flex-col bg-navy-900 shadow-2xl shadow-black/70 transition-transform duration-300 ease-out sm:max-w-md sm:border-l sm:border-navy-700/60 ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-[80] flex w-full max-w-[100vw] flex-col bg-navy-900 shadow-2xl shadow-black/70 transition-[transform,visibility] duration-300 ease-out sm:max-w-md sm:border-l sm:border-navy-700/60 ${
+          open ? "visible translate-x-0" : "invisible translate-x-full"
         }`}
       >
         {/* Header */}

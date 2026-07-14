@@ -48,8 +48,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050914",
-  viewportFit: "cover",
+  // Emits exactly: width=device-width, initial-scale=1 (Next defaults).
+  // No maximum-scale / user-scalable restrictions — pinch zoom stays free.
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({

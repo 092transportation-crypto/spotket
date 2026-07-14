@@ -64,6 +64,18 @@ export type Product = {
   soldCount?: number;
 };
 
+/**
+ * Hero products pinned to the top of Trending, Best Sellers, and the default
+ * shop sort. Matched by name because catalog ids are per-database uuids.
+ */
+const PROMOTED_NAMES = ["bluetooth eye massager", "cat paw mochi"];
+
+export function promotedRank(product: Product): number {
+  const name = product.name.toLowerCase();
+  const index = PROMOTED_NAMES.findIndex((needle) => name.includes(needle));
+  return index === -1 ? PROMOTED_NAMES.length : index;
+}
+
 export const categories = [
   "Electronics",
   "Home & Garden",
@@ -414,9 +426,12 @@ export function getProduct(id: string, list: Product[] = products): Product | un
 }
 
 export function getBestSellers(list: Product[] = products): Product[] {
-  return list
-    .filter((product) => product.bestSeller)
-    .sort((a, b) => b.reviewCount - a.reviewCount);
+  const sellers = list.filter(
+    (product) => product.bestSeller || promotedRank(product) < PROMOTED_NAMES.length,
+  );
+  return sellers.sort(
+    (a, b) => promotedRank(a) - promotedRank(b) || b.reviewCount - a.reviewCount,
+  );
 }
 
 export function getNewArrivals(list: Product[] = products): Product[] {
@@ -435,7 +450,7 @@ export function getDeals(list: Product[] = products): Product[] {
 export function getTrending(list: Product[] = products): Product[] {
   return list
     .filter((product) => product.trending)
-    .sort((a, b) => b.reviewCount - a.reviewCount);
+    .sort((a, b) => promotedRank(a) - promotedRank(b) || b.reviewCount - a.reviewCount);
 }
 
 /** Highest-rated products with meaningful review volume. */

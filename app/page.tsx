@@ -12,7 +12,7 @@ import Reveal from "@/components/Reveal";
 import TrustBar from "@/components/TrustBar";
 import WhySpotket from "@/components/WhySpotket";
 import { getCatalog } from "@/lib/catalog";
-import { getNewArrivals } from "@/lib/products";
+import { getNewArrivals, promotedRank } from "@/lib/products";
 import { getFeaturedReviews } from "@/lib/reviews";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,9 @@ export default async function HomePage() {
     rated.reduce((sum, product) => sum + product.rating * product.reviewCount, 0) /
     Math.max(1, reviewTotal);
 
-  const trending = [...catalog].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 8);
+  const trending = [...catalog]
+    .sort((a, b) => promotedRank(a) - promotedRank(b) || b.reviewCount - a.reviewCount)
+    .slice(0, 8);
   const staffPicks = [...catalog]
     .filter((product) => product.reviewCount >= 10)
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)

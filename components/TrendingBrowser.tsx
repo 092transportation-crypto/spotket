@@ -3,7 +3,7 @@
 import { Flame } from "lucide-react";
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import type { Product } from "@/lib/products";
+import { promotedRank, type Product } from "@/lib/products";
 
 const TABS = [
   { key: "all", label: "All" },
@@ -27,7 +27,10 @@ export default function TrendingBrowser({ products }: { products: Product[] }) {
       return true;
     });
     return [...filtered].sort(
-      (a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating,
+      (a, b) =>
+        promotedRank(a) - promotedRank(b) ||
+        b.reviewCount - a.reviewCount ||
+        b.rating - a.rating,
     );
   }, [products, tab]);
 

@@ -139,7 +139,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           {product.brand && (
             <p className="text-sm font-semibold text-brand">{product.brand}</p>
           )}
-          <h1 className="mt-1 text-2xl font-extrabold text-white sm:text-4xl">
+          <h1 className="mt-1 break-words text-2xl font-extrabold text-white sm:text-4xl">
             {product.name}
           </h1>
           {product.reviewCount > 0 ? (
@@ -303,7 +303,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           {/* Description */}
           <div className="mt-8 border-t border-navy-700/60 pt-6">
             <h2 className="text-lg font-bold text-white">About this item</h2>
-            <p className="mt-3 leading-relaxed text-slate-300">{product.description}</p>
+            <p className="mt-3 break-words leading-relaxed text-slate-300">{product.description}</p>
             {product.features.length > 0 && (
               <ul className="mt-4 space-y-2 text-sm text-slate-300">
                 {product.features.map((feature, index) => (
@@ -415,7 +415,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                     <Stars rating={review.rating} />
                     <span className="text-sm font-semibold text-white">{review.title}</span>
                   </div>
-                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-300">
+                  <p className="mt-2 whitespace-pre-line break-words text-sm leading-relaxed text-slate-300">
                     {review.text}
                   </p>
                 </li>

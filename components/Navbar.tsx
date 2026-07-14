@@ -4,6 +4,7 @@ import { Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import Logo from "@/components/Logo";
 import { useCart } from "@/context/CartContext";
 
@@ -19,9 +20,30 @@ export default function Navbar() {
   const router = useRouter();
   const { count } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Two-phase open/close so the slide animation can play.
+  const openMenu = () => {
+    setMenuOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setMenuVisible(true)));
+  };
+  const closeMenu = () => {
+    setMenuVisible(false);
+    setTimeout(() => setMenuOpen(false), 300);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -98,7 +120,7 @@ export default function Navbar() {
           </Link>
           <button
             type="button"
-            onClick={() => setMenuOpen(true)}
+            onClick={openMenu}
             aria-expanded={menuOpen}
             aria-label="Open menu"
             className="flex h-11 w-11 items-center justify-center rounded-full text-slate-300 transition-colors hover:bg-navy-800 hover:text-white md:hidden"
@@ -129,43 +151,58 @@ export default function Navbar() {
         </div>
       )}
 
-      {menuOpen && (
-        <div
-          className="fixed inset-0 z-[60] bg-navy-950 md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu"
-        >
-          <div className="flex h-16 items-center justify-between border-b border-navy-800 px-4">
-            <Logo withTagline={false} />
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              aria-label="Close menu"
-              className="flex h-11 w-11 items-center justify-center rounded-full text-slate-300 hover:bg-navy-800"
-            >
-              <X className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
-          <nav className="px-6 py-8" aria-label="Mobile">
-            <ul className="space-y-2">
-              {[...nav, { label: "Account", href: "/account" }, { label: "Help", href: "/help" }].map(
-                (item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="block py-3 text-2xl font-semibold text-white transition-colors hover:text-brand"
+      {/* Mobile menu — portaled to <body>: the header's backdrop-blur creates
+          a containing block that traps fixed children, which left this menu
+          without a full-screen background. */}
+      {mounted &&
+        menuOpen &&
+        createPortal(
+          <div
+            className={`fixed inset-0 z-[100] flex flex-col bg-navy-950 transition-transform duration-300 ease-out md:hidden ${
+              menuVisible ? "translate-x-0" : "translate-x-full"
+            }`}
+            style={{ backgroundColor: "#0a0a0a" }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+          >
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-navy-800 px-4">
+              <Logo withTagline={false} />
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label="Close menu"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-slate-300 transition-colors hover:bg-navy-800 hover:text-white"
+              >
+                <X className="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-6 py-8" aria-label="Mobile">
+              <ul className="space-y-2">
+                {[...nav, { label: "Account", href: "/account" }, { label: "Help", href: "/help" }].map(
+                  (item, index) => (
+                    <li
+                      key={item.href}
+                      className={`transition-all duration-300 ${
+                        menuVisible ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
+                      }`}
+                      style={{ transitionDelay: `${100 + index * 50}ms` }}
                     >
-                      {item.label}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </nav>
-        </div>
-      )}
+                      <Link
+                        href={item.href}
+                        onClick={closeMenu}
+                        className="block py-3 text-2xl font-semibold text-white transition-colors hover:text-brand"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </nav>
+          </div>,
+          document.body,
+        )}
     </header>
   );
 }

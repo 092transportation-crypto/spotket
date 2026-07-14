@@ -89,20 +89,22 @@ export default function Hero({
           <p className="animate-fade-up text-sm font-semibold uppercase tracking-[0.4em] text-gold">
             Spotket · Premium Store
           </p>
-          <h1
-            className="mt-5 font-bold leading-[0.95] tracking-tight text-white"
-            style={{ fontSize: "clamp(5rem, 10vw, 9rem)" }}
-          >
-            <AnimatedWord word="Shop" startDelay={200} />
-            <br />
-            <AnimatedWord word="Smarter." startDelay={480} className="text-brand" />
+          <h1 className="mt-5 font-bold tracking-tight text-white">
+            <span
+              className="block leading-[0.95]"
+              style={{ fontSize: "clamp(3.25rem, 10vw, 9rem)" }}
+            >
+              <AnimatedWord word="Shop" startDelay={200} />
+              <br />
+              <AnimatedWord word="Smarter" startDelay={480} className="text-brand" />
+            </span>
+            <span
+              className="mt-6 block max-w-lg animate-fade-up font-sans text-base font-normal leading-relaxed text-slate-400 sm:text-lg"
+              style={{ animationDelay: "950ms" }}
+            >
+              — Premium Products Delivered to Your Door
+            </span>
           </h1>
-          <p
-            className="mt-6 max-w-lg animate-fade-up text-base leading-relaxed text-slate-400 sm:text-lg"
-            style={{ animationDelay: "950ms" }}
-          >
-            Premium products. Unbeatable prices. Delivered to your door.
-          </p>
           <div
             className="mt-10 flex animate-fade-up flex-col gap-3 sm:flex-row sm:gap-4"
             style={{ animationDelay: "1100ms" }}

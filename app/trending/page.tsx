@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import TrendingBrowser from "@/components/TrendingBrowser";
 import { getCatalog } from "@/lib/catalog";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "What's Trending",

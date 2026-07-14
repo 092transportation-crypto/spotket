@@ -70,7 +70,7 @@ function OrderSummary({ items, totals }: { items: CartItem[]; totals: Totals | n
           <li key={item.id} className="flex items-center gap-3">
             <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-navy-900">
               {item.image && (
-                <Image src={item.image} alt="" fill sizes="56px" className="object-cover" />
+                <Image src={item.image} alt={item.name} fill sizes="56px" className="object-cover" />
               )}
             </span>
             <span className="flex-1 text-sm">

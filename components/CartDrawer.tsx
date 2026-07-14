@@ -123,7 +123,7 @@ export default function CartDrawer() {
                       className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-xl bg-navy-800"
                     >
                       {item.image && (
-                        <Image src={item.image} alt="" fill sizes="60px" className="object-cover" />
+                        <Image src={item.image} alt={item.name} fill sizes="60px" className="object-cover" />
                       )}
                     </Link>
                     <div className="min-w-0 flex-1">

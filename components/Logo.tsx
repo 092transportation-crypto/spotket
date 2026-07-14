@@ -5,12 +5,11 @@ function LogoMark({ className }: { className: string }) {
   return (
     <Image
       src="/logo-mark.png"
-      alt=""
+      alt="Spotket logo"
       width={620}
       height={480}
       priority
       className={`${className} rounded-md object-contain`}
-      aria-hidden="true"
     />
   );
 }

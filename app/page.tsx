@@ -15,12 +15,14 @@ import { getCatalog } from "@/lib/catalog";
 import { getNewArrivals, promotedRank } from "@/lib/products";
 import { getFeaturedReviews } from "@/lib/reviews";
 
-export const dynamic = "force-dynamic";
+// Revalidate once a minute: catalog changes appear quickly while the page
+// itself serves statically from the edge (TTFB fix).
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Spotket — Shop Smarter | Premium Products, Free Shipping Over $35",
+  title: "Spotket | Shop Smarter — Free Shipping Over $35",
   description:
-    "Shop smarter with Spotket. Premium electronics, home, beauty, and wellness products with free shipping over $35, 30-day returns, price match guarantee, and 24/7 support.",
+    "Shop smarter with Spotket. Premium products with free shipping over $35, 30-day returns, and secure checkout.",
 };
 
 export default async function HomePage() {

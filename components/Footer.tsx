@@ -71,15 +71,35 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-navy-700/60 bg-navy-900">
-      {/* Back to top */}
+    <footer className="relative mt-10 border-t border-navy-700/60 bg-gradient-to-b from-navy-900 via-navy-950 to-black">
+      {/* Purple ambience behind the columns */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-72"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 60% 100% at 50% 0%, rgba(124,58,237,0.10), transparent 70%)",
+        }}
+      />
+
+      {/* Back to top — floating pill over the footer's top edge */}
       <a
         href="#"
-        className="flex min-h-11 items-center justify-center gap-1.5 bg-navy-800 py-3 text-center text-xs font-semibold text-slate-300 transition-colors hover:bg-navy-700 hover:text-white"
+        className="absolute left-1/2 top-0 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/40 transition-all hover:bg-brand-dark hover:shadow-xl hover:shadow-brand/50 active:scale-95"
       >
         <ChevronUp className="h-4 w-4" aria-hidden="true" />
         Back to top
       </a>
+
+      {/* Secure shopping banner */}
+      <div className="border-b border-navy-800/80 px-4 pb-5 pt-10 text-center sm:px-6">
+        <p className="text-sm font-bold tracking-wide text-white">
+          🔒 Secure Shopping Guaranteed
+        </p>
+        <p className="mt-1 text-xs text-slate-400">
+          256-bit SSL encryption · PCI-DSS compliant payments · 30-day money-back guarantee
+        </p>
+      </div>
 
       {/* Brand + link columns */}
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 sm:py-12 lg:grid-cols-6">
@@ -145,34 +165,11 @@ export default function Footer() {
         ))}
       </div>
 
-      {/* Secure shopping + payments */}
+      {/* Payments */}
       <div className="border-t border-navy-700/60">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 py-4 sm:px-6 sm:py-7 md:flex-row md:justify-between">
-          <div className="flex items-center gap-3 rounded-2xl border border-navy-700/60 bg-navy-800/60 px-4 py-3">
-            <svg
-              className="h-8 w-8 shrink-0 text-emerald-400"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 2 4.5 5v6c0 5 3.2 8.7 7.5 10 4.3-1.3 7.5-5 7.5-10V5L12 2Z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            <div>
-              <p className="text-sm font-bold text-white">100% Secure Shopping</p>
-              <p className="text-xs text-slate-400">
-                256-bit SSL encryption · PCI-DSS compliant payments
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-2 md:items-end">
-            <p className="text-sm text-slate-500 sm:text-xs">We accept</p>
-            <PaymentIcons />
-          </div>
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-4 py-5 sm:px-6">
+          <p className="text-sm text-slate-500 sm:text-xs">We accept</p>
+          <PaymentIcons />
         </div>
       </div>
 

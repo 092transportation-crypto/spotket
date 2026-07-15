@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import ProductImage from "@/components/ProductImage";
 import { formatPrice, type Product } from "@/lib/products";
 
@@ -13,29 +14,93 @@ const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
   delay: (i * 1.1) % 9,
 }));
 
+/** Overlapping avatar circles for the trust row — initials on brand hues. */
+const TRUST_AVATARS = [
+  { initial: "S", gradient: "linear-gradient(135deg, #6366f1, #4f46e5)" },
+  { initial: "J", gradient: "linear-gradient(135deg, #7c3aed, #6d28d9)" },
+  { initial: "M", gradient: "linear-gradient(135deg, #c9a84c, #a8873a)" },
+  { initial: "A", gradient: "linear-gradient(135deg, #818cf8, #6366f1)" },
+  { initial: "N", gradient: "linear-gradient(135deg, #a78bfa, #7c3aed)" },
+];
+
 type HeroStats = { products: number; reviews: number; rating: number };
 
-/** Letter-by-letter reveal for a word. */
-function AnimatedWord({
-  word,
-  startDelay,
-  className = "",
-}: {
-  word: string;
-  startDelay: number;
-  className?: string;
-}) {
+const HEADLINE = ["Shop", "Smarter"] as const;
+const HEADLINE_LENGTH = HEADLINE.join("").length;
+const TYPE_SPEED_MS = 110;
+const TYPE_START_DELAY_MS = 400;
+
+/**
+ * Typewriter headline. The server renders the full text (SEO and no-JS
+ * safe); on mount the client rewinds and types it back in, then the caret
+ * blinks a few beats and fades.
+ */
+function TypewriterHeadline() {
+  const [typed, setTyped] = useState(HEADLINE_LENGTH);
+  const [caretVisible, setCaretVisible] = useState(false);
+  const done = typed >= HEADLINE_LENGTH;
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let count = 0;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTyped(0);
+     
+    setCaretVisible(true);
+    const start = setTimeout(() => {
+      interval = setInterval(() => {
+        count += 1;
+        setTyped(count);
+        if (count >= HEADLINE_LENGTH) {
+          clearInterval(interval);
+          // Let the caret blink twice on the finished line, then fade out.
+          setTimeout(() => setCaretVisible(false), 2200);
+        }
+      }, TYPE_SPEED_MS);
+    }, TYPE_START_DELAY_MS);
+    return () => {
+      clearTimeout(start);
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  const caret = (
+    <span
+      aria-hidden="true"
+      className="inline-block w-[0.07em] rounded-sm bg-gold align-baseline"
+      style={{ height: "0.82em", animation: "caret-blink 0.9s step-end infinite" }}
+    />
+  );
+
   return (
-    <span className={className}>
-      {[...word].map((letter, index) => (
-        <span
-          key={index}
-          className="inline-block animate-fade-up"
-          style={{ animationDelay: `${startDelay + index * 55}ms` }}
-        >
-          {letter}
-        </span>
-      ))}
+    <span className="block leading-[0.95]" style={{ fontSize: "clamp(3.25rem, 10vw, 9rem)" }}>
+      {HEADLINE.map((word, wordIndex) => {
+        const wordStart = HEADLINE.slice(0, wordIndex).join("").length;
+        const isLastWord = wordIndex === HEADLINE.length - 1;
+        return (
+          <span key={word} className={wordIndex > 0 ? "block text-brand" : "block"}>
+            {[...word].map((letter, letterIndex) => {
+              const global = wordStart + letterIndex;
+              return (
+                <span key={letterIndex} suppressHydrationWarning>
+                  {/* While typing, the caret sits just before the next character. */}
+                  {caretVisible && !done && typed === global && caret}
+                  <span
+                    suppressHydrationWarning
+                    className="inline-block"
+                    style={{ visibility: global < typed ? "visible" : "hidden" }}
+                  >
+                    {letter}
+                  </span>
+                </span>
+              );
+            })}
+            {/* Finished: the caret blinks after the last character. */}
+            {caretVisible && done && isLastWord && caret}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -49,13 +114,21 @@ export default function Hero({
 }) {
   return (
     <section className="relative flex min-h-[100dvh] items-center overflow-hidden bg-navy-950">
-      {/* Glowing gradient blobs */}
+      {/* Glowing gradient blobs — the indigo/purple one sits behind the headline */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-32 top-1/4 h-[34rem] w-[34rem] rounded-full blur-3xl"
         style={{
-          background: "radial-gradient(circle, rgba(99,102,241,0.35), rgba(124,58,237,0.12) 60%, transparent 75%)",
+          background: "radial-gradient(circle, rgba(99,102,241,0.45), rgba(124,58,237,0.22) 55%, transparent 75%)",
           animation: "blob-pulse 9s ease-in-out infinite",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[8%] top-[12%] h-[26rem] w-[30rem] rounded-full blur-3xl"
+        style={{
+          background: "radial-gradient(circle, rgba(124,58,237,0.32), rgba(99,102,241,0.14) 55%, transparent 75%)",
+          animation: "blob-pulse 12s ease-in-out 3s infinite",
         }}
       />
       <div
@@ -90,14 +163,7 @@ export default function Hero({
             Spotket · Premium Store
           </p>
           <h1 className="mt-5 font-bold tracking-tight text-white">
-            <span
-              className="block leading-[0.95]"
-              style={{ fontSize: "clamp(3.25rem, 10vw, 9rem)" }}
-            >
-              <AnimatedWord word="Shop" startDelay={200} />
-              <br />
-              <AnimatedWord word="Smarter" startDelay={480} className="text-brand" />
-            </span>
+            <TypewriterHeadline />
             <span
               className="mt-6 block max-w-lg animate-fade-up font-sans text-base font-normal leading-relaxed text-slate-400 sm:text-lg"
               style={{ animationDelay: "950ms" }}
@@ -121,6 +187,31 @@ export default function Hero({
             >
               What&apos;s Trending
             </Link>
+          </div>
+
+          {/* Trust row — count fed by real review volume */}
+          <div
+            className="mt-8 flex animate-fade-up items-center gap-3"
+            style={{ animationDelay: "1200ms" }}
+          >
+            <div className="flex -space-x-2.5" aria-hidden="true">
+              {TRUST_AVATARS.map((avatar) => (
+                <span
+                  key={avatar.initial}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-navy-950 text-xs font-bold text-white"
+                  style={{ background: avatar.gradient }}
+                >
+                  {avatar.initial}
+                </span>
+              ))}
+            </div>
+            <p className="text-sm text-slate-300">
+              Trusted by{" "}
+              <span className="font-bold text-white">
+                {Math.max(100, Math.floor(stats.reviews / 100) * 100).toLocaleString()}+
+              </span>{" "}
+              shoppers
+            </p>
           </div>
 
           {/* Real store stats */}
@@ -155,7 +246,7 @@ export default function Hero({
                 top: [0, 200, 320][index],
                 zIndex: index === 0 ? 3 : index,
                 ["--tilt" as string]: `${[3, -4, 2][index]}deg`,
-                animation: `float-y ${5.5 + index * 1.2}s cubic-bezier(0.45, 0, 0.55, 1) ${index * 0.7}s infinite`,
+                animation: `float-bounce ${5.5 + index * 1.2}s cubic-bezier(0.45, 0, 0.55, 1) ${index * 0.7}s infinite`,
               }}
             >
               <ProductImage src={product.image} alt={product.name} sizes="280px" />

@@ -163,7 +163,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           )}
 
           <div className="mt-5 border-t border-navy-700/60 pt-5">
-            <p className="flex flex-wrap items-center gap-3 text-4xl font-extrabold text-white">
+            <p className="flex flex-wrap items-center gap-3 text-4xl font-extrabold text-gold">
               {formatPrice(product.price)}
               {onSale && (
                 <>

@@ -57,24 +57,30 @@ export default function FeaturedCategories() {
       </Reveal>
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
-          <Reveal key={card.label} delay={index * 90}>
+          <Reveal
+            key={card.label}
+            delay={index * 90}
+            // The first card leads the mosaic at double width on desktop.
+            className={index === 0 ? "lg:col-span-2" : undefined}
+          >
             <Link
               href={`/products?category=${encodeURIComponent(card.category)}`}
-              className="group relative block h-56 overflow-hidden rounded-3xl border border-navy-700/60 sm:h-64"
+              className="group relative block h-72 overflow-hidden rounded-3xl border border-navy-700/60 transition-colors duration-300 hover:border-brand/50 sm:h-80"
             >
               <Image
                 src={card.image}
                 alt={card.label}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
+              {/* Transparent → deep purple wash */}
               <span
                 aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-navy-950/95 via-navy-950/40 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-[#1e1038]/95 via-[#2e1065]/35 to-transparent"
               />
-              <span className="absolute inset-x-0 bottom-0 p-6">
-                <span className="block font-bold text-white" style={{ fontFamily: "var(--font-playfair), serif", fontSize: "1.6rem" }}>
+              <span className="absolute inset-x-0 bottom-0 p-7">
+                <span className="block font-bold text-white" style={{ fontFamily: "var(--font-playfair), serif", fontSize: "1.9rem" }}>
                   {card.label}
                 </span>
                 <span className="mt-1 block text-sm text-slate-300">{card.blurb}</span>
@@ -85,27 +91,27 @@ export default function FeaturedCategories() {
             </Link>
           </Reveal>
         ))}
-        <Reveal delay={cards.length * 90}>
+        <Reveal delay={cards.length * 90} className="lg:col-span-4">
           <Link
             href="/products"
-            className="group relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-3xl border border-navy-700/60 bg-gradient-to-br from-navy-800 to-navy-900 sm:h-64"
+            className="group relative flex min-h-28 flex-col items-center justify-center overflow-hidden rounded-3xl border border-navy-700/60 bg-gradient-to-r from-navy-900 via-[#181025] to-navy-900 px-6 py-8 text-center transition-colors duration-300 hover:border-brand/50"
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 opacity-60"
+              className="absolute inset-0 opacity-70"
               style={{
                 backgroundImage:
-                  "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(0,102,255,0.25), transparent 70%)",
+                  "radial-gradient(ellipse 55% 130% at 50% 50%, rgba(124,58,237,0.22), transparent 70%)",
               }}
             />
-            <span className="relative block font-bold text-white" style={{ fontFamily: "var(--font-playfair), serif", fontSize: "1.6rem" }}>
+            <span className="relative block font-bold text-white" style={{ fontFamily: "var(--font-playfair), serif", fontSize: "1.7rem" }}>
               Shop All Products
             </span>
             <span className="relative mt-1 block text-sm text-slate-300">
               Browse the full catalog in one place
-            </span>
-            <span className="relative mt-3 inline-block text-sm font-semibold text-gold transition-transform duration-300 group-hover:translate-x-1.5">
-              Explore →
+              <span className="ml-2 inline-block font-semibold text-gold transition-transform duration-300 group-hover:translate-x-1.5">
+                Explore →
+              </span>
             </span>
           </Link>
         </Reveal>

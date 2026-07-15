@@ -162,6 +162,74 @@ h2 {
   font-family: var(--font-playfair), Georgia, serif;
 }
 
+/* Typewriter caret for the hero headline */
+@keyframes caret-blink {
+  0%, 45% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Springier float for the hero product showcase */
+@keyframes float-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(var(--tilt, 0deg)) scale(1);
+  }
+  40% {
+    transform: translateY(-16px) rotate(var(--tilt, 0deg)) scale(1.015);
+  }
+  55% {
+    transform: translateY(-13px) rotate(var(--tilt, 0deg)) scale(1.01);
+  }
+}
+
+/* Pulsing lightning bolt on the flash-sale banner */
+@keyframes zap-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(224, 195, 117, 0.4));
+  }
+  50% {
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 10px rgba(224, 195, 117, 0.9));
+  }
+}
+
+/* Skeleton shimmer shown behind product images while they load */
+@keyframes image-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.img-shimmer {
+  background: linear-gradient(
+    100deg,
+    #17171d 40%,
+    #26262e 50%,
+    #17171d 60%
+  );
+  background-size: 200% 100%;
+  animation: image-shimmer 1.6s linear infinite;
+}
+
+/* Animated brand/gold glow that breathes while a product card is hovered */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.55), 0 8px 32px rgba(99, 102, 241, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.55), 0 8px 36px rgba(201, 168, 76, 0.28);
+  }
+}
+.card-glow:hover {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
 /* Slow drifting particles for the hero */
 @keyframes particle-drift {
   0%, 100% {

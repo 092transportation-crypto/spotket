@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Flame } from "lucide-react";
 import FeaturedCategories from "@/components/FeaturedCategories";
+import FlashSaleBanner from "@/components/FlashSaleBanner";
 import Marquee from "@/components/Marquee";
 import StaffPicks from "@/components/StaffPicks";
 import Hero from "@/components/Hero";
@@ -9,6 +10,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductRow from "@/components/ProductRow";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import Reveal from "@/components/Reveal";
+import SocialProof from "@/components/SocialProof";
 import TrustBar from "@/components/TrustBar";
 import WhySpotket from "@/components/WhySpotket";
 import { getCatalog } from "@/lib/catalog";
@@ -37,8 +39,11 @@ const STAFF_PICK_NAMES = [
   "cat paw mochi",
 ];
 
+/** The three products floating beside the hero headline. */
+const SHOWCASE_NAMES = ["eye massager", "moon lamp", "squishy"];
+
 export default async function HomePage() {
-  const [catalog, featuredReviews] = await Promise.all([getCatalog(), getFeaturedReviews(5)]);
+  const [catalog, featuredReviews] = await Promise.all([getCatalog(), getFeaturedReviews(8)]);
 
   // Real store stats for the hero — no invented numbers.
   const reviewTotal = catalog.reduce((sum, product) => sum + product.reviewCount, 0);
@@ -61,8 +66,17 @@ export default async function HomePage() {
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
   const staffPicks = [...picked, ...fallback].slice(0, 4);
   const newArrivals = getNewArrivals(catalog).slice(0, 8);
-  const showcase = trending
-    .filter((product) => product.image)
+  const heroPicks = SHOWCASE_NAMES.map((needle) =>
+    catalog.find(
+      (product) => product.image && product.name.toLowerCase().includes(needle),
+    ),
+  ).filter((product): product is NonNullable<typeof product> => product !== undefined);
+  const showcase = [
+    ...heroPicks,
+    ...trending.filter(
+      (product) => product.image && !heroPicks.some((pick) => pick.id === product.id),
+    ),
+  ]
     .slice(0, 3)
     .map(({ id, name, price, image }) => ({ id, name, price, image }));
 
@@ -72,6 +86,7 @@ export default async function HomePage() {
         products={showcase}
         stats={{ products: catalog.length, reviews: reviewTotal, rating: avgRating }}
       />
+      <FlashSaleBanner />
       <Marquee />
 
       {/* Trending Now */}
@@ -84,10 +99,12 @@ export default async function HomePage() {
         </Reveal>
         <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
           {trending.map((product, index) => (
-            <div key={product.id} className="w-56 shrink-0 snap-start sm:w-64">
+            <div key={product.id} className="w-64 shrink-0 snap-start sm:w-72">
               <ProductCard
                 product={product}
                 delay={index * 80}
+                tall
+                urgency
                 badge={
                   <span className="flex items-center gap-1 rounded-full bg-navy-950/85 px-2.5 py-1 text-xs font-bold text-gold backdrop-blur">
                     <Flame className="h-3 w-3" aria-hidden="true" />
@@ -104,13 +121,15 @@ export default async function HomePage() {
 
       <StaffPicks products={staffPicks} />
 
+      <SocialProof reviews={featuredReviews} shopperCount={reviewTotal} />
+
       <WhySpotket />
 
       {newArrivals.length > 0 && (
         <ProductRow title="New Arrivals" href="/new-arrivals" products={newArrivals} />
       )}
 
-      <ReviewsCarousel reviews={featuredReviews} />
+      <ReviewsCarousel reviews={featuredReviews.slice(0, 5)} />
 
       <Newsletter />
       <TrustBar />

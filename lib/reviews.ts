@@ -62,10 +62,17 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
   }));
 }
 
+export type FeaturedReview = {
+  author: string;
+  rating: number;
+  text: string;
+  productId: string;
+  productName: string;
+  productImage?: string;
+};
+
 /** Strong real reviews for the homepage carousel — 4-5 stars with substance. */
-export async function getFeaturedReviews(limit = 8): Promise<
-  { author: string; rating: number; text: string; productName: string }[]
-> {
+export async function getFeaturedReviews(limit = 8): Promise<FeaturedReview[]> {
   const admin = adminClient();
   if (!admin) return [];
   const [{ data: rows }, { data: products }] = await Promise.all([
@@ -75,9 +82,14 @@ export async function getFeaturedReviews(limit = 8): Promise<
       .gte("rating", 4)
       .order("created_at", { ascending: false })
       .limit(120),
-    admin.from("products").select("id, name"),
+    admin.from("products").select("id, name, image"),
   ]);
-  const names = new Map((products ?? []).map((product) => [product.id, product.name]));
+  const catalog = new Map(
+    (products ?? []).map((product) => [
+      product.id,
+      { name: product.name as string, image: (product.image as string | null) ?? undefined },
+    ]),
+  );
   const candidates = (rows ?? [])
     .map((row) => ({
       author: row.name,
@@ -85,7 +97,8 @@ export async function getFeaturedReviews(limit = 8): Promise<
       // Show just the review text — the source label is displayed separately.
       text: row.body.split("\n\n—")[0].trim(),
       productId: row.product_id,
-      productName: (names.get(row.product_id) ?? "").slice(0, 48),
+      productName: (catalog.get(row.product_id)?.name ?? "").slice(0, 48),
+      productImage: catalog.get(row.product_id)?.image,
     }))
     .filter((review) => review.text.length > 60 && review.text.length < 260 && review.productName);
   // One review per product so the carousel shows a spread of the catalog;
@@ -97,7 +110,5 @@ export async function getFeaturedReviews(limit = 8): Promise<
     return true;
   });
   const rest = candidates.filter((review) => !spread.includes(review));
-  return [...spread, ...rest]
-    .slice(0, limit)
-    .map(({ author, rating, text, productName }) => ({ author, rating, text, productName }));
+  return [...spread, ...rest].slice(0, limit);
 }

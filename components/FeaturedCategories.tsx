@@ -49,13 +49,13 @@ const cards = [
 
 export default function FeaturedCategories() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6" aria-labelledby="categories-heading">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-9" aria-labelledby="categories-heading">
       <Reveal>
         <h2 id="categories-heading" className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Shop by Category
         </h2>
       </Reveal>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
           <Reveal
             key={card.label}

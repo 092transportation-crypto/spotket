@@ -25,7 +25,7 @@ export default function ReviewsCarousel({ reviews }: { reviews: FeaturedReview[]
 
   return (
     <section
-      className="border-y border-navy-800 bg-navy-900/50 px-4 py-20 text-center sm:px-6"
+      className="border-y border-navy-800 bg-navy-900/50 px-4 py-12 text-center sm:px-6"
       aria-labelledby="reviews-heading"
       style={{
         backgroundImage: "radial-gradient(ellipse 60% 70% at 50% 0%, rgba(99,102,241,0.10), transparent 65%)",

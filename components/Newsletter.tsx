@@ -29,7 +29,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section id="newsletter" className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 sm:pb-20">
+    <section id="newsletter" className="mx-auto max-w-6xl px-4 pb-6 pt-8 sm:px-6 sm:pb-10 sm:pt-10">
       <div className="relative overflow-hidden rounded-3xl border border-navy-700/60 bg-gradient-to-br from-navy-800 to-navy-900 px-5 py-8 text-center sm:px-12 sm:py-12">
         <div
           className="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-brand/20 blur-3xl"

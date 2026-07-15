@@ -9,7 +9,7 @@ const items = [
 export default function TrustBar() {
   return (
     <section className="border-t border-navy-800 bg-navy-900/60" aria-label="Why shop with us">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-3 sm:px-6">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-3 sm:px-6">
         {items.map((item) => (
           <div key={item.label} className="flex items-center justify-center gap-3 text-center sm:text-left">
             <item.icon className="h-5 w-5 shrink-0 text-gold" aria-hidden="true" />

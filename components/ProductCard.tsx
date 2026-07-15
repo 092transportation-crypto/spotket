@@ -132,7 +132,7 @@ export default function ProductCard({
         </button>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className="flex flex-1 flex-col gap-2 p-5 sm:p-6">
         {urgency && (
           <p className="text-xs font-semibold text-brand-light">
             🔥 {viewers} people viewing this now
@@ -143,7 +143,7 @@ export default function ProductCard({
         )}
         <Link
           href={`/products/${product.id}`}
-          className="line-clamp-2 text-sm font-semibold text-white transition-colors hover:text-brand-light"
+          className="line-clamp-2 text-[15px] font-bold leading-snug text-white transition-colors hover:text-brand-light"
         >
           {product.name}
         </Link>
@@ -157,7 +157,7 @@ export default function ProductCard({
         )}
 
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-lg font-bold text-gold">
+          <p className="text-xl font-extrabold text-gold">
             {formatPrice(product.price)}
             {onSale && (
               <span className="ml-2 text-sm font-normal text-slate-500 line-through">

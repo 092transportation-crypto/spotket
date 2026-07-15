@@ -10,7 +10,7 @@ const features = [
 
 export default function WhySpotket() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6" aria-labelledby="why-heading">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-9" aria-labelledby="why-heading">
       <Reveal>
         <h2 id="why-heading" className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Why Spotket

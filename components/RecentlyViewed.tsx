@@ -57,7 +57,7 @@ export default function RecentlyViewed({
         Pick up where you left off — the products you&apos;ve looked at recently
         live here, saved on this device.
       </p>
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {viewed.slice(0, 4).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

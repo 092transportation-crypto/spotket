@@ -255,7 +255,7 @@ export default function ProductsBrowser({
         {/* Grid / empty state */}
         <div>
           {visibleProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
               {visibleProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

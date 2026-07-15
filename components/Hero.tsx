@@ -113,7 +113,7 @@ export default function Hero({
   stats: HeroStats;
 }) {
   return (
-    <section className="relative flex min-h-[100dvh] items-center overflow-hidden bg-navy-950">
+    <section className="relative flex min-h-[86dvh] items-center overflow-hidden bg-navy-950 lg:min-h-[94dvh]">
       {/* Glowing gradient blobs — the indigo/purple one sits behind the headline */}
       <div
         aria-hidden="true"
@@ -157,7 +157,7 @@ export default function Hero({
         ))}
       </div>
 
-      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_auto]">
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_auto] lg:py-16">
         <div>
           <p className="animate-fade-up text-sm font-semibold uppercase tracking-[0.4em] text-gold">
             Spotket · Premium Store
@@ -232,24 +232,26 @@ export default function Hero({
           </div>
         </div>
 
-        {/* Floating product showcase */}
-        <div className="relative hidden h-[560px] w-[420px] lg:block" aria-label="Featured products">
+        {/* Floating product showcase — fanned stack, center card leads */}
+        <div className="relative hidden h-[480px] w-[470px] lg:block" aria-label="Featured products">
           {products.slice(0, 3).map((product, index) => (
             <Link
               key={product.id}
               href={`/products/${product.id}`}
-              className="group absolute block overflow-hidden rounded-2xl border border-navy-700/70 bg-navy-900 shadow-2xl shadow-black/50 transition-shadow hover:border-brand/60 hover:shadow-brand/25"
+              className="group absolute block overflow-hidden rounded-2xl border border-navy-700/70 bg-navy-900 transition-all hover:z-30 hover:border-brand/60"
               style={{
-                width: index === 0 ? 280 : 250,
-                height: index === 0 ? 280 : 250,
-                left: [90, 0, 160][index],
-                top: [0, 200, 320][index],
-                zIndex: index === 0 ? 3 : index,
-                ["--tilt" as string]: `${[3, -4, 2][index]}deg`,
+                width: [270, 240, 240][index],
+                height: [270, 240, 240][index],
+                left: [110, 0, 225][index],
+                top: [30, 120, 150][index],
+                zIndex: [20, 10, 12][index],
+                boxShadow:
+                  "0 30px 60px rgba(0, 0, 0, 0.55), 0 0 45px rgba(99, 102, 241, 0.28)",
+                ["--tilt" as string]: `${[2, -9, 9][index]}deg`,
                 animation: `float-bounce ${5.5 + index * 1.2}s cubic-bezier(0.45, 0, 0.55, 1) ${index * 0.7}s infinite`,
               }}
             >
-              <ProductImage src={product.image} alt={product.name} sizes="280px" />
+              <ProductImage src={product.image} alt={product.name} sizes="270px" />
               <span className="absolute inset-x-0 bottom-0 translate-y-full bg-navy-950/90 px-4 py-3 backdrop-blur transition-transform duration-300 group-hover:translate-y-0">
                 <span className="line-clamp-1 block text-sm font-semibold text-white">
                   {product.name}

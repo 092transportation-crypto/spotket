@@ -22,7 +22,7 @@ export default function SocialProof({
 
   return (
     <section
-      className="border-y border-navy-800 bg-navy-900/40 px-4 py-16 sm:px-6"
+      className="border-y border-navy-800 bg-navy-900/40 px-4 py-10 sm:px-6"
       aria-labelledby="social-proof-heading"
       style={{
         backgroundImage:
@@ -42,7 +42,7 @@ export default function SocialProof({
           </p>
         </Reveal>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="mt-7 grid gap-4 md:grid-cols-3">
           {cards.map((review, index) => (
             <Reveal key={`${review.productId}-${review.author}`} delay={index * 120}>
               <article className="flex h-full flex-col rounded-3xl border border-navy-700/60 bg-navy-900 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40">

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Flame } from "lucide-react";
+import AsSeenOn from "@/components/AsSeenOn";
+import CustomerPhotos from "@/components/CustomerPhotos";
 import FeaturedCategories from "@/components/FeaturedCategories";
+import FeaturedCollection from "@/components/FeaturedCollection";
 import FlashSaleBanner from "@/components/FlashSaleBanner";
+import GoldDivider from "@/components/GoldDivider";
 import Marquee from "@/components/Marquee";
 import StaffPicks from "@/components/StaffPicks";
 import Hero from "@/components/Hero";
@@ -14,7 +18,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustBar from "@/components/TrustBar";
 import WhySpotket from "@/components/WhySpotket";
 import { getCatalog } from "@/lib/catalog";
-import { getNewArrivals, promotedRank } from "@/lib/products";
+import { promotedRank } from "@/lib/products";
 import { getFeaturedReviews } from "@/lib/reviews";
 
 // Revalidate once a minute: catalog changes appear quickly while the page
@@ -65,7 +69,18 @@ export default async function HomePage() {
     )
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
   const staffPicks = [...picked, ...fallback].slice(0, 4);
-  const newArrivals = getNewArrivals(catalog).slice(0, 8);
+  // Proven favorites: most-reviewed products, best-rated first among ties.
+  const bestSellers = [...catalog]
+    .filter((product) => product.reviewCount > 0)
+    .sort((a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating)
+    .slice(0, 8);
+  // Latest additions — catalog arrives ordered by created_at ascending.
+  const recentlyAdded = [...catalog].reverse().slice(0, 10);
+  const nightGlow = ["moon lamp", "crystal ball"]
+    .map((needle) =>
+      catalog.find((product) => product.name.toLowerCase().includes(needle)),
+    )
+    .filter((product): product is NonNullable<typeof product> => product !== undefined);
   const heroPicks = SHOWCASE_NAMES.map((needle) =>
     catalog.find(
       (product) => product.image && product.name.toLowerCase().includes(needle),
@@ -90,14 +105,14 @@ export default async function HomePage() {
       <Marquee />
 
       {/* Trending Now */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6" aria-labelledby="trending-heading">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-9" aria-labelledby="trending-heading">
         <Reveal>
           <h2 id="trending-heading" className="flex items-center gap-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             <Flame className="h-7 w-7 text-gold" aria-hidden="true" />
             Trending Now
           </h2>
         </Reveal>
-        <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+        <div className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3">
           {trending.map((product, index) => (
             <div key={product.id} className="w-64 shrink-0 snap-start sm:w-72">
               <ProductCard
@@ -117,19 +132,43 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <GoldDivider />
+
       <FeaturedCategories />
+
+      <GoldDivider />
+
+      <ProductRow
+        title="Best Sellers"
+        subtitle="The most-loved products in the store, ranked by real reviews."
+        href="/best-sellers"
+        products={bestSellers}
+        limit={8}
+      />
+
+      <FeaturedCollection products={nightGlow} category="Home & Garden" />
 
       <StaffPicks products={staffPicks} />
 
+      <GoldDivider />
+
+      <ProductRow
+        title="Recently Added"
+        subtitle="Fresh finds, straight from this week's drops."
+        href="/new-arrivals"
+        products={recentlyAdded}
+        scroll
+      />
+
       <SocialProof reviews={featuredReviews} shopperCount={reviewTotal} />
+
+      <CustomerPhotos />
+
+      <ReviewsCarousel reviews={featuredReviews.slice(0, 5)} />
 
       <WhySpotket />
 
-      {newArrivals.length > 0 && (
-        <ProductRow title="New Arrivals" href="/new-arrivals" products={newArrivals} />
-      )}
-
-      <ReviewsCarousel reviews={featuredReviews.slice(0, 5)} />
+      <AsSeenOn />
 
       <Newsletter />
       <TrustBar />

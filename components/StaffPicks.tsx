@@ -7,7 +7,7 @@ import type { Product } from "@/lib/products";
 export default function StaffPicks({ products }: { products: Product[] }) {
   if (products.length === 0) return null;
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6" aria-labelledby="picks-heading">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-9" aria-labelledby="picks-heading">
       <Reveal>
         <h2 id="picks-heading" className="flex items-center gap-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
           <Award className="h-7 w-7 text-gold" aria-hidden="true" />
@@ -17,7 +17,7 @@ export default function StaffPicks({ products }: { products: Product[] }) {
           The products our team keeps coming back to.
         </p>
       </Reveal>
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {products.slice(0, 4).map((product, index) => (
           <ProductCard
             key={product.id}

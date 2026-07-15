@@ -11,6 +11,8 @@ type ProductRowProps = {
   emptyNote?: string;
   /** Horizontal snap-scroll strip instead of a grid (shows every product). */
   scroll?: boolean;
+  /** Products shown in grid mode (grid stays 4 columns wide). */
+  limit?: number;
 };
 
 export default function ProductRow({
@@ -20,11 +22,12 @@ export default function ProductRow({
   products,
   emptyNote,
   scroll = false,
+  limit = 4,
 }: ProductRowProps) {
   if (products.length === 0 && !emptyNote) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-12">
+    <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
       <div className="flex items-end justify-between gap-4">
         <div>
           <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{title}</h2>
@@ -44,16 +47,16 @@ export default function ProductRow({
 
       {products.length > 0 ? (
         scroll ? (
-          <div className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+          <div className="mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3">
             {products.map((product) => (
-              <div key={product.id} className="w-56 shrink-0 snap-start sm:w-64">
+              <div key={product.id} className="w-60 shrink-0 snap-start sm:w-68">
                 <ProductCard product={product} />
               </div>
             ))}
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-            {products.slice(0, 4).map((product, index) => (
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {products.slice(0, limit).map((product, index) => (
               <ProductCard key={product.id} product={product} delay={index * 90} />
             ))}
           </div>

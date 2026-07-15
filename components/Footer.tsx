@@ -15,17 +15,14 @@ const columns = [
     links: [
       { href: "/about", label: "About Spotket" },
       { href: "/trending", label: "What's Trending" },
-      { href: "/about", label: "Careers" },
-      { href: "/about", label: "Press" },
       { href: "/blog", label: "Blog" },
     ],
   },
   {
-    title: "Make Money with Us",
+    title: "Work with Us",
     links: [
-      { href: "/contact", label: "Sell on Spotket" },
-      { href: "/contact", label: "Affiliate Program" },
-      { href: "/contact", label: "Advertise Your Products" },
+      { href: "/contact", label: "Partner with Us" },
+      { href: "/contact", label: "Refer a Friend" },
       { href: "/contact", label: "Become a Supplier" },
     ],
   },

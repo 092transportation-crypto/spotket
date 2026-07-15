@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import { getProductsByIds, type Product } from "@/lib/products";
@@ -21,7 +20,14 @@ export function trackProductView(id: string) {
   }
 }
 
-export default function RecentlyViewed({ products }: { products: Product[] }) {
+export default function RecentlyViewed({
+  products,
+  excludeId,
+}: {
+  products: Product[];
+  /** Product to leave out — e.g. the one whose page the section sits on. */
+  excludeId?: string;
+}) {
   const [viewed, setViewed] = useState<Product[] | null>(null);
 
   // Read after mount — localStorage is client-only.
@@ -33,8 +39,14 @@ export default function RecentlyViewed({ products }: { products: Product[] }) {
       // Corrupt storage — treat as no history.
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setViewed(getProductsByIds(ids, products));
-  }, []);
+    setViewed(
+      getProductsByIds(ids, products).filter((product) => product.id !== excludeId),
+    );
+  }, [products, excludeId]);
+
+  // Nothing viewed yet (or still reading storage) — render nothing rather
+  // than an empty shell.
+  if (!viewed || viewed.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-12" aria-labelledby="recently-viewed-heading">
@@ -45,27 +57,11 @@ export default function RecentlyViewed({ products }: { products: Product[] }) {
         Pick up where you left off — the products you&apos;ve looked at recently
         live here, saved on this device.
       </p>
-
-      {viewed && viewed.length > 0 ? (
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {viewed.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-dashed border-navy-600 bg-navy-900/40 px-6 py-8 text-center sm:flex-row sm:text-left">
-          <p className="text-sm text-slate-400">
-            Nothing here yet. Start browsing and we&apos;ll keep your recently
-            viewed products one click away.
-          </p>
-          <Link
-            href="/products"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand px-6 text-sm font-semibold text-white transition-all hover:bg-brand-dark active:scale-95"
-          >
-            Start Browsing
-          </Link>
-        </div>
-      )}
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        {viewed.slice(0, 4).map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
     </section>
   );
 }

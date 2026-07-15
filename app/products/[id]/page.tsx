@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductDetail from "@/components/ProductDetail";
 import ProductRow from "@/components/ProductRow";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import { getCatalog } from "@/lib/catalog";
 import { getProduct, getRelated } from "@/lib/products";
 import { getProductReviews } from "@/lib/reviews";
@@ -33,7 +34,8 @@ export default async function ProductPage({ params }: Props) {
   const product = getProduct(id, catalog);
   if (!product) notFound();
 
-  const related = getRelated(product, catalog);
+  // Same-category picks first (getRelated already orders them that way).
+  const related = getRelated(product, catalog, 3);
   // Customer reviews from the database lead (newest first); any legacy
   // reviews stored on the product row follow.
   const dbReviews = await getProductReviews(product.id);
@@ -42,7 +44,8 @@ export default async function ProductPage({ params }: Props) {
   return (
     <>
       <ProductDetail product={merged} />
-      <ProductRow title="Customers also bought" products={related} scroll />
+      <ProductRow title="You might also like" products={related} scroll />
+      <RecentlyViewed products={catalog} excludeId={product.id} />
     </>
   );
 }

@@ -78,14 +78,26 @@ export async function getFeaturedReviews(limit = 8): Promise<
     admin.from("products").select("id, name"),
   ]);
   const names = new Map((products ?? []).map((product) => [product.id, product.name]));
-  return (rows ?? [])
+  const candidates = (rows ?? [])
     .map((row) => ({
       author: row.name,
       rating: row.rating,
       // Show just the review text — the source label is displayed separately.
       text: row.body.split("\n\n—")[0].trim(),
+      productId: row.product_id,
       productName: (names.get(row.product_id) ?? "").slice(0, 48),
     }))
-    .filter((review) => review.text.length > 60 && review.text.length < 260 && review.productName)
-    .slice(0, limit);
+    .filter((review) => review.text.length > 60 && review.text.length < 260 && review.productName);
+  // One review per product so the carousel shows a spread of the catalog;
+  // topped up with remaining strong reviews if that leaves slots open.
+  const seen = new Set<string>();
+  const spread = candidates.filter((review) => {
+    if (seen.has(review.productId)) return false;
+    seen.add(review.productId);
+    return true;
+  });
+  const rest = candidates.filter((review) => !spread.includes(review));
+  return [...spread, ...rest]
+    .slice(0, limit)
+    .map(({ author, rating, text, productName }) => ({ author, rating, text, productName }));
 }

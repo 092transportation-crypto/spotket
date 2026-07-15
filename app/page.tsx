@@ -25,8 +25,20 @@ export const metadata: Metadata = {
     "Shop smarter with Spotket. Premium products with free shipping over $35, 30-day returns, and secure checkout.",
 };
 
+/**
+ * Hand-picked Staff Picks, one per major category, matched by name because
+ * catalog ids are per-database uuids. Falls back to top-rated products if a
+ * pick ever leaves the catalog.
+ */
+const STAFF_PICK_NAMES = [
+  "eye massager",
+  "moon lamp",
+  "gaming mouse pad",
+  "cat paw mochi",
+];
+
 export default async function HomePage() {
-  const [catalog, featuredReviews] = await Promise.all([getCatalog(), getFeaturedReviews()]);
+  const [catalog, featuredReviews] = await Promise.all([getCatalog(), getFeaturedReviews(5)]);
 
   // Real store stats for the hero — no invented numbers.
   const reviewTotal = catalog.reduce((sum, product) => sum + product.reviewCount, 0);
@@ -38,10 +50,16 @@ export default async function HomePage() {
   const trending = [...catalog]
     .sort((a, b) => promotedRank(a) - promotedRank(b) || b.reviewCount - a.reviewCount)
     .slice(0, 8);
-  const staffPicks = [...catalog]
-    .filter((product) => product.reviewCount >= 10)
-    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
-    .slice(0, 4);
+  const picked = STAFF_PICK_NAMES.map((needle) =>
+    catalog.find((product) => product.name.toLowerCase().includes(needle)),
+  ).filter((product): product is NonNullable<typeof product> => product !== undefined);
+  const fallback = [...catalog]
+    .filter(
+      (product) =>
+        product.reviewCount >= 10 && !picked.some((pick) => pick.id === product.id),
+    )
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
+  const staffPicks = [...picked, ...fallback].slice(0, 4);
   const newArrivals = getNewArrivals(catalog).slice(0, 8);
   const showcase = trending
     .filter((product) => product.image)

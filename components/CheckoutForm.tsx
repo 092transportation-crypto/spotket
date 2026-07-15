@@ -91,6 +91,12 @@ function OrderSummary({ items, totals }: { items: CartItem[]; totals: Totals | n
             <dt className="text-slate-400">Subtotal</dt>
             <dd className="font-medium text-white">{formatPrice(totals.subtotal)}</dd>
           </div>
+          {totals.discount > 0 && (
+            <div className="flex justify-between">
+              <dt className="text-slate-400">Discount</dt>
+              <dd className="font-medium text-brand">-{formatPrice(totals.discount)}</dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt className="text-slate-400">Shipping</dt>
             <dd className={`font-medium ${totals.shipping === 0 ? "text-brand" : "text-white"}`}>

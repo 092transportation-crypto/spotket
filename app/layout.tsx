@@ -4,6 +4,9 @@ import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { FloatingCta } from "@/components/floating-cta";
+import { ChatWidget } from "@/components/chat-widget";
+import { LeadPopup } from "@/components/lead-popup";
+import { ExitIntentPopup } from "@/components/exit-intent-popup";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 const inter = Inter({
@@ -51,6 +54,9 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <FloatingCta />
+        <ChatWidget />
+        <LeadPopup />
+        <ExitIntentPopup />
       </body>
     </html>
   );

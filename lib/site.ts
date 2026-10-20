@@ -30,12 +30,14 @@ export const PRICING_TIERS = [
   {
     name: "Standard",
     price: 500,
-    description: "The full automation suite — our most popular plan.",
+    description: "The full automation suite plus a website — our most popular plan.",
     features: [
       "Everything in Starter",
+      "Custom-built, mobile-optimized website included",
       "Booking automation across text, chat, and email",
       "Automatic review requests after every service",
       "Lead routing to the right person on your team",
+      "Ongoing website edits and improvements",
       "Priority support",
     ],
     featured: true,
@@ -43,12 +45,13 @@ export const PRICING_TIERS = [
   {
     name: "Premium",
     price: 1000,
-    description: "A full AI system plus a custom website built to convert.",
+    description: "The full growth stack — SEO, deeper automation, and a dedicated strategist.",
     features: [
       "Everything in Standard",
-      "Custom-built, mobile-optimized website",
-      "Ongoing website edits and improvements",
-      "Advanced automation (reminders, follow-ups, re-engagement)",
+      "Ongoing SEO management (keyword, content & technical)",
+      "Automated invoice & payment reminders",
+      "Advanced lead scoring and re-engagement automation",
+      "Priority development queue for new requests",
       "Dedicated monthly strategy call",
     ],
     featured: false,

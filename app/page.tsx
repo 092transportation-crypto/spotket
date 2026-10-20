@@ -4,7 +4,7 @@ import { CountUp } from "@/components/count-up";
 import { LetterFadeHeading } from "@/components/letter-fade-heading";
 import { Reveal } from "@/components/reveal";
 import { TrustBadges } from "@/components/trust-badges";
-import { HERO_IMAGE, SERVICES, STATS } from "@/lib/site";
+import { HERO_IMAGE, PRICING_TIERS, STATS } from "@/lib/site";
 
 const STEPS = [
   { title: "We audit your current system", description: "We look at how customers reach you today and where inquiries fall through the cracks." },
@@ -34,7 +34,7 @@ export default function HomePage() {
               className="animate-fade-up mt-4 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand-light"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-brand-light" />
-              Starting at $200/month
+              Starting at $300/month
             </p>
             <LetterFadeHeading
               text="We Automate Your Business So You Can Focus On Growth"
@@ -110,39 +110,40 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <Reveal className="text-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
-              What We Do
+              Plans
             </p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Everything your business needs to stop losing customers
+              Three plans. No long-term contracts.
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {SERVICES.map((service, i) => (
-              <Reveal key={service.name} delay={i * 80}>
-                <div className="card-glow group h-full overflow-hidden rounded-2xl border border-white/10 bg-navy-900/60 transition-transform duration-300 hover:-translate-y-1.5">
-                  <div className="relative aspect-video overflow-hidden">
-                    <Image
-                      src={service.image.src}
-                      alt={service.image.alt}
-                      fill
-                      loading="lazy"
-                      sizes="(max-width: 640px) 100vw, 50vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/10 to-transparent" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-white">
-                      {service.name}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-                      {service.description}
-                    </p>
-                    <span className="mt-3 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-brand-light">
-                      {service.price}
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {PRICING_TIERS.map((tier, i) => (
+              <Reveal key={tier.name} delay={i * 80}>
+                <div
+                  className={`flex h-full flex-col rounded-2xl border p-6 ${
+                    tier.featured
+                      ? "border-brand/50 bg-gradient-to-b from-brand/15 via-navy-900 to-navy-900"
+                      : "border-white/10 bg-navy-900/60"
+                  }`}
+                >
+                  {tier.featured && (
+                    <span className="mb-3 inline-flex w-fit items-center rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand-light">
+                      Most Popular
                     </span>
-                  </div>
+                  )}
+                  <h3 className="text-lg font-semibold text-white">
+                    {tier.name}
+                  </h3>
+                  <p className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-bold text-white">
+                      ${tier.price}
+                    </span>
+                    <span className="text-sm text-neutral-400">/month</span>
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+                    {tier.description}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -153,7 +154,7 @@ export default function HomePage() {
               href="/services"
               className="text-sm font-semibold text-brand-light transition-colors hover:text-white"
             >
-              See all services &rarr;
+              See full plan details &rarr;
             </Link>
           </div>
         </div>

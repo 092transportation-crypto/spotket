@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import { ContactForm } from "@/components/contact-form";
 import { Reveal } from "@/components/reveal";
 import { CONTACT_EMAIL, CONTACT_IMAGE } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Book a free 10 minute call with Spotket Digital and see what AI automation could do for your business.",
-};
+export const metadata = pageMetadata(
+  "/contact",
+  "Contact",
+  "Book a free automation audit with Spotket Digital — AI automation for small business, including AI chatbots and AI receptionists that get you more bookings.",
+);
 
 export default function ContactPage() {
   return (

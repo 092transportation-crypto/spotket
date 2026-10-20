@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: `${SITE_NAME}'s privacy policy — what information we collect, how we use it, and your rights.`,
-};
+export const metadata = pageMetadata(
+  "/privacy-policy",
+  "Privacy Policy",
+  `${SITE_NAME}'s privacy policy — what information we collect, how we use it, and your rights.`,
+);
 
 export default function PrivacyPolicyPage() {
   return (

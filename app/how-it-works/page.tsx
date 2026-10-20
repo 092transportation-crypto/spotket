@@ -1,17 +1,35 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
+import { StepIcon } from "@/components/icons";
 import { HOW_IT_WORKS_STEPS, WHAT_YOU_GET } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "How It Works",
-  description:
-    "Our four-step process: Free Audit, Custom Build, Go Live, and Ongoing Support — your AI automation is live within 48 hours.",
+export const metadata = pageMetadata(
+  "/how-it-works",
+  "How It Works",
+  "Our four-step process to get more bookings with AI: Free Audit, Custom Build, Go Live, and Ongoing Support — live within 48 hours.",
+);
+
+const howItWorksFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: HOW_IT_WORKS_STEPS.flatMap((step) =>
+    step.faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  ),
 };
 
 export default function HowItWorksPage() {
   return (
     <div className="px-4 py-20 sm:px-6 sm:py-28">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howItWorksFaqSchema) }}
+      />
+
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
           How It Works
@@ -30,7 +48,10 @@ export default function HowItWorksPage() {
               <span className="z-10 flex h-12 w-12 items-center justify-center rounded-full border border-brand/40 bg-navy-900 text-base font-bold text-brand-light">
                 {i + 1}
               </span>
-              <p className="mt-4 text-sm font-semibold text-white">
+              <div className="mt-3">
+                <StepIcon icon={step.icon} />
+              </div>
+              <p className="mt-3 text-sm font-semibold text-white">
                 {step.title}
               </p>
               <p className="mt-1 text-xs text-neutral-500">{step.summary}</p>
@@ -52,9 +73,12 @@ export default function HowItWorksPage() {
                 )}
               </div>
               <div className="pb-2">
-                <h2 className="text-lg font-semibold text-white">
-                  {step.title}
-                </h2>
+                <div className="flex items-center gap-3">
+                  <StepIcon icon={step.icon} />
+                  <h2 className="text-lg font-semibold text-white">
+                    {step.title}
+                  </h2>
+                </div>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-400">
                   {step.description}
                 </p>
@@ -65,9 +89,9 @@ export default function HowItWorksPage() {
                       key={item.question}
                       className="rounded-xl border border-white/10 bg-navy-900/60 p-4"
                     >
-                      <p className="text-sm font-semibold text-white">
+                      <h3 className="text-sm font-semibold text-white">
                         {item.question}
-                      </p>
+                      </h3>
                       <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">
                         {item.answer}
                       </p>

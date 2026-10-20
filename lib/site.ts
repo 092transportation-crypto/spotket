@@ -3,7 +3,7 @@ export const SITE_URL =
 
 export const SITE_NAME = "Spotket Digital";
 export const SITE_TAGLINE =
-  "AI automation and web design for small businesses that don't want to miss another customer.";
+  "AI automation for small business — AI chatbots, AI receptionists, and automated review requests that get you more bookings, 24/7.";
 export const CONTACT_EMAIL = "hello@spotket.com";
 
 export const NAV_LINKS = [
@@ -250,6 +250,7 @@ export const RESULTS_COMPARISON = [
 export const HOW_IT_WORKS_STEPS = [
   {
     title: "Free Audit",
+    icon: "audit",
     summary: "We analyze your current setup.",
     description:
       "We review how customers reach your business today — your website, phone line, texts, and socials — and find exactly where inquiries get missed, delayed, or lost. No cost, no obligation.",
@@ -268,6 +269,7 @@ export const HOW_IT_WORKS_STEPS = [
   },
   {
     title: "Custom Build",
+    icon: "build",
     summary: "We build everything in 48 hours.",
     description:
       "We set up your AI chatbot, booking automation, and website, tuned to how your business actually runs. No generic templates — it's built around your services, hours, and pricing.",
@@ -285,6 +287,7 @@ export const HOW_IT_WORKS_STEPS = [
   },
   {
     title: "Go Live",
+    icon: "launch",
     summary: "Your AI system starts working immediately.",
     description:
       "Your AI chatbot, booking alerts, and review automation go live and start working the moment they're switched on — answering inquiries and notifying your team around the clock.",
@@ -303,6 +306,7 @@ export const HOW_IT_WORKS_STEPS = [
   },
   {
     title: "Ongoing Support",
+    icon: "support",
     summary: "We monitor and improve every month.",
     description:
       "We monitor performance every month, make improvements, and keep your system tuned as your business grows — so it keeps getting better, not stale.",
@@ -343,6 +347,19 @@ export const CONTACT_IMAGE = {
   src: "https://images.unsplash.com/photo-1572021335469-31706a17aaef?q=75&w=1200&auto=format&fit=crop",
   alt: "A small business team smiling and collaborating around a laptop in a modern office",
 };
+
+export const OFFICE_HERO_IMAGE = {
+  src: "https://images.unsplash.com/photo-1556761175-4b46a572b786?q=75&w=2000&auto=format&fit=crop",
+  alt: "A modern tech workspace with a team working at monitors",
+};
+
+export const BUSINESS_PHOTO = {
+  src: "https://images.unsplash.com/photo-1714624257449-b5495d1b8278?q=75&w=1400&auto=format&fit=crop",
+  alt: "A black chauffeur car driving down a city street",
+};
+
+export const MISSED_INQUIRIES_STAT =
+  "The average small business misses 40% of inquiries — we fix that.";
 
 export const STATS = [
   { value: 24, suffix: "/7", label: "AI Response" },

@@ -1,19 +1,34 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { TierIcon } from "@/components/icons";
-import { FEATURE_HIGHLIGHTS, PRICING_TIERS, SERVICES_FAQ } from "@/lib/site";
+import { CONTACT_IMAGE, FEATURE_HIGHLIGHTS, PRICING_TIERS, SERVICES_FAQ } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description:
-    "Four simple plans for AI automation and web design — Starter at $300/month, Standard at $500/month, Premium at $1,000/month, AI Receptionist at $200/month.",
+export const metadata = pageMetadata(
+  "/services",
+  "Services",
+  "AI automation for small business and AI chatbots for limo companies — AI receptionist, booking automation, and automated review requests. Plans from $200/month.",
+);
+
+const servicesFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: SERVICES_FAQ.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: { "@type": "Answer", text: item.answer },
+  })),
 };
 
 export default function ServicesPage() {
   return (
     <div className="px-4 py-20 sm:px-6 sm:py-28">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesFaqSchema) }}
+      />
+
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
           Services
@@ -26,6 +41,20 @@ export default function ServicesPage() {
           Cancel any time.
         </p>
       </div>
+
+      <Reveal className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-3xl border border-white/10">
+        <div className="relative aspect-[21/9]">
+          <Image
+            src={CONTACT_IMAGE.src}
+            alt={CONTACT_IMAGE.alt}
+            fill
+            loading="lazy"
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-navy-950/10 to-transparent" />
+        </div>
+      </Reveal>
 
       <div className="mx-auto mt-16 max-w-6xl">
         <Reveal className="text-center">
@@ -91,9 +120,9 @@ export default function ServicesPage() {
                   Most Popular
                 </span>
               )}
-              <h2 className="mt-4 text-lg font-semibold text-white">
+              <h3 className="mt-4 text-lg font-semibold text-white">
                 {tier.name}
-              </h2>
+              </h3>
               <p className="mt-3 flex items-baseline gap-1">
                 <span className="text-4xl font-bold text-white">
                   ${tier.price}

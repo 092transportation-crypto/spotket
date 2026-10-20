@@ -1,19 +1,21 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
+import { InitialsAvatar } from "@/components/icons";
 import {
+  BUSINESS_PHOTO,
   CASE_STUDIES,
   RESULTS_COMPARISON,
   RESULTS_IMAGE,
   RESULTS_STATS,
 } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Results",
-  description:
-    "Real automation results for 92 Transportation, DCA Limos, BWI Chauffeur, IAD Airport Limo, and MSY Limo Service — zero missed inquiries, 24/7 AI coverage.",
-};
+export const metadata = pageMetadata(
+  "/results",
+  "Results",
+  "See how AI automation gets small businesses more bookings — real results for 92 Transportation, DCA Limos, BWI Chauffeur, IAD Airport Limo, and MSY Limo Service.",
+);
 
 const BEFORE = [
   "Inquiries came in after hours and sat unanswered until morning",
@@ -85,6 +87,25 @@ export default function ResultsPage() {
             booking automation, every lead gets an instant response and an
             immediate alert to staff, day or night.
           </p>
+          <div className="mt-5 flex items-center justify-center gap-3">
+            <InitialsAvatar name="92 Transportation" />
+            <span className="text-sm text-neutral-400">
+              Owner, 92 Transportation
+            </span>
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-2xl border border-white/10">
+        <div className="relative aspect-[21/9]">
+          <Image
+            src={BUSINESS_PHOTO.src}
+            alt={BUSINESS_PHOTO.alt}
+            fill
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+          />
         </div>
       </Reveal>
 
@@ -175,8 +196,11 @@ export default function ResultsPage() {
 
               <blockquote className="mt-5 flex-1 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-neutral-300 italic">
                 &ldquo;{study.quote}&rdquo;
-                <footer className="mt-2 text-xs font-semibold not-italic text-neutral-500">
-                  &mdash; {study.quoteAttribution}
+                <footer className="mt-3 flex items-center gap-2.5 not-italic">
+                  <InitialsAvatar name={study.business} />
+                  <span className="text-xs font-semibold text-neutral-500">
+                    {study.quoteAttribution}
+                  </span>
                 </footer>
               </blockquote>
             </div>

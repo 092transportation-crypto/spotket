@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Refund Policy",
-  description: `${SITE_NAME}'s refund policy — all sales are final, and you can cancel anytime for future months.`,
-};
+export const metadata = pageMetadata(
+  "/refund-policy",
+  "Refund Policy",
+  `${SITE_NAME}'s refund policy — all sales are final, and you can cancel anytime for future months.`,
+);
 
 export default function RefundPolicyPage() {
   return (

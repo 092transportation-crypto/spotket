@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: `The terms governing your use of ${SITE_NAME}'s website and services.`,
-};
+export const metadata = pageMetadata(
+  "/terms-of-service",
+  "Terms of Service",
+  `The terms governing your use of ${SITE_NAME}'s website and services.`,
+);
 
 export default function TermsOfServicePage() {
   return (

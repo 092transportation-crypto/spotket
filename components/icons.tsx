@@ -81,11 +81,74 @@ function HeadsetIcon() {
   );
 }
 
+function MagnifierIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6"
+    >
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M15.3 15.3 21 21" />
+      <path d="M10.5 7.8v5.4" />
+      <path d="M7.8 10.5h5.4" />
+    </svg>
+  );
+}
+
+function WrenchIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6"
+    >
+      <path d="M14.7 6.3a4 4 0 0 0-5.4 4.9L3 17.5V21h3.5l6.3-6.3a4 4 0 0 0 4.9-5.4l-3 3-2.4-2.4z" />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6"
+    >
+      <path d="M4 20V10" />
+      <path d="M10 20V4" />
+      <path d="M16 20v-7" />
+      <path d="M22 20H2" />
+    </svg>
+  );
+}
+
+export type StepIconName = "audit" | "build" | "launch" | "support";
+
 const TIER_ICONS: Record<TierIconName, () => ReactElement> = {
   chatbot: ChatbotIcon,
   rocket: RocketIcon,
   crown: CrownIcon,
   phone: HeadsetIcon,
+};
+
+const STEP_ICONS: Record<StepIconName, () => ReactElement> = {
+  audit: MagnifierIcon,
+  build: WrenchIcon,
+  launch: RocketIcon,
+  support: ChartIcon,
 };
 
 export function TierIcon({
@@ -105,6 +168,30 @@ export function TierIcon({
       }`}
     >
       <Icon />
+    </span>
+  );
+}
+
+export function StepIcon({ icon }: { icon: StepIconName }) {
+  const Icon = STEP_ICONS[icon];
+  return (
+    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-brand-light">
+      <Icon />
+    </span>
+  );
+}
+
+export function InitialsAvatar({ name }: { name: string }) {
+  const initials = name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  return (
+    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand/40 bg-brand/15 text-sm font-bold text-brand-light">
+      {initials}
     </span>
   );
 }

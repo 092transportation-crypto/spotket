@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { listBlogPosts } from "@/lib/supabase";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description: "AI automation, marketing, and growth tips for small businesses from Spotket.",
-};
+export const metadata = pageMetadata(
+  "/blog",
+  "Blog",
+  "AI automation for small business, AI receptionists, automated review requests, and tips to get more bookings with AI — from Spotket Digital.",
+);
 
 export default async function BlogIndexPage() {
   const posts = await listBlogPosts();

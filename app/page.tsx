@@ -4,51 +4,97 @@ import { CountUp } from "@/components/count-up";
 import { LetterFadeHeading } from "@/components/letter-fade-heading";
 import { Reveal } from "@/components/reveal";
 import { TrustBadges } from "@/components/trust-badges";
-import { TierIcon } from "@/components/icons";
-import { HERO_IMAGE, PRICING_TIERS, STATS } from "@/lib/site";
+import { TierIcon, StepIcon, InitialsAvatar } from "@/components/icons";
+import {
+  CONTACT_EMAIL,
+  HERO_IMAGE,
+  HOW_IT_WORKS_STEPS,
+  MISSED_INQUIRIES_STAT,
+  OFFICE_HERO_IMAGE,
+  PRICING_TIERS,
+  RESULTS_IMAGE,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+  STATS,
+} from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-const STEPS = [
-  { title: "Free Audit", description: "We look at how customers reach you today and where inquiries fall through the cracks." },
-  { title: "Custom Build", description: "Chatbot, booking automation, and website built around your business in 48 hours." },
-  { title: "Go Live", description: "Your AI system starts answering inquiries and booking customers immediately." },
-  { title: "Ongoing Support", description: "We monitor performance and keep improving your system every month." },
-] as const;
+export const metadata = pageMetadata(
+  "/",
+  `${SITE_NAME} — AI Automation for Small Business`,
+  SITE_TAGLINE,
+);
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: SITE_NAME,
+  description: SITE_TAGLINE,
+  url: SITE_URL,
+  email: CONTACT_EMAIL,
+  image: `${SITE_URL}/spotket-logo.png`,
+  areaServed: { "@type": "State", name: "Maryland" },
+  priceRange: "$200-$1000",
+};
 
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+
       <section className="relative overflow-hidden px-4 pt-20 pb-20 sm:px-6 sm:pt-28 sm:pb-28">
+        <div className="absolute inset-0 -z-20">
+          <Image
+            src={OFFICE_HERO_IMAGE.src}
+            alt={OFFICE_HERO_IMAGE.alt}
+            fill
+            loading="eager"
+            fetchPriority="high"
+            sizes="100vw"
+            className="object-cover opacity-25"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy-950/70 via-navy-950/90 to-navy-950" />
+        </div>
         <div
           aria-hidden
-          className="blob-pulse absolute -top-32 -left-32 h-80 w-80 rounded-full bg-brand/30 blur-3xl"
+          className="blob-pulse absolute -top-32 -left-32 -z-10 h-80 w-80 rounded-full bg-brand/30 blur-3xl"
         />
         <div
           aria-hidden
-          className="blob-pulse-delay absolute top-10 -right-24 h-80 w-80 rounded-full bg-accent/25 blur-3xl"
+          className="blob-pulse-delay absolute top-10 -right-24 -z-10 h-80 w-80 rounded-full bg-accent/25 blur-3xl"
         />
 
         <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div className="text-center lg:text-left">
             <p className="animate-fade-up text-xs font-semibold uppercase tracking-widest text-brand-light">
-              AI Automation &amp; Web Design
+              AI Automation for Small Business
             </p>
             <p
               className="animate-fade-up mt-4 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand-light"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-brand-light" />
-              Starting at $300/month
+              Starting at $200/month
             </p>
             <LetterFadeHeading
-              text="We Automate Your Business So You Can Focus On Growth"
+              text="Stop Missing Inquiries. Start Getting More Customers."
               className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-5xl xl:text-6xl"
             />
             <p
               className="animate-fade-up mx-auto mt-6 max-w-xl text-base leading-relaxed text-neutral-400 sm:text-lg lg:mx-0"
               style={{ animationDelay: "0.5s" }}
             >
-              Inbox management, meetings, data entry, invoicing, content, and
-              lead follow-up — handled by AI, so nothing falls through the
-              cracks.
+              We build AI systems that respond to every customer 24/7 so you
+              never lose another booking.
+            </p>
+            <p
+              className="animate-fade-up mx-auto mt-4 max-w-xl text-sm font-semibold text-brand-light sm:text-base lg:mx-0"
+              style={{ animationDelay: "0.55s" }}
+            >
+              {MISSED_INQUIRIES_STAT}
             </p>
             <div
               className="animate-fade-up mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
@@ -115,7 +161,7 @@ export default function HomePage() {
               Plans
             </p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Three plans. No long-term contracts.
+              Four plans. No long-term contracts.
             </h2>
           </Reveal>
 
@@ -175,16 +221,14 @@ export default function HomePage() {
           </Reveal>
 
           <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((step, i) => (
+            {HOW_IT_WORKS_STEPS.map((step, i) => (
               <Reveal key={step.title} delay={i * 100} className="text-center sm:text-left">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand-light">
-                  {i + 1}
-                </span>
+                <StepIcon icon={step.icon} />
                 <h3 className="mt-4 text-base font-semibold text-white">
                   {step.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-                  {step.description}
+                  {step.summary}
                 </p>
               </Reveal>
             ))}
@@ -202,21 +246,39 @@ export default function HomePage() {
       </section>
 
       <section className="border-t border-white/10 px-4 py-20 sm:px-6">
-        <Reveal className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-gradient-to-br from-brand/15 via-navy-900 to-accent/15 p-8 text-center sm:p-12">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
-            Real Results
-          </p>
-          <p className="mt-4 text-xl font-semibold text-white sm:text-2xl">
-            &ldquo;Our client 92 Transportation saw zero missed inquiries
-            after setup.&rdquo;
-          </p>
-          <div className="mt-8">
-            <Link
-              href="/results"
-              className="text-sm font-semibold text-white underline underline-offset-4 transition-colors hover:text-brand-light"
-            >
-              Read the full case study &rarr;
-            </Link>
+        <Reveal className="mx-auto grid max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-white/10 lg:grid-cols-2">
+          <div className="relative hidden aspect-square lg:block">
+            <Image
+              src={RESULTS_IMAGE.src}
+              alt={RESULTS_IMAGE.alt}
+              fill
+              loading="lazy"
+              sizes="(max-width: 1024px) 0px, 400px"
+              className="object-cover"
+            />
+          </div>
+          <div className="flex flex-col justify-center bg-gradient-to-br from-brand/15 via-navy-900 to-accent/15 p-8 text-center sm:p-12 lg:text-left">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+              Real Results
+            </p>
+            <p className="mt-4 text-xl font-semibold text-white sm:text-2xl">
+              &ldquo;Our client 92 Transportation saw zero missed inquiries
+              after setup.&rdquo;
+            </p>
+            <div className="mt-5 flex items-center justify-center gap-3 lg:justify-start">
+              <InitialsAvatar name="92 Transportation" />
+              <span className="text-sm text-neutral-400">
+                Owner, 92 Transportation
+              </span>
+            </div>
+            <div className="mt-8">
+              <Link
+                href="/results"
+                className="text-sm font-semibold text-white underline underline-offset-4 transition-colors hover:text-brand-light"
+              >
+                Read the full case study &rarr;
+              </Link>
+            </div>
           </div>
         </Reveal>
       </section>

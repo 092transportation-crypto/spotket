@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { TierIcon } from "@/components/icons";
 import { PRICING_TIERS } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Pricing",
-  description:
-    "Simple monthly pricing for AI automation and web design — Starter at $300/month, Standard at $500/month, Premium at $1,000/month, AI Receptionist at $200/month.",
-};
+export const metadata = pageMetadata(
+  "/pricing",
+  "Pricing",
+  "AI automation for small business starting at $200/month — AI chatbot, AI receptionist, booking automation, and automated review requests. No long-term contracts.",
+);
 
 export default function PricingPage() {
   return (

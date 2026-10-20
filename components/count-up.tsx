@@ -14,7 +14,9 @@ export function CountUp({
   duration?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(0);
+  // Default to the final value so it's correct without JS (SSR, no-JS
+  // clients, crawlers) — only JS-enabled viewers see the count-up.
+  const [display, setDisplay] = useState(value);
   const started = useRef(false);
 
   useEffect(() => {
@@ -25,6 +27,7 @@ export function CountUp({
       ([entry]) => {
         if (!entry.isIntersecting || started.current) return;
         started.current = true;
+        setDisplay(0);
 
         const startTime = performance.now();
         function tick(now: number) {

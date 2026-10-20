@@ -1,5 +1,6 @@
-"use client";
-
+// Pure CSS animation (no hooks) — stays a server component so the
+// headline is fully present and already animating via CSS even
+// without JS.
 export function LetterFadeHeading({
   text,
   className,

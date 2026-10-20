@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NAV_LINKS } from "@/lib/site";
@@ -30,12 +31,16 @@ export function Nav() {
           scrolled ? "py-3" : "py-4"
         }`}
       >
-        <Link
-          href="/"
-          className="text-lg font-bold tracking-tight text-white"
-          onClick={() => setOpen(false)}
-        >
-          Spotket<span className="text-brand-light"> Digital</span>
+        <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+          <Image
+            src="/spotket-logo.png"
+            alt="Spotket Digital"
+            width={1057}
+            height={790}
+            loading="eager"
+            fetchPriority="high"
+            className={`w-auto transition-all duration-300 ${scrolled ? "h-11" : "h-14"}`}
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

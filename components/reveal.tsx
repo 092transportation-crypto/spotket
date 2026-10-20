@@ -12,7 +12,10 @@ export function Reveal({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  // Starts visible — correct for SSR and no-JS clients. The observer
+  // below only hides it if JS confirms it's actually out of view, so
+  // content never gets stranded invisible.
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const el = ref.current;
@@ -23,6 +26,8 @@ export function Reveal({
         if (entry.isIntersecting) {
           setVisible(true);
           observer.disconnect();
+        } else {
+          setVisible(false);
         }
       },
       { threshold: 0.15 },

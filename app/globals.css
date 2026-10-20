@@ -57,11 +57,15 @@ body {
   }
 }
 
-img,
-video,
-svg {
-  max-width: 100%;
-  height: auto;
+/* Layered so Tailwind's sizing utilities (e.g. h-14 on a logo) can still
+   override this default — unlayered CSS would otherwise always win. */
+@layer base {
+  img,
+  video,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 ::selection {

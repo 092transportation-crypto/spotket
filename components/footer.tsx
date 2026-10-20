@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { CONTACT_EMAIL, NAV_LINKS, SITE_NAME } from "@/lib/site";
 
@@ -7,9 +8,14 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 pb-28 pt-12 sm:px-6 sm:pb-12">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
-            <p className="text-lg font-bold text-white">
-              Spotket<span className="text-brand-light"> Digital</span>
-            </p>
+            <Image
+              src="/spotket-logo.png"
+              alt="Spotket Digital"
+              width={1057}
+              height={790}
+              loading="lazy"
+              className="h-16 w-auto"
+            />
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
               AI chatbots, booking automation, and custom websites that help
               small businesses stop missing customers.

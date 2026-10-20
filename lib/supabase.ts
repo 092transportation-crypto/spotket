@@ -87,7 +87,7 @@ export async function logActivity(agent: AgentName, message: string, level: "inf
   console.log(`[${agent}] ${level.toUpperCase()}: ${message}`);
   if (!client) return;
   try {
-    const { error } = await client.from("activity_log").insert({ agent_name: agent, message, level });
+    const { error } = await client.from("agent_activity_log").insert({ agent_name: agent, message, level });
     if (error) console.error("logActivity insert failed:", error.message);
   } catch (err) {
     console.error("logActivity threw:", (err as Error).message);
@@ -98,7 +98,7 @@ export async function recentActivity(limit = 50) {
   const client = getClient();
   if (!client) return [];
   const { data, error } = await client
-    .from("activity_log")
+    .from("agent_activity_log")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(limit);

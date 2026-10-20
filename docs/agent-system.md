@@ -11,16 +11,26 @@ system runs in a safe "not configured yet" mode (chat gives a polite
 fallback reply, cron jobs log "skipped," nothing crashes) until you add the
 real credentials below as Vercel env vars (Production **and** Preview).
 
-### 1. Supabase (new project)
+### 1. Supabase (a project already exists — this is not a fresh setup)
 
-Create a project at supabase.com, open its SQL editor, and run the entire
-contents of `supabase-schema.sql` in this repo once. Then from Project
-Settings → API, set:
+Live-tested 2026-10-20: `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
+were already set in Vercel (100+ days old — left over from the original
+Spotket dropshipping store, before the pivot to Spotket Digital). `lib/supabase.ts`
+reads `SUPABASE_URL` with a fallback to `NEXT_PUBLIC_SUPABASE_URL`, so this
+project connects today with no new env vars needed. **But the schema has
+never been run against it** — confirmed live: `insertLead` fails with
+`Could not find the table 'public.leads'`. You still need to open this
+EXISTING project's SQL editor (supabase.com → the project you set those keys
+from) and run the entire contents of `supabase-schema.sql` once.
 
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY` (the **service_role** key, not the anon key —
-  this server-side code needs to bypass RLS to read/write `leads`,
-  `activity_log`, `blog_posts`, `landing_pages`, `agent_settings`)
+One real collision already found and fixed: the old dropshipping store had
+its own `activity_log` table with different columns, which silently broke
+every `logActivity` call (`Could not find the 'agent_name' column`). Renamed
+to `agent_activity_log` to avoid guessing at that legacy table's shape —
+if you hit a similar "table/column not found" error on `leads`,
+`blog_posts`, `landing_pages`, or `agent_settings` after running the schema,
+it's the same class of collision and the fix is the same: rename the new
+table.
 
 ### 2. Anthropic (Claude API)
 
@@ -37,12 +47,21 @@ Settings → API, set:
 - `TWILIO_FROM_NUMBER` (your Twilio number)
 - `ALERT_PHONE_NUMBER` (the phone that gets a text on every captured lead)
 
-### 4. SMTP (follow-up emails — Zoho suggested)
+### 4. SMTP (follow-up + confirmation emails)
 
-- `SMTP_HOST` (e.g. `smtp.zoho.com`)
-- `SMTP_PORT` (`465`)
-- `SMTP_USER` / `SMTP_PASSWORD` (your Zoho mailbox + its app-specific
-  password, if 2FA is on)
+Live-tested 2026-10-20: `SMTP_USER`/`SMTP_PASSWORD` were already set (same
+100-day-old leftover as Supabase above), but `SMTP_HOST` defaulted to
+`smtp.zoho.com` and the mail server rejected the login. Set `SMTP_HOST` to
+`smtp.gmail.com` and `SMTP_PORT` to `587` — once that host was corrected,
+Google's own error response confirmed these genuinely are Gmail
+credentials, but the password itself is now invalid/expired:
+`535-5.7.8 Username and Password not accepted` (Google's bad-credentials
+error, not a wrong-host error). **You need to generate a fresh Gmail App
+Password** (the Google account `SMTP_USER` is set to → Security → 2-Step
+Verification → App Passwords) and update `SMTP_PASSWORD` in Vercel — the
+host/port are already fixed and don't need touching again. If you'd rather
+actually use Zoho as originally planned, set `SMTP_HOST=smtp.zoho.com`,
+`SMTP_PORT=465`, and swap in real Zoho mailbox credentials instead.
 
 Code is provider-agnostic — any standard SMTP account works, Zoho is just
 the suggested default per the original request.

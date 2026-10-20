@@ -32,7 +32,7 @@ alter table leads add column if not exists biggest_challenge text;
 alter table leads add column if not exists heard_about_us text;
 alter table leads add column if not exists message text;
 
-create table if not exists activity_log (
+create table if not exists agent_activity_log (
   id uuid primary key default gen_random_uuid(),
   agent_name text not null,
   message text not null,
@@ -68,6 +68,6 @@ insert into agent_settings (agent_name, enabled) values
 on conflict (agent_name) do nothing;
 
 create index if not exists leads_follow_up_idx on leads (created_at) where followed_up = false and contacted = false;
-create index if not exists activity_log_created_idx on activity_log (created_at desc);
+create index if not exists agent_activity_log_created_idx on agent_activity_log (created_at desc);
 create index if not exists blog_posts_published_idx on blog_posts (published_at desc);
 create index if not exists landing_pages_published_idx on landing_pages (published_at desc);

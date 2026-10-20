@@ -47,6 +47,10 @@ export async function sendEmail(to: string, subject: string, text: string, html?
   }
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function shell(innerHtml: string): string {
   return `
     <div style="font-family:Arial,Helvetica,sans-serif;background:#0a0a0f;padding:30px;">
@@ -59,10 +63,27 @@ function shell(innerHtml: string): string {
     </div>`;
 }
 
+export function buildContactConfirmationEmail(name: string): {
+  subject: string;
+  text: string;
+  html: string;
+} {
+  const firstName = (name || "there").split(" ")[0] || "there";
+  const subject = "We got your message — Spotket";
+  const text = `Hi ${firstName},\n\nThanks for reaching out to Spotket. We'll be in touch within 24 hours.`;
+  const html = shell(
+    `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(firstName)},</p>` +
+      `<p style="font-size:15px;line-height:1.6;">Thanks for reaching out to Spotket. We'll be in touch within 24 hours.</p>`
+  );
+  return { subject, text, html };
+}
+
 export function buildFollowUpEmail(name: string): { subject: string; text: string; html: string } {
   const firstName = (name || "there").split(" ")[0] || "there";
   const subject = `Following up, ${firstName}`;
   const text = `Hey ${firstName} — just following up on your interest in Spotket. Would love to show you a quick demo.`;
-  const html = shell(`<p style="font-size:15px;line-height:1.6;">${text}</p>`);
+  const html = shell(
+    `<p style="font-size:15px;line-height:1.6;">Hey ${escapeHtml(firstName)} — just following up on your interest in Spotket. Would love to show you a quick demo.</p>`
+  );
   return { subject, text, html };
 }

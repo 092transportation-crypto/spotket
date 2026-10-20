@@ -12,7 +12,10 @@ let cachedClient: SupabaseClient | null | undefined;
 
 function getClient(): SupabaseClient | null {
   if (cachedClient !== undefined) return cachedClient;
-  const url = process.env.SUPABASE_URL;
+  // NEXT_PUBLIC_SUPABASE_URL is accepted as a fallback — this project already
+  // has a Supabase project configured under that name (pre-dating this
+  // agent system) with a working SUPABASE_SERVICE_ROLE_KEY alongside it.
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     console.log("Supabase not configured (SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY unset) — skipping.");
@@ -113,6 +116,12 @@ export interface NewLead {
   email?: string;
   recommended_package?: string;
   source: string;
+  business_type?: string;
+  website_url?: string;
+  revenue_range?: string;
+  biggest_challenge?: string;
+  heard_about_us?: string;
+  message?: string;
 }
 
 export async function insertLead(lead: NewLead): Promise<boolean> {

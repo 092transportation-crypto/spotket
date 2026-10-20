@@ -23,6 +23,15 @@ create table if not exists leads (
   created_at timestamptz not null default now()
 );
 
+-- Added for the detailed contact/inquiry form (safe to re-run against a
+-- leads table created by an earlier version of this schema).
+alter table leads add column if not exists business_type text;
+alter table leads add column if not exists website_url text;
+alter table leads add column if not exists revenue_range text;
+alter table leads add column if not exists biggest_challenge text;
+alter table leads add column if not exists heard_about_us text;
+alter table leads add column if not exists message text;
+
 create table if not exists activity_log (
   id uuid primary key default gen_random_uuid(),
   agent_name text not null,

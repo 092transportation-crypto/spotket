@@ -110,6 +110,63 @@ async function run() {
     extractText([{ type: "text", text: "a" }, { type: "tool_use" }, { type: "text", text: "b" }]) === "a\nb",
   );
 
+  // --- lib/mailer.ts: contact confirmation + follow-up copy must match spec exactly ---
+  const { buildContactConfirmationEmail } = await import("../lib/mailer");
+  const confirmation = buildContactConfirmationEmail("Jane Smith");
+  check(
+    "buildContactConfirmationEmail: matches the required copy",
+    confirmation.text.includes("Thanks for reaching out to Spotket. We'll be in touch within 24 hours."),
+  );
+  check(
+    "buildContactConfirmationEmail: escapes HTML in the name",
+    !buildContactConfirmationEmail("<script>alert(1)</script>").html.includes("<script>alert"),
+  );
+  check(
+    "buildFollowUpEmail: escapes HTML in the name",
+    !buildFollowUpEmail("<script>alert(1)</script>").html.includes("<script>alert"),
+  );
+
+  // --- app/api/contact-inquiry/route.ts: exercise the real handler, no network needed ---
+  supa._resetSupabaseClientForTests();
+  const { POST: contactInquiryPost } = await import("../app/api/contact-inquiry/route");
+  function fakeRequest(body: unknown) {
+    return { json: async () => body } as unknown as Parameters<typeof contactInquiryPost>[0];
+  }
+  const missingFieldsRes = await contactInquiryPost(fakeRequest({ name: "Jane" }));
+  check("contact-inquiry: 400 on missing required fields", missingFieldsRes.status === 400);
+
+  const badEmailRes = await contactInquiryPost(
+    fakeRequest({
+      name: "Jane",
+      business_name: "Jane's Shop",
+      business_type: "Barbershop",
+      phone: "4105551234",
+      email: "not-an-email",
+      biggest_challenge: "Not enough leads",
+      heard_about_us: "Google",
+    }),
+  );
+  check("contact-inquiry: 400 on invalid email", badEmailRes.status === 400);
+
+  const validRes = await contactInquiryPost(
+    fakeRequest({
+      name: "Jane Smith",
+      business_name: "Jane's Barbershop",
+      business_type: "Barbershop",
+      phone: "4105551234",
+      email: "jane@example.org",
+      website_url: "https://janesbarbershop.example",
+      revenue_range: "$5k-$20k",
+      biggest_challenge: "Not enough leads",
+      heard_about_us: "Google",
+      message: "Call me after 5pm.",
+    }),
+  );
+  check(
+    "contact-inquiry: 201 + ok on valid input, even with no Twilio/SMTP/Supabase configured",
+    validRes.status === 201 && (await validRes.json()).ok === true,
+  );
+
   // --- lib/markdown.ts ---
   const { renderMarkdown } = await import("../lib/markdown");
   const rendered = renderMarkdown("## Heading\n\nSome text\n\n- item one\n- item two");

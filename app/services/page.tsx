@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { Reveal } from "@/components/reveal";
 import { SERVICES } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -25,18 +27,30 @@ export default function ServicesPage() {
       </div>
 
       <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
-        {SERVICES.map((service) => (
-          <div
-            key={service.name}
-            className="card-glow rounded-2xl border border-white/10 bg-navy-900/60 p-7 transition-shadow"
-          >
-            <h2 className="text-xl font-semibold text-white">
-              {service.name}
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              {service.description}
-            </p>
-          </div>
+        {SERVICES.map((service, i) => (
+          <Reveal key={service.name} delay={i * 80}>
+            <div className="card-glow group h-full overflow-hidden rounded-2xl border border-white/10 bg-navy-900/60 transition-transform duration-300 hover:-translate-y-1.5">
+              <div className="relative aspect-video overflow-hidden">
+                <Image
+                  src={service.image.src}
+                  alt={service.image.alt}
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 500px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/10 to-transparent" />
+              </div>
+              <div className="p-7">
+                <h2 className="text-xl font-semibold text-white">
+                  {service.name}
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+                  {service.description}
+                </p>
+              </div>
+            </div>
+          </Reveal>
         ))}
       </div>
 

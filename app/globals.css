@@ -15,7 +15,6 @@
   --font-mono: var(--font-geist-mono);
 
   --animate-fade-up: fade-up 0.7s ease-out both;
-  --animate-fade-in: fade-in 0.5s ease-out both;
 
   @keyframes fade-up {
     from {
@@ -25,15 +24,6 @@
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
     }
   }
 }
@@ -144,6 +134,35 @@ svg {
 }
 .card-glow:hover {
   animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+/* Pulsing ring around the floating mobile CTA */
+@keyframes btn-pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+}
+.btn-pulse {
+  animation: btn-pulse-ring 2.4s ease-in-out infinite;
+}
+
+/* Slide-up fade used for route transitions */
+@keyframes page-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.page-fade {
+  animation: page-fade 0.5s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ContactForm } from "@/components/contact-form";
-import { CONTACT_EMAIL } from "@/lib/site";
+import { Reveal } from "@/components/reveal";
+import { CONTACT_EMAIL, CONTACT_IMAGE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -24,20 +26,42 @@ export default function ContactPage() {
         </p>
       </div>
 
-      <div className="mx-auto mt-14 max-w-md rounded-2xl border border-white/10 bg-navy-900/60 p-7 sm:p-8">
-        <ContactForm />
-      </div>
+      <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
+        <Reveal className="rounded-2xl border border-white/10 bg-navy-900/60 p-7 sm:p-8">
+          <ContactForm />
+          <p className="mt-8 text-center text-sm text-neutral-500">
+            Prefer email? Reach us directly at{" "}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="text-brand-light hover:text-white"
+            >
+              {CONTACT_EMAIL}
+            </a>
+            .
+          </p>
+        </Reveal>
 
-      <p className="mx-auto mt-8 max-w-md text-center text-sm text-neutral-500">
-        Prefer email? Reach us directly at{" "}
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className="text-brand-light hover:text-white"
-        >
-          {CONTACT_EMAIL}
-        </a>
-        .
-      </p>
+        <Reveal delay={150} className="relative hidden overflow-hidden rounded-2xl border border-white/10 lg:block">
+          <Image
+            src={CONTACT_IMAGE.src}
+            alt={CONTACT_IMAGE.alt}
+            fill
+            loading="lazy"
+            sizes="(max-width: 1024px) 0vw, 500px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/20 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-7">
+            <p className="text-lg font-semibold text-white">
+              We respond within one business day.
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-300">
+              No sales pressure — just a straight answer about what
+              automation would look like for your business.
+            </p>
+          </div>
+        </Reveal>
+      </div>
     </div>
   );
 }

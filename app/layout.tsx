@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { FloatingCta } from "@/components/floating-cta";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 const inter = Inter({
@@ -49,6 +50,7 @@ export default function RootLayout({
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />
+        <FloatingCta />
       </body>
     </html>
   );

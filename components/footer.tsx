@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, NAV_LINKS, SITE_NAME } from "@/lib/site";
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-navy-950">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-28 pt-12 sm:px-6 sm:pb-12">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
             <p className="text-lg font-bold text-white">

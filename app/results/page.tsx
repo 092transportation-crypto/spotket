@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { Reveal } from "@/components/reveal";
+import { RESULTS_IMAGE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Results",
@@ -33,28 +36,41 @@ export default function ResultsPage() {
         </h1>
       </div>
 
-      <div className="mx-auto mt-14 max-w-3xl rounded-3xl border border-white/10 bg-gradient-to-br from-brand/15 via-navy-900 to-accent/15 p-8 text-center sm:p-12">
-        <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
-          Case Study
-        </p>
-        <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
-          92 Transportation
-        </h2>
-        <p className="mt-4 text-lg leading-relaxed text-white">
-          Our client 92 Transportation saw zero missed inquiries after
-          setup.
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-          Before Spotket Digital, every inquiry that came in outside office
-          hours was a coin flip — answered in the morning, or lost to a
-          competitor overnight. After rolling out the AI chatbot and booking
-          automation, every lead gets an instant response and an immediate
-          alert to staff, day or night.
-        </p>
-      </div>
+      <Reveal className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-3xl border border-white/10">
+        <div className="relative aspect-[16/9]">
+          <Image
+            src={RESULTS_IMAGE.src}
+            alt={RESULTS_IMAGE.alt}
+            fill
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/60 to-transparent" />
+        </div>
+        <div className="bg-gradient-to-br from-brand/15 via-navy-900 to-accent/15 p-8 text-center sm:p-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+            Case Study
+          </p>
+          <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+            92 Transportation
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-white">
+            Our client 92 Transportation saw zero missed inquiries after
+            setup.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+            Before Spotket Digital, every inquiry that came in outside office
+            hours was a coin flip — answered in the morning, or lost to a
+            competitor overnight. After rolling out the AI chatbot and
+            booking automation, every lead gets an instant response and an
+            immediate alert to staff, day or night.
+          </p>
+        </div>
+      </Reveal>
 
       <div className="mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-navy-900/60 p-7">
+        <Reveal className="rounded-2xl border border-white/10 bg-navy-900/60 p-7">
           <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
             Before
           </p>
@@ -69,9 +85,9 @@ export default function ResultsPage() {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="rounded-2xl border border-brand/30 bg-navy-900/60 p-7">
+        <Reveal delay={120} className="rounded-2xl border border-brand/30 bg-navy-900/60 p-7">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
             After
           </p>
@@ -86,10 +102,10 @@ export default function ResultsPage() {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
       </div>
 
-      <div className="mx-auto mt-16 max-w-2xl text-center">
+      <Reveal className="mx-auto mt-16 max-w-2xl text-center">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Want results like this for your business?
         </h2>
@@ -101,7 +117,7 @@ export default function ResultsPage() {
             Get a Free Demo
           </Link>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }

@@ -1,15 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NAV_LINKS } from "@/lib/site";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-navy-950/80 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+    <header
+      className={`sticky top-0 z-50 border-b backdrop-blur-lg transition-all duration-300 ${
+        scrolled
+          ? "border-white/10 bg-navy-950/90 shadow-lg shadow-black/20"
+          : "border-transparent bg-navy-950/40"
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-6xl items-center justify-between px-4 transition-[padding] duration-300 sm:px-6 ${
+          scrolled ? "py-3" : "py-4"
+        }`}
+      >
         <Link
           href="/"
           className="text-lg font-bold tracking-tight text-white"

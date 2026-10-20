@@ -1,4 +1,4 @@
-/** Fades every route in — lightweight page transition. */
+/** Fades and slides every route in — lightweight page transition. */
 export default function Template({ children }: { children: React.ReactNode }) {
-  return <div className="animate-fade-in">{children}</div>;
+  return <div className="page-fade">{children}</div>;
 }

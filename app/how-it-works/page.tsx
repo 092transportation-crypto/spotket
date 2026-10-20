@@ -65,7 +65,7 @@ export default function HowItWorksPage() {
           href="/contact"
           className="btn-shimmer inline-flex items-center justify-center rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95"
         >
-          Get a Free Demo
+          Get Your Free Automation Audit
         </Link>
       </div>
     </div>

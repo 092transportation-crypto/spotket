@@ -14,7 +14,7 @@ export function FloatingCta() {
         href="/contact"
         className="btn-shimmer btn-pulse flex items-center justify-center rounded-full px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-black/40"
       >
-        Get a Free Demo
+        Get Your Free Automation Audit
       </Link>
     </div>
   );

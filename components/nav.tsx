@@ -60,7 +60,7 @@ export function Nav() {
             href="/contact"
             className="btn-shimmer inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03] active:scale-95"
           >
-            Get a Free Demo
+            Get Your Free Automation Audit
           </Link>
         </div>
 
@@ -102,7 +102,7 @@ export function Nav() {
             onClick={() => setOpen(false)}
             className="btn-shimmer mt-2 inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white"
           >
-            Get a Free Demo
+            Get Your Free Automation Audit
           </Link>
         </nav>
       )}

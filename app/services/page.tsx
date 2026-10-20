@@ -7,7 +7,7 @@ import { SERVICES } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "AI chatbots, booking automation, review generation, and custom websites for small businesses — starting at $500/month.",
+    "Inbox management, meeting admin, data entry, invoicing, content repurposing, lead qualification, SEO, chatbots, booking automation, and custom websites — starting at $200/month.",
 };
 
 export default function ServicesPage() {
@@ -48,6 +48,9 @@ export default function ServicesPage() {
                 <p className="mt-3 text-sm leading-relaxed text-neutral-400">
                   {service.description}
                 </p>
+                <span className="mt-4 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-brand-light">
+                  {service.price}
+                </span>
               </div>
             </div>
           </Reveal>
@@ -59,7 +62,7 @@ export default function ServicesPage() {
           Pricing
         </p>
         <p className="mt-3 text-2xl font-bold text-white">
-          Starting at $500/month
+          Starting at $200/month
         </p>
         <p className="mt-2 text-sm text-neutral-400">
           Pick the plan that fits your business — no long-term contracts.
@@ -75,7 +78,7 @@ export default function ServicesPage() {
             href="/contact"
             className="btn-shimmer inline-flex w-full items-center justify-center rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95 sm:w-auto"
           >
-            Get a Free Demo
+            Get Your Free Automation Audit
           </Link>
         </div>
       </div>

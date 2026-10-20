@@ -30,16 +30,23 @@ export default function HomePage() {
             <p className="animate-fade-up text-xs font-semibold uppercase tracking-widest text-brand-light">
               AI Automation &amp; Web Design
             </p>
+            <p
+              className="animate-fade-up mt-4 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand-light"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-light" />
+              Starting at $200/month
+            </p>
             <LetterFadeHeading
-              text="We Build AI Systems That Get You More Customers"
+              text="We Automate Your Business So You Can Focus On Growth"
               className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-5xl xl:text-6xl"
             />
             <p
               className="animate-fade-up mx-auto mt-6 max-w-xl text-base leading-relaxed text-neutral-400 sm:text-lg lg:mx-0"
               style={{ animationDelay: "0.5s" }}
             >
-              Automated booking systems, AI chatbots, and custom websites for
-              small businesses.
+              Inbox management, meetings, data entry, invoicing, content, and
+              lead follow-up — handled by AI, so nothing falls through the
+              cracks.
             </p>
             <div
               className="animate-fade-up mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
@@ -49,7 +56,7 @@ export default function HomePage() {
                 href="/contact"
                 className="btn-shimmer inline-flex w-full items-center justify-center rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95 sm:w-auto"
               >
-                Get a Free Demo
+                Get Your Free Automation Audit
               </Link>
               <Link
                 href="/results"
@@ -132,6 +139,9 @@ export default function HomePage() {
                     <p className="mt-2 text-sm leading-relaxed text-neutral-400">
                       {service.description}
                     </p>
+                    <span className="mt-3 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-brand-light">
+                      {service.price}
+                    </span>
                   </div>
                 </div>
               </Reveal>
@@ -212,7 +222,7 @@ export default function HomePage() {
               href="/contact"
               className="btn-shimmer inline-flex items-center justify-center rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95"
             >
-              Get a Free Demo
+              Get Your Free Automation Audit
             </Link>
           </div>
         </Reveal>

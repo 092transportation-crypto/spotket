@@ -17,8 +17,8 @@ export function Footer() {
               className="h-16 w-auto"
             />
             <p className="mt-3 text-sm leading-relaxed text-neutral-400">
-              AI chatbots, booking automation, and custom websites that help
-              small businesses stop missing customers.
+              AI automation for inboxes, meetings, invoicing, content, and
+              leads — plus custom websites that help small businesses grow.
             </p>
           </div>
 

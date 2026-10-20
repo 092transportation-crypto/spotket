@@ -5,8 +5,10 @@ import { LetterFadeHeading } from "@/components/letter-fade-heading";
 import { Reveal } from "@/components/reveal";
 import { TrustBadges } from "@/components/trust-badges";
 import { TierIcon, StepIcon, InitialsAvatar } from "@/components/icons";
+import { ServicesSlider } from "@/components/services-slider";
 import {
   CONTACT_EMAIL,
+  FEATURE_HIGHLIGHTS,
   HERO_IMAGE,
   HOW_IT_WORKS_STEPS,
   MISSED_INQUIRIES_STAT,
@@ -204,6 +206,32 @@ export default function HomePage() {
               className="text-sm font-semibold text-brand-light transition-colors hover:text-white"
             >
               See full plan details &rarr;
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-5xl">
+          <Reveal className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+              What&apos;s Included
+            </p>
+            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+              The automation stack behind every plan
+            </h2>
+          </Reveal>
+
+          <div className="mt-12">
+            <ServicesSlider slides={FEATURE_HIGHLIGHTS} />
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link
+              href="/services"
+              className="text-sm font-semibold text-brand-light transition-colors hover:text-white"
+            >
+              See every service in detail &rarr;
             </Link>
           </div>
         </div>

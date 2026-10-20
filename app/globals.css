@@ -177,3 +177,13 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Hides the scrollbar on swipeable carousels while keeping native
+   touch/trackpad scroll and keyboard scroll behavior. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

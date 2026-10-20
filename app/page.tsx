@@ -24,8 +24,8 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   "/",
-  `${SITE_NAME} — AI Automation for Small Business`,
-  SITE_TAGLINE,
+  "Spotket | AI Automation That Gets Small Businesses More Customers",
+  "We build AI chatbots, booking automation, and custom websites for small businesses. Stop missing inquiries. Start getting more customers. Plans from $300/month.",
 );
 
 const localBusinessSchema = {

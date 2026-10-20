@@ -8,9 +8,10 @@ import { TierIcon } from "@/components/icons";
 import { HERO_IMAGE, PRICING_TIERS, STATS } from "@/lib/site";
 
 const STEPS = [
-  { title: "We audit your current system", description: "We look at how customers reach you today and where inquiries fall through the cracks." },
-  { title: "We build your custom AI automation", description: "Chatbot, booking alerts, and review requests, set up and tuned for your business." },
-  { title: "You get more bookings on autopilot", description: "Customers get answered instantly, you get notified instantly, and reviews pile up on their own." },
+  { title: "Free Audit", description: "We look at how customers reach you today and where inquiries fall through the cracks." },
+  { title: "Custom Build", description: "Chatbot, booking automation, and website built around your business in 48 hours." },
+  { title: "Go Live", description: "Your AI system starts answering inquiries and booking customers immediately." },
+  { title: "Ongoing Support", description: "We monitor performance and keep improving your system every month." },
 ] as const;
 
 export default function HomePage() {
@@ -169,11 +170,11 @@ export default function HomePage() {
               How It Works
             </p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Up and running in three simple steps
+              Up and running in 48 hours
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, i) => (
               <Reveal key={step.title} delay={i * 100} className="text-center sm:text-left">
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand-light">
@@ -187,6 +188,15 @@ export default function HomePage() {
                 </p>
               </Reveal>
             ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link
+              href="/how-it-works"
+              className="text-sm font-semibold text-brand-light transition-colors hover:text-white"
+            >
+              See the full process &rarr;
+            </Link>
           </div>
         </div>
       </section>

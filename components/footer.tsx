@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CONTACT_EMAIL, NAV_LINKS, SITE_NAME } from "@/lib/site";
+import { CONTACT_EMAIL, LEGAL_LINKS, NAV_LINKS, SITE_NAME } from "@/lib/site";
 
 export function Footer() {
   return (
@@ -59,11 +59,23 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6">
+        <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-neutral-500">
             &copy; {new Date().getFullYear()} {SITE_NAME}. All rights
             reserved.
           </p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {LEGAL_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-xs text-neutral-500 transition-colors hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </footer>

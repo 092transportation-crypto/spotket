@@ -2,12 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
-import { RESULTS_IMAGE } from "@/lib/site";
+import {
+  CASE_STUDIES,
+  RESULTS_COMPARISON,
+  RESULTS_IMAGE,
+  RESULTS_STATS,
+} from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Results",
   description:
-    "See how 92 Transportation went from missed inquiries to zero missed bookings after setting up Spotket Digital's AI automation.",
+    "Real automation results for 92 Transportation, DCA Limos, BWI Chauffeur, IAD Airport Limo, and MSY Limo Service — zero missed inquiries, 24/7 AI coverage.",
 };
 
 const BEFORE = [
@@ -34,6 +39,20 @@ export default function ResultsPage() {
         <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Proof it works
         </h1>
+      </div>
+
+      <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+        {RESULTS_STATS.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-2xl border border-white/10 bg-navy-900/60 px-6 py-5 text-center"
+          >
+            <p className="text-3xl font-bold text-white">{stat.value}</p>
+            <p className="mt-1 text-sm font-medium text-neutral-400">
+              {stat.label}
+            </p>
+          </div>
+        ))}
       </div>
 
       <Reveal className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-3xl border border-white/10">
@@ -105,7 +124,106 @@ export default function ResultsPage() {
         </Reveal>
       </div>
 
-      <Reveal className="mx-auto mt-16 max-w-2xl text-center">
+      <div className="mx-auto mt-20 max-w-3xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+          More Results
+        </p>
+        <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+          More businesses, same results
+        </h2>
+      </div>
+
+      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2">
+        {CASE_STUDIES.map((study, i) => (
+          <Reveal key={study.business} delay={i * 80}>
+            <div className="card-glow flex h-full flex-col rounded-2xl border border-white/10 bg-navy-900/60 p-7">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-lg font-semibold text-white">
+                  {study.business}
+                </h3>
+                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+                  {study.location}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3 text-sm leading-relaxed">
+                <p className="text-neutral-400">
+                  <span className="font-semibold text-neutral-300">
+                    Before:{" "}
+                  </span>
+                  {study.problem}
+                </p>
+                <p className="text-neutral-400">
+                  <span className="font-semibold text-neutral-300">
+                    What we built:{" "}
+                  </span>
+                  {study.built}
+                </p>
+              </div>
+
+              <ul className="mt-4 space-y-2">
+                {study.results.map((result) => (
+                  <li
+                    key={result}
+                    className="flex gap-3 text-sm leading-relaxed text-neutral-200"
+                  >
+                    <span className="mt-0.5 text-brand-light">✓</span>
+                    <span>{result}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <blockquote className="mt-5 flex-1 rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-neutral-300 italic">
+                &ldquo;{study.quote}&rdquo;
+                <footer className="mt-2 text-xs font-semibold not-italic text-neutral-500">
+                  &mdash; {study.quoteAttribution}
+                </footer>
+              </blockquote>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <div className="mx-auto mt-20 max-w-3xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+          At A Glance
+        </p>
+        <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+          Before Spotket vs. After Spotket
+        </h2>
+      </div>
+
+      <Reveal className="mx-auto mt-10 max-w-4xl overflow-hidden rounded-2xl border border-white/10">
+        <div className="grid grid-cols-3 bg-white/5 text-xs font-semibold uppercase tracking-widest text-neutral-400">
+          <div className="px-4 py-3 sm:px-6">&nbsp;</div>
+          <div className="px-4 py-3 text-neutral-500 sm:px-6">
+            Before Spotket
+          </div>
+          <div className="px-4 py-3 text-brand-light sm:px-6">
+            After Spotket
+          </div>
+        </div>
+        {RESULTS_COMPARISON.map((row, i) => (
+          <div
+            key={row.label}
+            className={`grid grid-cols-3 text-sm leading-relaxed ${
+              i % 2 === 0 ? "bg-navy-900/40" : "bg-navy-900/60"
+            }`}
+          >
+            <div className="px-4 py-4 font-semibold text-white sm:px-6">
+              {row.label}
+            </div>
+            <div className="px-4 py-4 text-neutral-500 sm:px-6">
+              {row.before}
+            </div>
+            <div className="px-4 py-4 text-neutral-200 sm:px-6">
+              {row.after}
+            </div>
+          </div>
+        ))}
+      </Reveal>
+
+      <Reveal className="mx-auto mt-20 max-w-2xl text-center">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           Want results like this for your business?
         </h2>

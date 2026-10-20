@@ -32,6 +32,17 @@ export type AgentName =
   | "landing_page_agent"
   | "lead_follow_up_agent";
 
+export const AGENT_NAMES: AgentName[] = [
+  "sales_agent",
+  "blog_agent",
+  "landing_page_agent",
+  "lead_follow_up_agent",
+];
+
+export function isAgentName(value: string): value is AgentName {
+  return (AGENT_NAMES as string[]).includes(value);
+}
+
 /** Defaults to true (agent runs) when Supabase isn't configured yet, or the row is missing. */
 export async function isAgentEnabled(agent: AgentName): Promise<boolean> {
   const client = getClient();
@@ -107,6 +118,40 @@ export async function recentActivity(limit = 50) {
     return [];
   }
   return data ?? [];
+}
+
+/** Full (capped) log history for one agent, newest first — powers the per-agent terminal view. */
+export async function activityForAgent(agent: AgentName, limit = 300) {
+  const client = getClient();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("agent_activity_log")
+    .select("*")
+    .eq("agent_name", agent)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error(`activityForAgent(${agent}) failed:`, error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+/** Count of this agent's log entries in the last 24h (a rolling window, not calendar-day). */
+export async function actionsLast24h(agent: AgentName): Promise<number> {
+  const client = getClient();
+  if (!client) return 0;
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await client
+    .from("agent_activity_log")
+    .select("*", { count: "exact", head: true })
+    .eq("agent_name", agent)
+    .gte("created_at", since);
+  if (error) {
+    console.error(`actionsLast24h(${agent}) failed:`, error.message);
+    return 0;
+  }
+  return count ?? 0;
 }
 
 export interface NewLead {

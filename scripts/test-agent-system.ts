@@ -62,6 +62,34 @@ async function run() {
   const supa = await import("../lib/supabase");
   supa._resetSupabaseClientForTests();
   check("isAgentEnabled: defaults true when Supabase unconfigured", (await supa.isAgentEnabled("sales_agent")) === true);
+  check("isAgentName: accepts a real agent name", supa.isAgentName("blog_agent"));
+  check("isAgentName: rejects an unknown name", !supa.isAgentName("made_up_agent"));
+  check(
+    "activityForAgent: returns [] when Supabase unconfigured",
+    (await supa.activityForAgent("blog_agent")).length === 0,
+  );
+  check(
+    "actionsLast24h: returns 0 when Supabase unconfigured",
+    (await supa.actionsLast24h("blog_agent")) === 0,
+  );
+
+  // --- app/api/admin/agents/[agent]/activity/route.ts: exercise the real handler ---
+  const { GET: agentActivityGet } = await import("../app/api/admin/agents/[agent]/activity/route");
+  function fakeAgentRequest() {
+    return {} as Parameters<typeof agentActivityGet>[0];
+  }
+  const unknownAgentRes = await agentActivityGet(fakeAgentRequest(), {
+    params: Promise.resolve({ agent: "made_up_agent" }),
+  });
+  check("agent activity route: 404s on an unknown agent", unknownAgentRes.status === 404);
+  const knownAgentRes = await agentActivityGet(fakeAgentRequest(), {
+    params: Promise.resolve({ agent: "blog_agent" }),
+  });
+  const knownAgentBody = await knownAgentRes.json();
+  check(
+    "agent activity route: 200s with empty logs when Supabase unconfigured",
+    knownAgentRes.status === 200 && Array.isArray(knownAgentBody.logs) && knownAgentBody.logs.length === 0,
+  );
   check("setAgentEnabled: returns false (no-op) when unconfigured", (await supa.setAgentEnabled("sales_agent", false)) === false);
   check("listAgentSettings: returns [] when unconfigured", (await supa.listAgentSettings()).length === 0);
   check(

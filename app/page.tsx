@@ -4,6 +4,7 @@ import { CountUp } from "@/components/count-up";
 import { LetterFadeHeading } from "@/components/letter-fade-heading";
 import { Reveal } from "@/components/reveal";
 import { TrustBadges } from "@/components/trust-badges";
+import { TierIcon } from "@/components/icons";
 import { HERO_IMAGE, PRICING_TIERS, STATS } from "@/lib/site";
 
 const STEPS = [
@@ -117,7 +118,7 @@ export default function HomePage() {
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {PRICING_TIERS.map((tier, i) => (
               <Reveal key={tier.name} delay={i * 80}>
                 <div
@@ -127,12 +128,13 @@ export default function HomePage() {
                       : "border-white/10 bg-navy-900/60"
                   }`}
                 >
+                  <TierIcon icon={tier.icon} featured={tier.featured} />
                   {tier.featured && (
-                    <span className="mb-3 inline-flex w-fit items-center rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand-light">
+                    <span className="mt-3 mb-3 inline-flex w-fit items-center rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand-light">
                       Most Popular
                     </span>
                   )}
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="mt-3 text-lg font-semibold text-white">
                     {tier.name}
                   </h3>
                   <p className="mt-2 flex items-baseline gap-1">

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TierIcon } from "@/components/icons";
 import { PRICING_TIERS } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Simple monthly pricing for AI automation and web design — Starter at $300/month, Standard at $500/month, Premium at $1,000/month.",
+    "Simple monthly pricing for AI automation and web design — Starter at $300/month, Standard at $500/month, Premium at $1,000/month, AI Receptionist at $200/month.",
 };
 
 export default function PricingPage() {
@@ -23,7 +24,7 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3">
+      <div className="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {PRICING_TIERS.map((tier) => (
           <div
             key={tier.name}
@@ -33,12 +34,13 @@ export default function PricingPage() {
                 : "border-white/10 bg-navy-900/60"
             }`}
           >
+            <TierIcon icon={tier.icon} featured={tier.featured} />
             {tier.featured && (
-              <span className="mb-4 inline-flex w-fit items-center rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand-light">
+              <span className="mt-4 mb-4 inline-flex w-fit items-center rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand-light">
                 Most Popular
               </span>
             )}
-            <h2 className="text-lg font-semibold text-white">{tier.name}</h2>
+            <h2 className="mt-4 text-lg font-semibold text-white">{tier.name}</h2>
             <p className="mt-3 flex items-baseline gap-1">
               <span className="text-4xl font-bold text-white">
                 ${tier.price}

@@ -26,6 +26,7 @@ export const PRICING_TIERS = [
       "Monthly performance summary",
     ],
     featured: false,
+    icon: "chatbot",
   },
   {
     name: "Standard",
@@ -41,6 +42,7 @@ export const PRICING_TIERS = [
       "Priority support",
     ],
     featured: true,
+    icon: "rocket",
   },
   {
     name: "Premium",
@@ -53,6 +55,88 @@ export const PRICING_TIERS = [
       "Full AI system management",
     ],
     featured: false,
+    icon: "crown",
+  },
+  {
+    name: "AI Receptionist",
+    price: 200,
+    description: "A dedicated AI voice receptionist that answers every call, 24/7.",
+    features: [
+      "AI answers and screens every incoming call",
+      "Call summaries & transcripts sent instantly",
+      "Custom greeting and FAQ script",
+      "Missed-call text-back",
+    ],
+    featured: false,
+    icon: "phone",
+  },
+] as const;
+
+export const FEATURE_HIGHLIGHTS = [
+  {
+    name: "AI Chatbot",
+    description:
+      "Answers customer questions instantly, 24/7 — pricing, availability, hours, and more — so no inquiry ever goes unanswered.",
+    image: {
+      src: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=75&w=1200&auto=format&fit=crop",
+      alt: "A sleek white robotic hand reaching outward, representing an AI assistant",
+    },
+  },
+  {
+    name: "Booking Automation",
+    description:
+      "Instant alerts and scheduling the moment a customer reaches out, so you respond in minutes instead of hours.",
+    image: {
+      src: "https://images.unsplash.com/photo-1649433391719-2e784576d044?q=75&w=1200&auto=format&fit=crop",
+      alt: "A close-up of an online calendar interface used to schedule and manage bookings",
+    },
+  },
+  {
+    name: "Review Generation",
+    description:
+      "Automatic review requests sent after every service, turning happy customers into 5-star ratings on autopilot.",
+    image: {
+      src: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?q=75&w=1200&auto=format&fit=crop",
+      alt: "A row of yellow five-star ratings representing a glowing customer review",
+    },
+  },
+  {
+    name: "Custom Website",
+    description:
+      "A fast, mobile-optimized website built for your business — designed to turn visitors into booked customers.",
+    image: {
+      src: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=75&w=1200&auto=format&fit=crop",
+      alt: "A laptop on a desk displaying lines of website code in an editor",
+    },
+  },
+  {
+    name: "AI Receptionist",
+    description:
+      "A dedicated AI voice receptionist that answers every call, books appointments, and never puts a customer on hold.",
+    image: {
+      src: "https://images.unsplash.com/photo-1758876204242-787309002a8f?q=75&w=1200&auto=format&fit=crop",
+      alt: "A man talking on the phone at his desk while working on a laptop",
+    },
+  },
+] as const;
+
+export const SERVICES_FAQ = [
+  {
+    question: "How long does setup take?",
+    answer: "Most businesses are fully up and running within 48 hours of signing up.",
+  },
+  {
+    question: "Do I need a contract?",
+    answer: "No. There are no long-term contracts — you can cancel any time.",
+  },
+  {
+    question: "What businesses do you work with?",
+    answer:
+      "Any local business that takes inbound calls, messages, or bookings — from service providers to retail.",
+  },
+  {
+    question: "What if I want to cancel?",
+    answer: "Cancel any time, no questions asked. There are no cancellation fees or lock-in periods.",
   },
 ] as const;
 

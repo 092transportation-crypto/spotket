@@ -2,5 +2,18 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: SITE_URL, changeFrequency: "yearly", priority: 1 }];
+  const routes = [
+    "",
+    "/services",
+    "/how-it-works",
+    "/results",
+    "/pricing",
+    "/contact",
+  ];
+
+  return routes.map((route) => ({
+    url: `${SITE_URL}${route}`,
+    changeFrequency: "monthly",
+    priority: route === "" ? 1 : 0.8,
+  }));
 }

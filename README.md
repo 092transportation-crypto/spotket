@@ -1,8 +1,8 @@
-# Spotket (retired)
+# Spotket Digital
 
-The Spotket store is shut down. This repo now serves a single landing
-page announcing the move to [RIFQA](https://rifqa.shop), plus a
-middleware redirect that sends every other path back to `/`.
+Marketing site for Spotket Digital, an AI automation and web design
+agency for small businesses — AI chatbots, booking automation, review
+generation, and custom websites.
 
 ## Getting started
 

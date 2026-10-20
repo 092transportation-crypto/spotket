@@ -1,21 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Indigo brand (matches the SK logo) on a near-black canvas */
+  /* Blue/purple brand on a near-black canvas */
   --color-brand: #6366f1;
   --color-brand-light: #818cf8;
   --color-brand-dark: #4f46e5;
-  /* Dark cinematic theme: near-black canvas, indigo brand, gold highlights. */
-  --color-gold: #c9a84c;
-  --color-gold-light: #e0c375;
-  --color-navy-950: #0a0a0a;
-  --color-navy-900: #111114;
-  --color-navy-800: #17171d;
-  --color-navy-700: #26262e;
-  --color-navy-600: #35353f;
+  --color-accent: #a855f7;
+  --color-navy-950: #0a0a0f;
+  --color-navy-900: #111116;
+  --color-navy-800: #17171f;
+  --color-navy-700: #26262f;
 
   --font-sans: var(--font-inter);
-  --font-display: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
 
   --animate-fade-up: fade-up 0.7s ease-out both;
@@ -45,20 +41,16 @@
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
-  /* Nothing may stretch the page wider than the screen */
   overflow-x: clip;
 }
 
 body {
-  background: #0a0a0a;
+  background: #0a0a0f;
   color: #f5f5f5;
-  /* Removes the 300ms double-tap-to-zoom delay for snappier taps */
   touch-action: manipulation;
   overflow-x: clip;
 }
 
-/* Older mobile engines without clip support fall back to hidden —
-   in a @supports block so the minifier can't collapse the override. */
 @supports not (overflow-x: clip) {
   html,
   body {
@@ -75,7 +67,6 @@ body {
   }
 }
 
-/* Media never exceeds its container */
 img,
 video,
 svg {
@@ -88,49 +79,27 @@ svg {
   color: #ffffff;
 }
 
-@keyframes float-y {
-  0%, 100% {
-    transform: translateY(0) rotate(var(--tilt, 0deg));
-  }
-  50% {
-    transform: translateY(-14px) rotate(var(--tilt, 0deg));
-  }
-}
-
-@keyframes particle-rise {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(-90vh);
-    opacity: 0;
-  }
-}
-
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
+/* Slow-pulsing background blobs used behind hero sections */
 @keyframes blob-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1) translate(0, 0);
-    opacity: 0.5;
+    opacity: 0.45;
   }
   50% {
     transform: scale(1.15) translate(2%, -3%);
-    opacity: 0.75;
+    opacity: 0.7;
   }
 }
+.blob-pulse {
+  animation: blob-pulse 9s ease-in-out infinite;
+}
+.blob-pulse-delay {
+  animation: blob-pulse 9s ease-in-out infinite;
+  animation-delay: 2.5s;
+}
 
+/* Gradient CTA with a periodic light sweep */
 @keyframes shimmer-sweep {
   0% {
     transform: translateX(-150%) skewX(-20deg);
@@ -139,12 +108,10 @@ svg {
     transform: translateX(250%) skewX(-20deg);
   }
 }
-
-/* Gradient CTA with a periodic light sweep */
 .btn-shimmer {
   position: relative;
   overflow: hidden;
-  background-image: linear-gradient(100deg, #6366f1, #4f46e5 55%, #7c3aed);
+  background-image: linear-gradient(100deg, #6366f1, #4f46e5 55%, #a855f7);
 }
 .btn-shimmer::after {
   content: "";
@@ -152,97 +119,33 @@ svg {
   top: 0;
   bottom: 0;
   width: 40%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
   animation: shimmer-sweep 3.2s ease-in-out infinite;
 }
 
-/* Cinematic headings */
-h1,
-h2 {
-  font-family: var(--font-playfair), Georgia, serif;
-}
-
-/* Typewriter caret for the hero headline */
-@keyframes caret-blink {
-  0%, 45% {
-    opacity: 1;
-  }
-  50%, 100% {
-    opacity: 0;
-  }
-}
-
-/* Springier float for the hero product showcase */
-@keyframes float-bounce {
-  0%, 100% {
-    transform: translateY(0) rotate(var(--tilt, 0deg)) scale(1);
-  }
-  40% {
-    transform: translateY(-16px) rotate(var(--tilt, 0deg)) scale(1.015);
-  }
-  55% {
-    transform: translateY(-13px) rotate(var(--tilt, 0deg)) scale(1.01);
-  }
-}
-
-/* Pulsing lightning bolt on the flash-sale banner */
-@keyframes zap-pulse {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 2px rgba(224, 195, 117, 0.4));
-  }
-  50% {
-    transform: scale(1.25);
-    filter: drop-shadow(0 0 10px rgba(224, 195, 117, 0.9));
-  }
-}
-
-/* Skeleton shimmer shown behind product images while they load */
-@keyframes image-shimmer {
-  from {
-    background-position: 200% 0;
-  }
-  to {
-    background-position: -200% 0;
-  }
-}
-.img-shimmer {
-  background: linear-gradient(
-    100deg,
-    #17171d 40%,
-    #26262e 50%,
-    #17171d 60%
-  );
-  background-size: 200% 100%;
-  animation: image-shimmer 1.6s linear infinite;
-}
-
-/* Animated brand/gold glow that breathes while a product card is hovered */
+/* Glow on hover for cards (services, pricing) */
 @keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.55), 0 8px 32px rgba(99, 102, 241, 0.35);
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.55),
+      0 8px 32px rgba(99, 102, 241, 0.35);
   }
   50% {
-    box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.55), 0 8px 36px rgba(201, 168, 76, 0.28);
+    box-shadow:
+      0 0 0 1px rgba(168, 85, 247, 0.55),
+      0 8px 36px rgba(168, 85, 247, 0.28);
   }
 }
 .card-glow:hover {
   animation: glow-pulse 2.4s ease-in-out infinite;
 }
 
-/* Slow drifting particles for the hero */
-@keyframes particle-drift {
-  0%, 100% {
-    transform: translate(0, 0);
-    opacity: 0.15;
-  }
-  50% {
-    transform: translate(12px, -22px);
-    opacity: 0.5;
-  }
-}
-
-/* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

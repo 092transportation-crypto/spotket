@@ -1,7 +1,7 @@
 /**
  * Lightweight resilience tests for the agent system's lib/ helpers,
  * run directly against the TypeScript source via `npx tsx`.
- * No real Supabase/Twilio/SMTP/Anthropic credentials are used or needed —
+ * No real Supabase/SMTP/Anthropic credentials are used or needed —
  * everything here verifies graceful no-op behavior when they're unset,
  * plus the auth/crypto logic which needs no network at all.
  *
@@ -43,31 +43,6 @@ async function run() {
   check("cron auth: wrong bearer rejected", !verifyCronAuth("Bearer wrong"));
   check("cron auth: missing header rejected", !verifyCronAuth(null));
   check("cron auth: malformed header rejected", !verifyCronAuth("cron-test-secret"));
-
-  // --- lib/sms.ts: no env vars configured — must no-op, never throw ---
-  delete process.env.TWILIO_ACCOUNT_SID;
-  delete process.env.TWILIO_AUTH_TOKEN;
-  delete process.env.TWILIO_FROM_NUMBER;
-  delete process.env.ALERT_PHONE_NUMBER;
-  const { sendSms } = await import("../lib/sms");
-  check("sendSms: no-ops cleanly when unconfigured", (await sendSms("test")) === false);
-
-  // --- lib/sms.ts: a real call (fake creds, real Twilio URL) must still be
-  // bounded by its own 6s timeout rather than hanging indefinitely ---
-  process.env.TWILIO_ACCOUNT_SID = "AC_test";
-  process.env.TWILIO_AUTH_TOKEN = "test_token";
-  process.env.TWILIO_FROM_NUMBER = "+15555550100";
-  process.env.ALERT_PHONE_NUMBER = "+15555550101";
-  const twilioStart = Date.now();
-  const smsLiveAttempt = await Promise.race([
-    sendSms("timeout-check"),
-    new Promise<string>((resolve) => setTimeout(() => resolve("TIMED_OUT_TEST_HARNESS"), 8000)),
-  ]);
-  check(
-    "sendSms: bounded by its own timeout, doesn't hang past ~6s",
-    smsLiveAttempt !== "TIMED_OUT_TEST_HARNESS",
-    `took ${Date.now() - twilioStart}ms, result=${smsLiveAttempt}`,
-  );
 
   // --- lib/mailer.ts: no env vars configured — must no-op, never throw ---
   delete process.env.SMTP_USER;
@@ -111,7 +86,24 @@ async function run() {
   );
 
   // --- lib/mailer.ts: contact confirmation + follow-up copy must match spec exactly ---
-  const { buildContactConfirmationEmail } = await import("../lib/mailer");
+  const { buildContactConfirmationEmail, buildLeadAlertEmail } = await import("../lib/mailer");
+  const alert = buildLeadAlertEmail("contact form", [
+    { label: "Name", value: "Jane Smith" },
+    { label: "Phone", value: "4105551234" },
+    { label: "Website", value: undefined },
+  ]);
+  check(
+    "buildLeadAlertEmail: includes filled fields, omits empty ones",
+    alert.text.includes("Name: Jane Smith") &&
+      alert.text.includes("Phone: 4105551234") &&
+      !alert.text.includes("Website"),
+  );
+  check(
+    "buildLeadAlertEmail: escapes HTML in field values",
+    !buildLeadAlertEmail("contact form", [{ label: "Name", value: "<script>alert(1)</script>" }]).html.includes(
+      "<script>alert",
+    ),
+  );
   const confirmation = buildContactConfirmationEmail("Jane Smith");
   check(
     "buildContactConfirmationEmail: matches the required copy",
@@ -163,7 +155,7 @@ async function run() {
     }),
   );
   check(
-    "contact-inquiry: 201 + ok on valid input, even with no Twilio/SMTP/Supabase configured",
+    "contact-inquiry: 201 + ok on valid input, even with no ALERT_EMAIL/SMTP/Supabase configured",
     validRes.status === 201 && (await validRes.json()).ok === true,
   );
 

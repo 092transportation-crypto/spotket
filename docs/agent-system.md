@@ -40,12 +40,12 @@ table.
   Anthropic model ID, so this was corrected; set this var to
   `claude-sonnet-5-5` if you want higher-quality, slower, pricier replies)
 
-### 3. Twilio (SMS alerts)
+### 3. Lead alert email (replaces Twilio/SMS — removed 2026-10-20)
 
-- `TWILIO_ACCOUNT_SID`
-- `TWILIO_AUTH_TOKEN`
-- `TWILIO_FROM_NUMBER` (your Twilio number)
-- `ALERT_PHONE_NUMBER` (the phone that gets a text on every captured lead)
+- `ALERT_EMAIL` — every captured lead (contact form, lead/exit-intent popups,
+  sales chat) sends an email here instead of a text message. No SMS, no
+  Twilio dependency anywhere in this repo anymore. No-ops (logs and skips)
+  if unset, same resilience pattern as everything else here.
 
 ### 4. SMTP (follow-up + confirmation emails)
 

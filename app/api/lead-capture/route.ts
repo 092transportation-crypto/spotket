@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { insertLead, logActivity } from "@/lib/supabase";
-import { sendSms } from "@/lib/sms";
+import { sendEmail, buildLeadAlertEmail } from "@/lib/mailer";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,9 +25,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: "email is invalid" }, { status: 400 });
   }
 
-  const smsBody = `New Spotket lead (${source}): ${name} — ${phone}${email ? ` — ${email}` : ""}`;
+  const alertTo = process.env.ALERT_EMAIL;
+  const alert = buildLeadAlertEmail(source, [
+    { label: "Name", value: name },
+    { label: "Phone", value: phone },
+    { label: "Email", value: email },
+  ]);
   await Promise.allSettled([
-    sendSms(smsBody),
+    alertTo ? sendEmail(alertTo, alert.subject, alert.text, alert.html) : Promise.resolve(false),
     insertLead({ name, phone, email, source }),
     logActivity("sales_agent", `Captured lead via ${source}: ${name}`),
   ]);

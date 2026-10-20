@@ -78,6 +78,29 @@ export function buildContactConfirmationEmail(name: string): {
   return { subject, text, html };
 }
 
+/** Internal alert email sent to ALERT_EMAIL whenever any surface captures a lead. */
+export function buildLeadAlertEmail(
+  source: string,
+  fields: Array<{ label: string; value?: string }>
+): { subject: string; text: string; html: string } {
+  const filled = fields.filter((f): f is { label: string; value: string } => Boolean(f.value));
+  const subject = `New Spotket lead (${source})`;
+  const text = [`New lead from ${source}:`, "", ...filled.map((f) => `${f.label}: ${f.value}`)].join("\n");
+  const rows = filled
+    .map(
+      (f) =>
+        `<tr><td style="padding:6px 10px;color:#9ca3af;font-size:13px;white-space:nowrap;">${escapeHtml(
+          f.label
+        )}</td><td style="padding:6px 10px;color:#fff;font-size:14px;">${escapeHtml(f.value)}</td></tr>`
+    )
+    .join("");
+  const html = shell(
+    `<p style="font-size:15px;margin:0 0 14px;">New lead from <strong>${escapeHtml(source)}</strong>:</p>` +
+      `<table style="width:100%;border-collapse:collapse;">${rows}</table>`
+  );
+  return { subject, text, html };
+}
+
 export function buildFollowUpEmail(name: string): { subject: string; text: string; html: string } {
   const firstName = (name || "there").split(" ")[0] || "there";
   const subject = `Following up, ${firstName}`;

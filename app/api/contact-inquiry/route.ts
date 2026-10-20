@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { insertLead, logActivity } from "@/lib/supabase";
-import { sendSms } from "@/lib/sms";
-import { sendEmail, buildContactConfirmationEmail } from "@/lib/mailer";
+import { sendEmail, buildContactConfirmationEmail, buildLeadAlertEmail } from "@/lib/mailer";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -60,29 +59,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: "email is invalid" }, { status: 400 });
   }
 
-  const smsLines = [
-    `New Spotket contact form inquiry:`,
-    `${lead.name} — ${lead.business_name} (${lead.business_type})`,
-    `${lead.phone} — ${lead.email}`,
-    lead.website_url ? `Site: ${lead.website_url}` : null,
-    lead.revenue_range ? `Revenue: ${lead.revenue_range}` : null,
-    `Challenge: ${lead.biggest_challenge}`,
-    `Heard via: ${lead.heard_about_us}`,
-    lead.message ? `Message: ${lead.message.slice(0, 200)}` : null,
-  ].filter(Boolean);
-
+  const alertTo = process.env.ALERT_EMAIL;
+  const alert = buildLeadAlertEmail("contact form", [
+    { label: "Name", value: lead.name },
+    { label: "Business", value: lead.business_name },
+    { label: "Business type", value: lead.business_type },
+    { label: "Phone", value: lead.phone },
+    { label: "Email", value: lead.email },
+    { label: "Website", value: lead.website_url },
+    { label: "Revenue range", value: lead.revenue_range },
+    { label: "Biggest challenge", value: lead.biggest_challenge },
+    { label: "Heard about us via", value: lead.heard_about_us },
+    { label: "Message", value: lead.message },
+  ]);
   const confirmation = buildContactConfirmationEmail(lead.name);
 
-  const [smsResult, emailResult, dbResult] = await Promise.allSettled([
-    sendSms(smsLines.join("\n")),
+  const [alertResult, confirmResult, dbResult] = await Promise.allSettled([
+    alertTo ? sendEmail(alertTo, alert.subject, alert.text, alert.html) : Promise.resolve(false),
     sendEmail(lead.email, confirmation.subject, confirmation.text, confirmation.html),
     insertLead({ ...lead, source: "contact_form" }),
     logActivity("sales_agent", `Contact form inquiry from ${lead.name} (${lead.business_name})`),
   ]);
 
   for (const [label, result] of [
-    ["SMS", smsResult],
-    ["confirmation email", emailResult],
+    ["lead alert email", alertResult],
+    ["confirmation email", confirmResult],
     ["Supabase insert", dbResult],
   ] as const) {
     if (result.status === "rejected") {

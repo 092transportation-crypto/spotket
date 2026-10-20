@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { PRICING_TIERS } from "@/lib/site";
 import { insertLead, isAgentEnabled, logActivity } from "@/lib/supabase";
-import { sendSms } from "@/lib/sms";
+import { sendEmail, buildLeadAlertEmail } from "@/lib/mailer";
 import { callAnthropic, extractText, type AnthropicMessage } from "@/lib/anthropic";
 
 const FALLBACK_REPLY =
@@ -87,9 +87,16 @@ export async function POST(request: NextRequest) {
     const email = String(input.email || "").trim().slice(0, 150);
     const recommendedPackage = String(input.recommended_package || "").trim().slice(0, 30);
 
-    const smsBody = `New Spotket lead: ${name} (${businessName}) — ${phone} — recommended: ${recommendedPackage || "n/a"}`;
+    const alertTo = process.env.ALERT_EMAIL;
+    const alert = buildLeadAlertEmail("sales chat", [
+      { label: "Name", value: name },
+      { label: "Business", value: businessName },
+      { label: "Phone", value: phone },
+      { label: "Email", value: email },
+      { label: "Recommended package", value: recommendedPackage },
+    ]);
     await Promise.allSettled([
-      sendSms(smsBody),
+      alertTo ? sendEmail(alertTo, alert.subject, alert.text, alert.html) : Promise.resolve(false),
       insertLead({
         name,
         business_name: businessName,

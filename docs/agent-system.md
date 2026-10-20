@@ -64,7 +64,7 @@ the suggested default per the original request.
 | Sales Agent | Chat widget (`/api/chat`) | Qualifies visitors, recommends a real pricing tier from `lib/site.ts`, collects name/business/phone/email, texts + saves + logs the lead |
 | Blog Agent | Daily cron, 6am (`/api/cron/blog-agent`) | Generates 1 SEO blog post from the 5 given topics, publishes to `/blog/<slug>`, added to sitemap |
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
-| Lead Follow-Up Agent | Hourly cron (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
+| Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
 
 Every agent checks `agent_settings` in Supabase before running — toggle any
 of them off from `/admin` and it logs "skipped" instead of running, on its
@@ -97,4 +97,7 @@ handler actually does).
   reply tracking. `contacted` would need to be set by whoever answers a
   lead (e.g. a future admin-dashboard button), so it is currently always
   `false` until something sets it, meaning every lead gets exactly one
-  follow-up 24h after capture unless disabled.
+  follow-up unless disabled. Also note: this cron runs once daily (noon) —
+  Vercel's Hobby plan only allows daily cron schedules, not hourly — so in
+  practice the follow-up goes out sometime between 24h and 48h after
+  capture, not within an hour of hitting the 24h mark.

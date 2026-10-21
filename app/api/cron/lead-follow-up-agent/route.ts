@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   let sent = 0;
   for (const lead of leads) {
     if (!lead.email) continue;
-    const { subject, text, html } = buildFollowUpEmail(lead.name || "");
+    const { subject, text, html } = buildFollowUpEmail(lead.name || "", lead.business_name);
     const ok = await sendEmail(lead.email, subject, text, html);
     if (ok) {
       await markFollowedUp(lead.id);

@@ -115,6 +115,16 @@ create table if not exists payments (
   paid_at timestamptz
 );
 
+-- Repairs an older `payments` table created before client_id/paid_at existed
+-- in this file (PostgREST error: "Could not find the 'client_id' column of
+-- 'payments' in the schema cache" / "column payments.paid_at does not
+-- exist"). `create table if not exists` above is a no-op once the table
+-- already exists, so these columns never land on an existing table without
+-- this. Safe to re-run — add column if not exists is idempotent.
+alter table payments add column if not exists client_id uuid references clients(id) on delete cascade;
+alter table payments add column if not exists paid_at timestamptz;
+notify pgrst, 'reload schema';
+
 create table if not exists email_campaigns (
   id uuid primary key default gen_random_uuid(),
   name text not null,

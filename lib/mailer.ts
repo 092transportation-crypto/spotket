@@ -6,7 +6,12 @@
  * past the caller.
  */
 import nodemailer from "nodemailer";
-import { SITE_NAME, SITE_URL } from "./site";
+import { BOOKING_URL, SITE_NAME, SITE_URL } from "./site";
+
+/** Every outbound email signs off this way — brand only, no personal name. */
+const SIGNATURE_TEXT = "— Spotket Team\nspotket.com | spotketllc@gmail.com";
+const SIGNATURE_HTML =
+  `<p style="margin:0;font-size:13px;color:#9ca3af;line-height:1.6;">— Spotket Team<br />spotket.com | spotketllc@gmail.com</p>`;
 
 let cachedTransport: ReturnType<typeof nodemailer.createTransport> | null | undefined;
 
@@ -70,10 +75,11 @@ export function buildContactConfirmationEmail(name: string): {
 } {
   const firstName = (name || "there").split(" ")[0] || "there";
   const subject = "We got your message — Spotket";
-  const text = `Hi ${firstName},\n\nThanks for reaching out to Spotket. We'll be in touch within 24 hours.`;
+  const text = `Hi ${firstName},\n\nThanks for reaching out to Spotket. We'll be in touch within 24 hours.\n\n${SIGNATURE_TEXT}`;
   const html = shell(
     `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(firstName)},</p>` +
-      `<p style="font-size:15px;line-height:1.6;">Thanks for reaching out to Spotket. We'll be in touch within 24 hours.</p>`
+      `<p style="font-size:15px;line-height:1.6;margin:0 0 20px;">Thanks for reaching out to Spotket. We'll be in touch within 24 hours.</p>` +
+      SIGNATURE_HTML
   );
   return { subject, text, html };
 }
@@ -101,20 +107,52 @@ export function buildLeadAlertEmail(
   return { subject, text, html };
 }
 
-export function buildFollowUpEmail(name: string): { subject: string; text: string; html: string } {
+/** Lead follow-up email (24h+, no response yet) — sent by the lead-follow-up cron agent. */
+export function buildFollowUpEmail(
+  name: string,
+  businessName?: string | null,
+): { subject: string; text: string; html: string } {
   const firstName = (name || "there").split(" ")[0] || "there";
-  const subject = `Following up, ${firstName}`;
-  const text = `Hey ${firstName} — just following up on your interest in Spotket. Would love to show you a quick demo.`;
+  const subject = businessName ? `Quick follow up — ${businessName}` : "Quick follow up";
+
+  const text = [
+    `Hi ${firstName},`,
+    "",
+    "I wanted to follow up on your interest in Spotket.",
+    "",
+    "I help small businesses like yours get more customers using AI — we build a custom website, set up a chatbot that responds 24/7, and automatically collect Google reviews after every job.",
+    "",
+    "We did this for 92 Transportation in Maryland and they picked up 5 extra bookings per month just from responding faster than competitors.",
+    "",
+    "It takes 48 hours to set up and starts at $300/month with no contracts.",
+    "",
+    "Would you be open to a quick 10 minute call this week?",
+    "",
+    `Book a call: ${BOOKING_URL}`,
+    "",
+    SIGNATURE_TEXT,
+  ].join("\n");
+
   const html = shell(
-    `<p style="font-size:15px;line-height:1.6;">Hey ${escapeHtml(firstName)} — just following up on your interest in Spotket. Would love to show you a quick demo.</p>`
+    `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(firstName)},</p>` +
+      `<p style="font-size:15px;line-height:1.6;">I wanted to follow up on your interest in Spotket.</p>` +
+      `<p style="font-size:15px;line-height:1.6;">I help small businesses like yours get more customers using AI — we build a custom website, set up a chatbot that responds 24/7, and automatically collect Google reviews after every job.</p>` +
+      `<p style="font-size:15px;line-height:1.6;">We did this for <strong>92 Transportation</strong> in Maryland and they picked up <strong>5 extra bookings per month</strong> just from responding faster than competitors.</p>` +
+      `<p style="font-size:15px;line-height:1.6;">It takes 48 hours to set up and starts at <strong>$300/month</strong> with no contracts.</p>` +
+      `<p style="font-size:15px;line-height:1.6;">Would you be open to a quick 10 minute call this week?</p>` +
+      `<div style="text-align:center;margin:24px 0;">` +
+      `<a href="${BOOKING_URL}" style="display:inline-block;background:linear-gradient(100deg,#6366f1,#4f46e5 55%,#a855f7);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:999px;">Book a Call</a>` +
+      `</div>` +
+      SIGNATURE_HTML
   );
+
   return { subject, text, html };
 }
 
 /** Monthly summary email sent from a client's workspace. Real data (plan) only — no fabricated metrics. */
 export function buildClientReportEmail(businessName: string, plan: string): { subject: string; text: string; html: string } {
   const subject = `Your Spotket monthly report — ${businessName}`;
-  const text = `Hi ${businessName},\n\nHere's your monthly Spotket summary:\n\n- Plan: ${plan}\n- Your AI automation is live and running\n\nQuestions or want to add anything? Just reply to this email.\n\n— Spotket Digital`;
+  const text = `Hi ${businessName},\n\nHere's your monthly Spotket summary:\n\n- Plan: ${plan}\n- Your AI automation is live and running\n\nQuestions or want to add anything? Just reply to this email.\n\n${SIGNATURE_TEXT}`;
   const html = shell(
     `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(businessName)},</p>` +
       `<p style="font-size:15px;line-height:1.6;">Here's your monthly Spotket summary:</p>` +
@@ -122,7 +160,8 @@ export function buildClientReportEmail(businessName: string, plan: string): { su
       `<li><strong>Plan:</strong> ${escapeHtml(plan)}</li>` +
       `<li>Your AI automation is live and running</li>` +
       `</ul>` +
-      `<p style="font-size:14px;line-height:1.6;">Questions or want to add anything? Just reply to this email.</p>`
+      `<p style="font-size:14px;line-height:1.6;margin:0 0 20px;">Questions or want to add anything? Just reply to this email.</p>` +
+      SIGNATURE_HTML
   );
   return { subject, text, html };
 }
@@ -132,11 +171,12 @@ export function buildCampaignFollowUpEmail(contactName: string | null, businessN
   const name = (contactName || "there").split(" ")[0] || "there";
   const business = businessName || "your business";
   const subject = "Following up — quick question";
-  const text = `Hi ${name},\n\nJust following up on my last note about helping ${business} with AI automation — happy to answer any questions, no pressure either way.\n\n— Spotket Digital\n\nIf you'd rather not hear from us again, just reply "unsubscribe."`;
+  const text = `Hi ${name},\n\nJust following up on my last note about helping ${business} with AI automation — happy to answer any questions, no pressure either way.\n\n${SIGNATURE_TEXT}\n\nIf you'd rather not hear from us again, just reply "unsubscribe."`;
   const html = shell(
     `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(name)},</p>` +
-      `<p style="font-size:15px;line-height:1.6;">Just following up on my last note about helping ${escapeHtml(business)} with AI automation — happy to answer any questions, no pressure either way.</p>` +
-      `<p style="font-size:13px;color:#9ca3af;">If you'd rather not hear from us again, just reply "unsubscribe."</p>`
+      `<p style="font-size:15px;line-height:1.6;margin:0 0 20px;">Just following up on my last note about helping ${escapeHtml(business)} with AI automation — happy to answer any questions, no pressure either way.</p>` +
+      SIGNATURE_HTML +
+      `<p style="font-size:13px;color:#9ca3af;margin-top:16px;">If you'd rather not hear from us again, just reply "unsubscribe."</p>`
   );
   return { subject, text, html };
 }
@@ -173,8 +213,7 @@ export function buildPaymentLinkEmail(
     "",
     "Questions? Reply to this email or visit spotket.com",
     "",
-    "— The Spotket Team",
-    "spotket.com",
+    SIGNATURE_TEXT,
   ]
     .filter((line) => line !== null)
     .join("\n");
@@ -214,8 +253,8 @@ export function buildPaymentLinkEmail(
           </p>
         </div>
         <div style="padding:20px 32px;background:#fafafa;border-top:1px solid #efeff4;text-align:center;">
-          <p style="margin:0;font-size:13px;color:#71717a;">— The Spotket Team</p>
-          <p style="margin:4px 0 0;font-size:13px;color:#a1a1aa;">spotket.com</p>
+          <p style="margin:0;font-size:13px;color:#71717a;">— Spotket Team</p>
+          <p style="margin:4px 0 0;font-size:13px;color:#a1a1aa;">spotket.com | spotketllc@gmail.com</p>
         </div>
       </div>
     </div>`;

@@ -6,6 +6,9 @@ export const SITE_TAGLINE =
   "AI automation for small business — AI chatbots, AI receptionists, and automated review requests that get you more bookings, 24/7.";
 export const CONTACT_EMAIL = "hello@spotket.com";
 
+/** The "Book a Call" link used in outbound emails. Set NEXT_PUBLIC_BOOKING_URL (a real Calendly link) to override — defaults to the contact page. */
+export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL || `${SITE_URL}/contact`;
+
 export const NAV_LINKS = [
   { href: "/services", label: "Services" },
   { href: "/how-it-works", label: "How It Works" },

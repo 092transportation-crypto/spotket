@@ -49,10 +49,15 @@ async function run() {
   delete process.env.SMTP_PASSWORD;
   const { sendEmail, buildFollowUpEmail } = await import("../lib/mailer");
   check("sendEmail: no-ops cleanly when unconfigured", (await sendEmail("test@example.com", "subj", "body")) === false);
-  const followUp = buildFollowUpEmail("Jane Smith");
+  const followUp = buildFollowUpEmail("Jane Smith", "Jane's Bakery");
   check(
-    "buildFollowUpEmail: matches the required copy",
-    followUp.text === "Hey Jane — just following up on your interest in Spotket. Would love to show you a quick demo.",
+    "buildFollowUpEmail: subject includes the business name",
+    followUp.subject === "Quick follow up — Jane's Bakery",
+    followUp.subject,
+  );
+  check(
+    "buildFollowUpEmail: body greets the first name and has no personal signer",
+    followUp.text.startsWith("Hi Jane,") && followUp.text.includes("— Spotket Team") && !/muhammad|shah/i.test(followUp.text),
     followUp.text,
   );
 

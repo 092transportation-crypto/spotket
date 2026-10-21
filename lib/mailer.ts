@@ -6,7 +6,7 @@
  * past the caller.
  */
 import nodemailer from "nodemailer";
-import { SITE_NAME } from "./site";
+import { SITE_NAME, SITE_URL } from "./site";
 
 let cachedTransport: ReturnType<typeof nodemailer.createTransport> | null | undefined;
 
@@ -138,6 +138,88 @@ export function buildCampaignFollowUpEmail(contactName: string | null, businessN
       `<p style="font-size:15px;line-height:1.6;">Just following up on my last note about helping ${escapeHtml(business)} with AI automation — happy to answer any questions, no pressure either way.</p>` +
       `<p style="font-size:13px;color:#9ca3af;">If you'd rather not hear from us again, just reply "unsubscribe."</p>`
   );
+  return { subject, text, html };
+}
+
+/** Short, scannable "Includes" line per plan — shown on the payment link email. */
+const PLAN_INCLUDES: Record<string, string[]> = {
+  Starter: ["AI Chatbot", "Instant Lead Alerts", "FAQ Setup", "Monthly Report"],
+  Standard: ["Everything in Starter", "Custom Website", "Booking Automation", "Review Automation", "Priority Support"],
+  Premium: ["Everything in Standard", "Advanced Automations", "Strategy Call", "Full System Management"],
+  "AI Receptionist": ["24/7 Call Answering", "Call Summaries & Transcripts", "Custom Greeting & FAQ Script", "Missed-Call Text-Back"],
+};
+
+/** Payment link email — dark branded header, white body, one prominent CTA button. */
+export function buildPaymentLinkEmail(
+  name: string,
+  plan: string,
+  amount: number,
+  url: string
+): { subject: string; text: string; html: string } {
+  const firstName = (name || "there").split(" ")[0] || "there";
+  const includes = PLAN_INCLUDES[plan] ?? [];
+  const subject = "Your Spotket Payment Link 🚀";
+  const text = [
+    `Hi ${firstName},`,
+    "",
+    "Thank you for choosing Spotket! Here's your secure payment link to get started.",
+    "",
+    `Plan: ${plan} — $${amount}/month`,
+    includes.length ? `Includes: ${includes.join(", ")}` : null,
+    "",
+    `Pay now: ${url}`,
+    "",
+    "After payment is confirmed we'll begin your setup within 24 hours.",
+    "",
+    "Questions? Reply to this email or visit spotket.com",
+    "",
+    "— The Spotket Team",
+    "spotket.com",
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+
+  const html = `
+    <div style="font-family:Arial,Helvetica,sans-serif;background:#f4f4f7;padding:30px;">
+      <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(17,17,22,0.08);">
+        <div style="background:linear-gradient(100deg,#6366f1,#4f46e5 55%,#a855f7);padding:28px 24px;text-align:center;">
+          <img src="${SITE_URL}/spotket-logo.png" alt="${escapeHtml(SITE_NAME)}" height="32" style="height:32px;display:inline-block;" />
+        </div>
+        <div style="padding:36px 32px 32px;color:#18181f;">
+          <p style="font-size:15px;line-height:1.6;margin:0 0 16px;">Hi ${escapeHtml(firstName)},</p>
+          <p style="font-size:15px;line-height:1.6;margin:0 0 24px;color:#3f3f46;">
+            Thank you for choosing Spotket! Here's your secure payment link to get started.
+          </p>
+          <div style="background:#f6f6fb;border:1px solid #e9e9f2;border-radius:10px;padding:18px 20px;margin:0 0 28px;">
+            <p style="margin:0 0 8px;font-size:14px;color:#52525b;">
+              <span style="color:#18181f;font-weight:700;">Plan:</span> ${escapeHtml(plan)} — $${amount}/month
+            </p>
+            ${
+              includes.length
+                ? `<p style="margin:0;font-size:14px;color:#52525b;"><span style="color:#18181f;font-weight:700;">Includes:</span> ${escapeHtml(includes.join(", "))}</p>`
+                : ""
+            }
+          </div>
+          <div style="text-align:center;margin:0 0 28px;">
+            <a href="${url}" style="display:inline-block;background:linear-gradient(100deg,#6366f1,#4f46e5 55%,#a855f7);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:16px 36px;border-radius:999px;letter-spacing:0.2px;">
+              PAY NOW — $${amount}/month
+            </a>
+          </div>
+          <p style="font-size:14px;line-height:1.6;margin:0 0 20px;color:#3f3f46;">
+            After payment is confirmed we'll begin your setup within 24 hours.
+          </p>
+          <p style="font-size:14px;line-height:1.6;margin:0;color:#3f3f46;">
+            Questions? Reply to this email or visit
+            <a href="https://spotket.com" style="color:#4f46e5;text-decoration:none;">spotket.com</a>
+          </p>
+        </div>
+        <div style="padding:20px 32px;background:#fafafa;border-top:1px solid #efeff4;text-align:center;">
+          <p style="margin:0;font-size:13px;color:#71717a;">— The Spotket Team</p>
+          <p style="margin:4px 0 0;font-size:13px;color:#a1a1aa;">spotket.com</p>
+        </div>
+      </div>
+    </div>`;
+
   return { subject, text, html };
 }
 

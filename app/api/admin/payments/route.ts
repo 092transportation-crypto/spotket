@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { sendEmail } from "@/lib/mailer";
+import { sendEmail, buildPaymentLinkEmail } from "@/lib/mailer";
 import { createPaymentLink } from "@/lib/stripe";
 import {
   PLAN_AMOUNTS,
@@ -41,16 +41,19 @@ export async function POST(request: NextRequest) {
 
   let email: string | null = null;
   let label = "";
+  let contactName = "";
   if (body.clientId) {
     const client = await getClientById(body.clientId);
     if (!client) return NextResponse.json({ detail: "Client not found" }, { status: 404 });
     email = client.email;
     label = client.business_name || client.name || client.email || "client";
+    contactName = client.name || client.business_name || "";
   } else if (body.leadId) {
     const lead = await getLeadById(body.leadId);
     if (!lead) return NextResponse.json({ detail: "Lead not found" }, { status: 404 });
     email = lead.email;
     label = lead.business_name || lead.name || lead.email || "lead";
+    contactName = lead.name || lead.business_name || "";
   }
 
   const link = await createPaymentLink(body.plan, amount, { clientId: body.clientId ?? "", leadId: body.leadId ?? "" });
@@ -69,7 +72,8 @@ export async function POST(request: NextRequest) {
 
   let emailed = false;
   if (email) {
-    emailed = await sendEmail(email, `Your Spotket payment link — ${body.plan}`, `Here's your payment link for the ${body.plan} plan ($${amount}/mo): ${link.url}`);
+    const { subject, text, html } = buildPaymentLinkEmail(contactName, body.plan, amount, link.url);
+    emailed = await sendEmail(email, subject, text, html);
   }
 
   await logActivity("sales_agent", `Sent ${body.plan} payment link to ${label}`);

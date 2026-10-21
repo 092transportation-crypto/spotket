@@ -11,7 +11,7 @@
  */
 import type { AnthropicMessage } from "./anthropic";
 import { callAnthropic, extractText } from "./anthropic";
-import { buildClientReportEmail, sendEmail } from "./mailer";
+import { buildClientReportEmail, buildPaymentLinkEmail, sendEmail } from "./mailer";
 import { createPaymentLink } from "./stripe";
 import {
   PLAN_AMOUNTS,
@@ -85,11 +85,13 @@ export async function runClientAssistant(
       stripe_payment_link_id: link.id,
       stripe_payment_link_url: link.url,
     });
-    const sent = await sendEmail(
-      client.email,
-      `Your Spotket payment link — ${plan}`,
-      `Here's your payment link for the ${plan} plan ($${amount}/mo): ${link.url}`,
+    const { subject, text, html } = buildPaymentLinkEmail(
+      client.name || client.business_name || "",
+      plan,
+      amount,
+      link.url,
     );
+    const sent = await sendEmail(client.email, subject, text, html);
     await logActivity("sales_agent", `Sent ${plan} payment link to ${client.business_name || client.email}`);
     return sent
       ? `Sent a $${amount}/mo ${plan} payment link to ${client.email}: ${link.url}`

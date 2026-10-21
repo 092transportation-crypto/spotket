@@ -66,6 +66,17 @@ actually use Zoho as originally planned, set `SMTP_HOST=smtp.zoho.com`,
 Code is provider-agnostic — any standard SMTP account works, Zoho is just
 the suggested default per the original request.
 
+### 5. Stripe (payment links, Payment Tracker, Client Workspace)
+
+- `STRIPE_SECRET_KEY` — without it, "Send Payment Link" (Payments tab,
+  Client Workspace, lead-profile convert flow) returns a clear 502 instead
+  of silently failing; no payment link is ever faked.
+- `STRIPE_WEBHOOK_SECRET` (optional) — only needed if you add a Stripe
+  webhook endpoint pointed at `/api/stripe/webhook` (Dashboard → Developers
+  → Webhooks → listen for `checkout.session.completed`). Without it,
+  payments created here still track as "pending" until you mark them paid
+  by hand in the Payments tab — the webhook is what makes that automatic.
+
 ### Already set (done for you, not something you need to do)
 
 - `ADMIN_DASHBOARD_PASSWORD` — set via Vercel CLI, value is the password
@@ -84,6 +95,7 @@ the suggested default per the original request.
 | Blog Agent | Daily cron, 6am (`/api/cron/blog-agent`) | Generates 1 SEO blog post from the 5 given topics, publishes to `/blog/<slug>`, added to sitemap |
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
 | Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
+| Email Campaign Agent | Daily cron, 1pm (`/api/cron/email-campaign-agent`) | Sends up to 100 AI-personalized campaign emails/day across every "sending" campaign, then 3-day no-reply follow-ups with whatever allowance is left |
 
 Every agent checks `agent_settings` in Supabase before running — toggle any
 of them off from `/admin` and it logs "skipped" instead of running, on its
@@ -108,6 +120,46 @@ handler actually does).
    break deliverability for the real lead-follow-up emails this system
    sends. If you get a compliant B2B contact list from somewhere, this can
    be built as a draft-and-approve queue in `/admin` as a follow-up.
+
+## CRM: Leads → Clients, Payments, Email Campaigns
+
+`/admin` is a 6-tab CRM: Dashboard, Leads, Clients, Email Campaigns,
+Payments, Agents.
+
+- **Leads** — search/filter, per-call notes, CSV export (client-side, no
+  extra route), and a **Convert to Client** button on each lead's profile
+  (picks a plan, creates the `clients` row, marks the lead `Closed`).
+- **Clients** — click a row to open the **Client Workspace**: edit
+  plan/payment/client status, send a Stripe payment link, and chat with a
+  Claude-powered assistant scoped to that one client. Two chat commands
+  actually execute (`send_payment_link`, `send_monthly_report` — real
+  Stripe/SMTP calls); everything else ("build their website", "write
+  blogs for them") is drafted as text in the reply, not deployed anywhere
+  — there's no live website builder or per-client CMS connected here, and
+  the assistant is told to say so rather than pretend.
+- **Email Campaigns** — CSV import (`business_name, contact_name, email,
+  website_url, notes` header row; no quoted-comma support — keep fields
+  comma-free), one AI-personalized email per recipient via
+  `lib/email-campaign.ts`, a 100/day send cap shared with the cron agent
+  above, and a 1x1 tracking pixel (`/api/email/track/[id]`, public route)
+  for opens. **"Replies" are never actually detected** — there's no
+  inbound-email webhook wired up, so a recipient only becomes `replied` if
+  someone manually marks it that way; the 3-day follow-up really means
+  "3 days since sent and nobody marked this replied," the same honest
+  proxy the Lead Follow-Up Agent already uses for `contacted`. Only ever
+  email CSV lists you already own — nothing here scrapes contacts (see
+  "Scoped down," point 2 above, which still holds for prospecting).
+- **Payments** — every Stripe Payment Link created anywhere in `/admin`
+  lands here (`payments` table) with status `pending` until marked `paid`
+  (by the Stripe webhook if configured, or by hand). MRR on the Dashboard
+  sums `clients.monthly_amount` for `status = 'active'`, independent of
+  whether that client's latest payment actually cleared.
+- **Chatbot activity / reviews generated this month** (per client) are
+  **not tracked** — the Client Workspace says so outright rather than
+  showing a fabricated number. The AI chatbot/review automation Spotket
+  sells runs on each *client's own* site, not inside this admin's
+  database; wiring that up would mean every client deployment reporting
+  activity back here, which doesn't exist yet.
 
 ## Honesty notes in the code
 

@@ -2,6 +2,7 @@
   "crons": [
     { "path": "/api/cron/blog-agent", "schedule": "0 6 * * *" },
     { "path": "/api/cron/landing-page-agent", "schedule": "0 6 * * 1" },
-    { "path": "/api/cron/lead-follow-up-agent", "schedule": "0 12 * * *" }
+    { "path": "/api/cron/lead-follow-up-agent", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/email-campaign-agent", "schedule": "0 13 * * *" }
   ]
 }

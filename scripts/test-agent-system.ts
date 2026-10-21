@@ -102,6 +102,55 @@ async function run() {
   const stats = await supa.leadStats();
   check("leadStats: returns zeroed stats when unconfigured", stats.totalLeads === 0 && stats.followUpsSent === 0);
 
+  // --- CRM layer (lib/supabase.ts additions): no-ops when unconfigured ---
+  check("listClients: returns [] when unconfigured", (await supa.listClients()).length === 0);
+  check("getClientById: returns null when unconfigured", (await supa.getClientById("x")) === null);
+  check("insertClient: returns null (no-op) when unconfigured", (await supa.insertClient({ plan: "Starter" })) === null);
+  check(
+    "convertLeadToClient: returns null when unconfigured",
+    (await supa.convertLeadToClient("x", { plan: "Standard" })) === null,
+  );
+  check("listPayments: returns [] when unconfigured", (await supa.listPayments()).length === 0);
+  check("listPaymentsEnriched: returns [] when unconfigured", (await supa.listPaymentsEnriched()).length === 0);
+  check(
+    "monthlyRecurringRevenue: returns 0 when unconfigured",
+    (await supa.monthlyRecurringRevenue()) === 0,
+  );
+  const revenue = await supa.revenueLast30Days();
+  check(
+    "revenueLast30Days: returns 30 zeroed buckets when unconfigured",
+    revenue.length === 30 && revenue.every((r) => r.amount === 0),
+  );
+  check("newLeadsToday: returns 0 when unconfigured", (await supa.newLeadsToday()) === 0);
+  check("activeClientsCount: returns 0 when unconfigured", (await supa.activeClientsCount()) === 0);
+  check("emailsSentToday: returns 0 when unconfigured", (await supa.emailsSentToday()) === 0);
+  check("listEmailCampaigns: returns [] when unconfigured", (await supa.listEmailCampaigns()).length === 0);
+  check(
+    "createEmailCampaign: returns null when unconfigured",
+    (await supa.createEmailCampaign("test", [{ email: "a@b.com" }])) === null,
+  );
+  check("nextQueuedRecipients: returns [] when unconfigured", (await supa.nextQueuedRecipients(10)).length === 0);
+  check(
+    "recipientsDueForFollowUp: returns [] when unconfigured",
+    (await supa.recipientsDueForFollowUp()).length === 0,
+  );
+  check(
+    "listClientChatMessages: returns [] when unconfigured",
+    (await supa.listClientChatMessages("x")).length === 0,
+  );
+
+  // --- lib/stripe.ts: no STRIPE_SECRET_KEY configured ---
+  delete process.env.STRIPE_SECRET_KEY;
+  const stripeLib = await import("../lib/stripe");
+  check(
+    "createPaymentLink: returns null when STRIPE_SECRET_KEY unset",
+    (await stripeLib.createPaymentLink("Starter", 300)) === null,
+  );
+  check(
+    "constructWebhookEvent: returns null when unconfigured",
+    stripeLib.constructWebhookEvent("{}", "sig") === null,
+  );
+
   // --- lib/anthropic.ts: no API key configured ---
   delete process.env.ANTHROPIC_API_KEY;
   const { callAnthropic, extractText, slugify } = await import("../lib/anthropic");

@@ -110,3 +110,43 @@ export function buildFollowUpEmail(name: string): { subject: string; text: strin
   );
   return { subject, text, html };
 }
+
+/** Monthly summary email sent from a client's workspace. Real data (plan) only — no fabricated metrics. */
+export function buildClientReportEmail(businessName: string, plan: string): { subject: string; text: string; html: string } {
+  const subject = `Your Spotket monthly report — ${businessName}`;
+  const text = `Hi ${businessName},\n\nHere's your monthly Spotket summary:\n\n- Plan: ${plan}\n- Your AI automation is live and running\n\nQuestions or want to add anything? Just reply to this email.\n\n— Spotket Digital`;
+  const html = shell(
+    `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(businessName)},</p>` +
+      `<p style="font-size:15px;line-height:1.6;">Here's your monthly Spotket summary:</p>` +
+      `<ul style="font-size:14px;line-height:1.8;padding-left:18px;">` +
+      `<li><strong>Plan:</strong> ${escapeHtml(plan)}</li>` +
+      `<li>Your AI automation is live and running</li>` +
+      `</ul>` +
+      `<p style="font-size:14px;line-height:1.6;">Questions or want to add anything? Just reply to this email.</p>`
+  );
+  return { subject, text, html };
+}
+
+/** 3-day no-reply follow-up for an email campaign recipient — same honest "no reply tracked" caveat as buildFollowUpEmail. */
+export function buildCampaignFollowUpEmail(contactName: string | null, businessName: string | null): { subject: string; text: string; html: string } {
+  const name = (contactName || "there").split(" ")[0] || "there";
+  const business = businessName || "your business";
+  const subject = "Following up — quick question";
+  const text = `Hi ${name},\n\nJust following up on my last note about helping ${business} with AI automation — happy to answer any questions, no pressure either way.\n\n— Spotket Digital\n\nIf you'd rather not hear from us again, just reply "unsubscribe."`;
+  const html = shell(
+    `<p style="font-size:15px;line-height:1.6;">Hi ${escapeHtml(name)},</p>` +
+      `<p style="font-size:15px;line-height:1.6;">Just following up on my last note about helping ${escapeHtml(business)} with AI automation — happy to answer any questions, no pressure either way.</p>` +
+      `<p style="font-size:13px;color:#9ca3af;">If you'd rather not hear from us again, just reply "unsubscribe."</p>`
+  );
+  return { subject, text, html };
+}
+
+/** Outbound cold-email campaign send — subject/body are already fully composed (lib/email-campaign.ts). */
+export async function sendCampaignEmail(to: string, subject: string, body: string, trackingPixelUrl?: string): Promise<boolean> {
+  const html =
+    body
+      .split("\n\n")
+      .map((para) => `<p style="font-size:14px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(para)}</p>`)
+      .join("") + (trackingPixelUrl ? `<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:none;" />` : "");
+  return sendEmail(to, subject, body, shell(html));
+}

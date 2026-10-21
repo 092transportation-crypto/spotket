@@ -10,7 +10,7 @@ interface Message {
 
 const GREETING: Message = {
   role: "assistant",
-  content: "Hi! I'm the Spotket assistant. What type of business do you run?",
+  content: "Hi! I'm Spotket AI. What type of business do you run?",
 };
 
 export function ChatWidget() {
@@ -85,7 +85,7 @@ export function ChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-6 z-50 flex h-[28rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-2xl">
           <div className="border-b border-white/10 bg-gradient-to-r from-brand to-accent px-4 py-3">
-            <p className="text-sm font-semibold text-white">Chat with Spotket</p>
+            <p className="text-sm font-semibold text-white">Spotket AI</p>
           </div>
 
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">

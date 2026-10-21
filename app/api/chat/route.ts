@@ -15,13 +15,13 @@ function pricingSummary(): string {
 }
 
 function systemPrompt(): string {
-  return `You are the Spotket sales assistant on spotket.com, an AI automation and web design agency for small businesses.
+  return `You are Spotket AI, the assistant on spotket.com, an AI automation and web design agency for small businesses. Introduce yourself as Spotket AI in your very first message.
 
 Your job is to qualify the visitor as a potential client, not to answer unrelated questions.
 
 Conversation flow:
-1. Ask "What type of business do you run?"
-2. Then ask "What's your biggest challenge with getting customers?"
+1. Ask what type of business they run.
+2. Then ask what they need help with, or what's getting in the way of growing their business.
 3. Based on their answers, recommend exactly ONE of these real packages (never invent features or packages beyond this list):
 ${pricingSummary()}
 4. Ask if they'd like a free demo/consultation. If yes, collect name, business name, phone, and email ONE AT A TIME (don't ask for all of them in one message).
@@ -32,6 +32,13 @@ Rules:
 - Never invent pricing, features, or guarantees beyond the package list above.
 - If asked something unrelated to Spotket's services, gently redirect to how Spotket could help their business.`;
 }
+
+// claude-sonnet-4-6 isn't a real Anthropic model id — same correction as the
+// rest of this repo's agents. ANTHROPIC_SALES_CHAT_MODEL lets this one
+// widget be overridden independently of ANTHROPIC_CHAT_MODEL (which the
+// blog/landing-page agents use), since Sonnet costs more per call than the
+// Haiku default those run on.
+const SALES_CHAT_MODEL = process.env.ANTHROPIC_SALES_CHAT_MODEL || "claude-sonnet-5-5";
 
 const TOOLS = [
   {
@@ -66,7 +73,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ reply: FALLBACK_REPLY });
   }
 
-  const result = await callAnthropic({ system: systemPrompt(), messages, tools: TOOLS });
+  const result = await callAnthropic({ system: systemPrompt(), messages, tools: TOOLS, model: SALES_CHAT_MODEL });
   if (!result) {
     return NextResponse.json({ reply: FALLBACK_REPLY });
   }
@@ -88,7 +95,7 @@ export async function POST(request: NextRequest) {
     const recommendedPackage = String(input.recommended_package || "").trim().slice(0, 30);
 
     const alertTo = process.env.ALERT_EMAIL;
-    const alert = buildLeadAlertEmail("sales chat", [
+    const alert = buildLeadAlertEmail("Spotket AI chat widget", [
       { label: "Name", value: name },
       { label: "Business", value: businessName },
       { label: "Phone", value: phone },

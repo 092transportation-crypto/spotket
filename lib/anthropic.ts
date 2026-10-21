@@ -26,10 +26,12 @@ export async function callAnthropic(options: {
   messages: AnthropicMessage[];
   tools?: AnthropicTool[];
   maxTokens?: number;
+  /** Per-call override — falls back to ANTHROPIC_CHAT_MODEL, then DEFAULT_CHAT_MODEL. Lets one caller (e.g. the sales chat widget) use a different model without changing every other agent's default. */
+  model?: string;
 }): Promise<AnthropicResponse | null> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
-  const model = process.env.ANTHROPIC_CHAT_MODEL || DEFAULT_CHAT_MODEL;
+  const model = options.model || process.env.ANTHROPIC_CHAT_MODEL || DEFAULT_CHAT_MODEL;
   try {
     const res = await fetch(ANTHROPIC_API_URL, {
       method: "POST",

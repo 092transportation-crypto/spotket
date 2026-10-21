@@ -34,18 +34,29 @@ table.
 
 ### 2. Anthropic (Claude API)
 
-- `ANTHROPIC_API_KEY`
-- `ANTHROPIC_CHAT_MODEL` (optional, defaults to `claude-haiku-5-5` — the
-  model name in the original request, `claude-sonnet-4-6`, isn't a real
-  Anthropic model ID, so this was corrected; set this var to
-  `claude-sonnet-5-5` if you want higher-quality, slower, pricier replies)
+- `ANTHROPIC_API_KEY` — set for Production; **not yet set for Preview**
+  (confirmed via `vercel env ls`), so the chat widget replies with the
+  "live chat isn't available" fallback on preview deployments until it's
+  added there too.
+- `ANTHROPIC_CHAT_MODEL` (optional, defaults to `claude-haiku-5-5`) — used
+  by the Blog Agent and Landing Page Agent. `claude-sonnet-4-6`, named in
+  an early request, isn't a real Anthropic model ID; corrected here.
+- `ANTHROPIC_SALES_CHAT_MODEL` (optional, defaults to `claude-sonnet-5-5`)
+  — the chat widget (**Spotket AI**, bottom-right on every public page)
+  uses this instead of `ANTHROPIC_CHAT_MODEL`, so it can run a better
+  (pricier) model than the blog/landing-page cron agents without
+  upgrading those too. `claude-sonnet-4-6`, named in the request for this
+  widget, isn't real either — same correction.
 
 ### 3. Lead alert email (replaces Twilio/SMS — removed 2026-10-20)
 
-- `ALERT_EMAIL` — every captured lead (contact form, lead/exit-intent popups,
-  sales chat) sends an email here instead of a text message. No SMS, no
-  Twilio dependency anywhere in this repo anymore. No-ops (logs and skips)
-  if unset, same resilience pattern as everything else here.
+- `ALERT_EMAIL` — every captured lead (contact form, lead/exit-intent
+  popups, the Spotket AI chat widget) sends an email here instead of a
+  text message. Set to `spotketllc@gmail.com` for both Production and
+  Preview via Vercel CLI (not committed anywhere in this repo — same
+  not-a-secret-but-not-public treatment as the other env vars here). No
+  SMS, no Twilio dependency anywhere in this repo anymore. No-ops (logs
+  and skips) if unset, same resilience pattern as everything else here.
 
 ### 4. SMTP (follow-up + confirmation emails)
 
@@ -110,7 +121,7 @@ remove, nothing in this repo reads them anymore.
 
 | Agent | Trigger | What it does |
 |---|---|---|
-| Sales Agent | Chat widget (`/api/chat`) | Qualifies visitors, recommends a real pricing tier from `lib/site.ts`, collects name/business/phone/email, texts + saves + logs the lead |
+| Sales Agent | **Spotket AI** chat widget, bottom-right on every public page (`/api/chat`) | Introduces itself as Spotket AI, asks about the visitor's business and what they need, qualifies them against a real pricing tier from `lib/site.ts`, collects name/business/phone/email, emails + saves + logs the lead |
 | Blog Agent | Daily cron, 6am (`/api/cron/blog-agent`) | Generates 1 SEO blog post from the 5 given topics, publishes to `/blog/<slug>`, added to sitemap |
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
 | Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |

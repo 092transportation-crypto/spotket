@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TierIcon } from "@/components/icons";
-import { PRICING_TIERS } from "@/lib/site";
+import { FaqSection } from "@/components/faq-section";
+import { PRICING_FAQ, PRICING_TIERS } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -88,6 +89,8 @@ export default function PricingPage() {
           </Link>
         </div>
       </div>
+
+      <FaqSection eyebrow="Pricing FAQ" heading="Billing questions" items={PRICING_FAQ} />
     </div>
   );
 }

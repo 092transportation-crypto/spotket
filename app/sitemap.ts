@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/site";
+import { LANDING_PAGES, SITE_URL } from "@/lib/site";
 import { listBlogPosts, listLandingPages } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1 : 0.8,
   }));
 
+  const staticLandingSlugs = new Set(LANDING_PAGES.map((page) => page.slug));
+
+  const staticLandingEntries: MetadataRoute.Sitemap = LANDING_PAGES.map((page) => ({
+    url: `${SITE_URL}/lp/${page.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   const [posts, pages] = await Promise.all([listBlogPosts(), listLandingPages()]);
 
   const blogEntries: MetadataRoute.Sitemap = posts.map((post) => ({
@@ -32,11 +40,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const landingEntries: MetadataRoute.Sitemap = pages.map((page) => ({
-    url: `${SITE_URL}/lp/${page.slug}`,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+  // Dynamic (agent-generated) landing pages, excluding any slug already
+  // covered by the static LANDING_PAGES set above.
+  const dynamicLandingEntries: MetadataRoute.Sitemap = pages
+    .filter((page) => !staticLandingSlugs.has(page.slug))
+    .map((page) => ({
+      url: `${SITE_URL}/lp/${page.slug}`,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }));
 
-  return [...staticEntries, ...blogEntries, ...landingEntries];
+  return [...staticEntries, ...staticLandingEntries, ...blogEntries, ...dynamicLandingEntries];
 }

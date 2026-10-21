@@ -1,6 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CONTACT_EMAIL, LEGAL_LINKS, NAV_LINKS, SITE_NAME } from "@/lib/site";
+import {
+  CONTACT_EMAIL,
+  FOOTER_GUIDE_LINKS,
+  LANDING_PAGES,
+  LEGAL_LINKS,
+  NAV_LINKS,
+  SITE_NAME,
+} from "@/lib/site";
+
+const guideLinks = LANDING_PAGES.filter((page) =>
+  (FOOTER_GUIDE_LINKS as readonly string[]).includes(page.slug),
+);
 
 export function Footer() {
   return (
@@ -53,6 +64,32 @@ export function Footer() {
                   >
                     {CONTACT_EMAIL}
                   </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+                Guides
+              </p>
+              <ul className="mt-3 space-y-2">
+                {guideLinks.map((page) => (
+                  <li key={page.slug}>
+                    <Link
+                      href={`/lp/${page.slug}`}
+                      className="text-sm text-neutral-400 transition-colors hover:text-white"
+                    >
+                      {page.keyword}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    href="/blog"
+                    className="text-sm text-neutral-400 transition-colors hover:text-white"
+                  >
+                    Blog
+                  </Link>
                 </li>
               </ul>
             </div>

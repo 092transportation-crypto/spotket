@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { ContactForm } from "@/components/contact-form";
 import { Reveal } from "@/components/reveal";
-import { CONTACT_EMAIL, CONTACT_IMAGE } from "@/lib/site";
+import { FaqSection } from "@/components/faq-section";
+import { CONTACT_EMAIL, CONTACT_FAQ, CONTACT_IMAGE } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -62,6 +63,8 @@ export default function ContactPage() {
           </div>
         </Reveal>
       </div>
+
+      <FaqSection eyebrow="Contact FAQ" heading="What to expect" items={CONTACT_FAQ} />
     </div>
   );
 }

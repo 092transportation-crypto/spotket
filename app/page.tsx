@@ -6,11 +6,16 @@ import { Reveal } from "@/components/reveal";
 import { TrustBadges } from "@/components/trust-badges";
 import { TierIcon, StepIcon, InitialsAvatar } from "@/components/icons";
 import { ServicesSlider } from "@/components/services-slider";
+import { FaqSection } from "@/components/faq-section";
+import { ExploreLinks } from "@/components/explore-links";
 import {
   CONTACT_EMAIL,
   FEATURE_HIGHLIGHTS,
+  FOOTER_GUIDE_LINKS,
   HERO_IMAGE,
+  HOME_FAQ,
   HOW_IT_WORKS_STEPS,
+  LANDING_PAGES,
   MISSED_INQUIRIES_STAT,
   OFFICE_HERO_IMAGE,
   PRICING_TIERS,
@@ -21,6 +26,10 @@ import {
   STATS,
 } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
+
+const exploreLinks = LANDING_PAGES.filter((page) =>
+  (FOOTER_GUIDE_LINKS as readonly string[]).includes(page.slug),
+).map((page) => ({ href: `/lp/${page.slug}`, label: page.keyword }));
 
 export const metadata = pageMetadata(
   "/",
@@ -309,6 +318,14 @@ export default function HomePage() {
             </div>
           </div>
         </Reveal>
+      </section>
+
+      <section className="border-t border-white/10 px-4 py-20 sm:px-6">
+        <ExploreLinks
+          heading="AI automation for your industry"
+          items={exploreLinks}
+        />
+        <FaqSection eyebrow="FAQ" heading="Quick answers" items={HOME_FAQ} />
       </section>
 
       <section className="border-t border-white/10 px-4 py-20 sm:px-6">

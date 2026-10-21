@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { InitialsAvatar } from "@/components/icons";
+import { FaqSection } from "@/components/faq-section";
 import {
   BUSINESS_PHOTO,
   CASE_STUDIES,
   RESULTS_COMPARISON,
+  RESULTS_FAQ,
   RESULTS_IMAGE,
   RESULTS_STATS,
 } from "@/lib/site";
@@ -246,6 +248,8 @@ export default function ResultsPage() {
           </div>
         ))}
       </Reveal>
+
+      <FaqSection eyebrow="Results FAQ" heading="Proof it's real" items={RESULTS_FAQ} />
 
       <Reveal className="mx-auto mt-20 max-w-2xl text-center">
         <h2 className="text-2xl font-bold text-white sm:text-3xl">

@@ -29,3 +29,30 @@ export function pageMetadata(
     },
   };
 }
+
+/** FAQPage JSON-LD for a page's FAQ section — pass straight to a <script> tag. */
+export function faqSchema(items: readonly { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+}
+
+/** BreadcrumbList JSON-LD — pass [{name, path}] from home down to the current page. */
+export function breadcrumbSchema(items: readonly { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path}`,
+    })),
+  };
+}

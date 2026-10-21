@@ -172,6 +172,7 @@ export interface NewLead {
   heard_about_us?: string;
   message?: string;
   google_place_id?: string;
+  yelp_business_id?: string;
 }
 
 export const LEAD_STATUSES = ["New", "Called", "Interested", "Closed", "Lost"] as const;
@@ -268,6 +269,35 @@ export async function existingGooglePlaceIds(): Promise<Set<string>> {
     return new Set();
   }
   return new Set((data ?? []).map((row) => row.google_place_id as string));
+}
+
+/** Every yelp_business_id already in the leads table — the Lead Finder Agent's Yelp-side dedup key. */
+export async function existingYelpBusinessIds(): Promise<Set<string>> {
+  const client = getClient();
+  if (!client) return new Set();
+  const { data, error } = await client.from("leads").select("yelp_business_id").not("yelp_business_id", "is", null);
+  if (error) {
+    console.error("existingYelpBusinessIds failed:", error.message);
+    return new Set();
+  }
+  return new Set((data ?? []).map((row) => row.yelp_business_id as string));
+}
+
+/**
+ * Every phone number already in the leads table, normalized to digits only.
+ * Looser cross-source dedup backstop for the Lead Finder Agent — the same
+ * real business can have a different id on Google vs. Yelp, but the same
+ * phone number, so this catches what the per-source id checks can't.
+ */
+export async function existingPhoneNumbers(): Promise<Set<string>> {
+  const client = getClient();
+  if (!client) return new Set();
+  const { data, error } = await client.from("leads").select("phone").not("phone", "is", null);
+  if (error) {
+    console.error("existingPhoneNumbers failed:", error.message);
+    return new Set();
+  }
+  return new Set((data ?? []).map((row) => String(row.phone).replace(/\D/g, "")).filter(Boolean));
 }
 
 export async function insertLead(lead: NewLead): Promise<boolean> {

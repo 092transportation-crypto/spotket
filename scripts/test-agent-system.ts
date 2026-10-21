@@ -164,6 +164,22 @@ async function run() {
     (await supa.existingGooglePlaceIds()).size === 0,
   );
 
+  // --- lib/yelp.ts: no YELP_API_KEY configured ---
+  delete process.env.YELP_API_KEY;
+  const yelp = await import("../lib/yelp");
+  check(
+    "searchCategoryYelp: returns [] when YELP_API_KEY unset",
+    (await yelp.searchCategoryYelp(places.LEAD_FINDER_CATEGORIES[0])).length === 0,
+  );
+  check(
+    "existingYelpBusinessIds: returns an empty Set when unconfigured",
+    (await supa.existingYelpBusinessIds()).size === 0,
+  );
+  check(
+    "existingPhoneNumbers: returns an empty Set when unconfigured",
+    (await supa.existingPhoneNumbers()).size === 0,
+  );
+
   // --- lib/anthropic.ts: no API key configured ---
   delete process.env.ANTHROPIC_API_KEY;
   const { callAnthropic, extractText, slugify } = await import("../lib/anthropic");

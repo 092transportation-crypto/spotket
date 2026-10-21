@@ -36,11 +36,16 @@ alter table leads add column if not exists message text;
 alter table leads add column if not exists status text not null default 'New';
 alter table leads add column if not exists notes text;
 
--- Added for the Lead Finder Agent (Google Places). Nullable + partial
--- unique index — only rows the agent inserts ever set this, and it's the
--- exact key used to skip businesses already in the table on every run.
+-- Added for the Lead Finder Agent (Google Places + Yelp). Nullable + partial
+-- unique indexes — only rows the agent inserts ever set these, and each is
+-- the exact per-source key used to skip businesses already in the table on
+-- every run. A phone-number index backs a looser cross-source dedup check
+-- (the same real business can have a different id on each platform).
 alter table leads add column if not exists google_place_id text;
+alter table leads add column if not exists yelp_business_id text;
 create unique index if not exists leads_google_place_id_idx on leads (google_place_id) where google_place_id is not null;
+create unique index if not exists leads_yelp_business_id_idx on leads (yelp_business_id) where yelp_business_id is not null;
+create index if not exists leads_phone_idx on leads (phone) where phone is not null;
 
 create table if not exists agent_activity_log (
   id uuid primary key default gen_random_uuid(),

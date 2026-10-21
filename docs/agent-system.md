@@ -77,13 +77,26 @@ the suggested default per the original request.
   payments created here still track as "pending" until you mark them paid
   by hand in the Payments tab — the webhook is what makes that automatic.
 
-### 6. Google Places API (Lead Finder Agent)
+### 6. Lead Finder Agent sources (Google Places + Yelp)
+
+Both are official APIs, not scraping — see "Lead Finder Agent" below for
+why scraping Google Maps/Yelp/Yellow Pages directly was explicitly
+rejected. Either var alone is enough for the agent to run (it just skips
+whichever source isn't configured); both together means more coverage per
+category.
 
 - `GOOGLE_PLACES_API_KEY` — needs **Places API (New)** enabled (not the
   legacy Places API) on a Google Cloud project with billing enabled (Places
-  API has no billing-free tier, even within quota). Without this var, the
-  Lead Finder Agent cron logs "skipped" and inserts nothing — no fake leads
-  are ever generated.
+  API has no billing-free tier, even within quota — though at this agent's
+  volume, ~300 calls/month, you likely stay within Google's $200/month
+  free credit).
+- `YELP_API_KEY` — a Yelp Fusion API key (free developer signup at
+  yelp.com/developers). Yelp's free tier has its own daily call quota —
+  check your Yelp developer dashboard for the exact number, it's changed
+  over time.
+
+Without either var set, the Lead Finder Agent cron logs "skipped" and
+inserts nothing — no fake leads are ever generated.
 
 ### Already set (done for you, not something you need to do)
 
@@ -104,7 +117,7 @@ the suggested default per the original request.
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
 | Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
 | Email Campaign Agent | Daily cron, 1pm (`/api/cron/email-campaign-agent`) | Sends up to 100 AI-personalized campaign emails/day across every "sending" campaign, then 3-day no-reply follow-ups with whatever allowance is left |
-| Lead Finder Agent | Daily cron, 7am (`/api/cron/lead-finder-agent`) | Searches Google Places across 10 service categories within 50mi of Laurel, MD 20723 for small/underserved businesses, inserts up to 20 new leads/day tagged **Auto-Found** |
+| Lead Finder Agent | Daily cron, 7am (`/api/cron/lead-finder-agent`) | Searches Google Places + Yelp (official APIs) across 10 service categories within 50mi of Laurel, MD 20723 for small/underserved businesses, inserts up to 20 new leads/day tagged **Auto-Found** |
 
 Every agent checks `agent_settings` in Supabase before running — toggle any
 of them off from `/admin` and it logs "skipped" instead of running, on its
@@ -172,40 +185,67 @@ Payments, Agents.
 
 ## Lead Finder Agent: read before trusting its output
 
-- **The 50-mile radius isn't a hard Google guarantee.** Google Places API
-  (New) caps `locationBias.circle.radius` at 50,000m (~31 miles) — there's
-  no way to ask it for a true 50-mile radius. We clamp to Google's max and
-  then re-filter every result ourselves by real distance against the true
-  50-mile cutoff, so nothing *outside* 50mi ever gets inserted — but
-  because the bias itself only pulls ranking toward the inner ~31mi,
-  coverage of the 31–50mi ring is partial/best-effort, not exhaustive.
-- **"No website or basic/outdated website" is two different things, and
-  only the first is real.** Places API can tell us whether a `websiteUri`
-  exists at all — that part is exact. It has no signal whatsoever for
-  "outdated" or "low quality." We approximate "basic" as the website being
-  a Facebook/Instagram page or a known free site-builder subdomain (Wix,
-  Weebly, GoDaddy Sites, Square, Google Business Profile's own placeholder,
-  Linktree) — see `BASIC_WEBSITE_HOSTS` in `lib/google-places.ts`. A real,
-  custom-domain site that just looks dated to a human will NOT be flagged;
-  there's no API for that judgment.
-- **Leads with no phone number are skipped entirely** — the whole Leads CRM
-  workflow (call, mark Called/Interested, convert) is phone-first, so a
-  business Google has no phone number for isn't inserted at all.
-- **No email is ever set** on these leads — Places API doesn't return one.
+**Why this uses two official APIs instead of scraping Google Maps, Yelp,
+or Yellow Pages:** that was the first version requested, and it was
+rejected. All three explicitly prohibit automated scraping in their Terms
+of Service, all three have active bot-detection that breaks naive scraping
+within days, and running it as a *daily, scheduled, unattended* job is the
+sustained-automated-access pattern these platforms actively enforce
+against — not a one-off manual pull. Google Places API (New) and Yelp
+Fusion are each the platform's own sanctioned, ToS-compliant way to get
+this data; `lib/google-places.ts` and `lib/yelp.ts` call those APIs
+directly, never yelp.com/google.com/yellowpages.com HTML.
+
+- **Either source alone is enough to run** — the agent checks
+  `GOOGLE_PLACES_API_KEY` and `YELP_API_KEY` independently and just skips
+  whichever one isn't set (only skipping the whole run if *neither* is
+  configured). Running both gets more candidates per category than either
+  alone.
+- **The 50-mile radius isn't a hard guarantee from either API.** Google
+  Places caps `locationBias.circle.radius` at 50,000m (~31mi); Yelp's
+  `radius` param caps even tighter, at 40,000m (~25mi) — neither lets us
+  ask for a true 50-mile radius. We clamp to each API's max and then
+  re-filter every result ourselves by real haversine distance against the
+  true 50-mile cutoff, so nothing *outside* 50mi ever gets inserted from
+  either source — but because each bias only pulls ranking toward its own
+  inner radius, coverage of the 25–50mi ring is partial/best-effort, and
+  thinner from Yelp than from Google.
+- **The website filter only applies to Google results.** Places API can
+  tell us whether a `websiteUri` exists at all — exact, not a quality
+  judgment. We approximate "basic" as the website being a Facebook/
+  Instagram page or a known free site-builder subdomain (Wix, Weebly,
+  GoDaddy Sites, Square, Google Business Profile's own placeholder,
+  Linktree) — see `BASIC_WEBSITE_HOSTS` in `lib/lead-finder-shared.ts`. A
+  real, custom-domain site that just looks dated to a human will NOT be
+  flagged; there's no API for that judgment from either source. **Yelp's
+  Business Search response has no website field at all** — not "no
+  website," just no data — so the website criterion is skipped entirely
+  for Yelp-sourced leads; their summary note says "website not checked"
+  rather than implying one way or the other.
+- **Leads with no phone number are skipped entirely**, from either source —
+  the whole Leads CRM workflow (call, mark Called/Interested, convert) is
+  phone-first.
+- **No email is ever set** on these leads — neither API returns one.
   They're meant to be called, not emailed; `email` stays null until/unless
   someone adds it by hand.
-- **Dedup is exact, not fuzzy.** Each inserted lead stores Google's
-  `place_id` in the new `google_place_id` column; the agent skips anything
-  already in `leads` by that id. Two different Google listings for what's
-  actually the same business (a common Places data-quality issue) won't be
-  caught — only a literal re-find of the same `place_id` is.
-- **Categories are free-text queries, not Google's formal place-type
-  taxonomy** — several of the requested categories (HVAC, pressure
-  washing, moving, auto detailing) don't map cleanly to Google's official
-  `types` enum, so every category searches via Text Search
-  (`"<category> near Laurel, MD"`) instead of a type filter. This is a
-  supported, normal way to use the API, just worth knowing if result
-  quality varies category to category.
+- **Dedup has two layers.** Exact: each inserted lead stores its source's
+  own id (`google_place_id` or `yelp_business_id`); the agent skips
+  anything already in `leads` by that id, per source. Looser cross-source
+  backstop: phone number (normalized to digits), since the *same real
+  business* can have a different id on Google vs. Yelp but the same phone
+  — a business found by both in the same run, or already in `leads` from
+  either source, is only inserted once. Two different listings for the
+  same business with *different* phone numbers on file (a real data-
+  quality issue on both platforms) won't be caught by either check.
+- **Categories are free-text queries, not either platform's formal
+  category taxonomy** — several of the requested categories (HVAC,
+  pressure washing, moving, auto detailing) don't map cleanly onto
+  Google's `types` enum or Yelp's category aliases, so every category
+  searches as free text (`"<category> near Laurel, MD"` for Google,
+  `term=<category>` + `location=Laurel, MD 20723` for Yelp) instead of a
+  type/category filter. Supported, normal usage for both APIs — just
+  worth knowing if result quality varies category to category or source
+  to source.
 
 ## Honesty notes in the code
 

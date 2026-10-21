@@ -15,71 +15,15 @@
  *   whether a `websiteUri` exists, never whether a real site is outdated or
  *   low-quality (no such signal exists in the API). We treat "no website"
  *   literally, and approximate "basic" as the website being a social-media
- *   profile or a free site-builder subdomain (see BASIC_WEBSITE_HOSTS) —
- *   not a real design-quality assessment.
+ *   profile or a free site-builder subdomain (see BASIC_WEBSITE_HOSTS in
+ *   lib/lead-finder-shared.ts) — not a real design-quality assessment.
  */
+import { LAUREL_MD, SEARCH_RADIUS_MILES, haversineMiles, isBasicWebsite, type FoundBusiness } from "./lead-finder-shared";
+
+export { LAUREL_MD, SEARCH_RADIUS_MILES, LEAD_FINDER_CATEGORIES, type FoundBusiness } from "./lead-finder-shared";
 
 const SEARCH_TEXT_URL = "https://places.googleapis.com/v1/places:searchText";
 const MAX_BIAS_RADIUS_METERS = 50000; // Google's hard cap, not our real cutoff
-
-export const LAUREL_MD = { lat: 39.0993, lng: -76.8483 };
-export const SEARCH_RADIUS_MILES = 50;
-
-export const LEAD_FINDER_CATEGORIES = [
-  { label: "limo service", query: "limo service" },
-  { label: "barbershop", query: "barbershop" },
-  { label: "nail salon", query: "nail salon" },
-  { label: "cleaning service", query: "cleaning service" },
-  { label: "HVAC", query: "HVAC company" },
-  { label: "auto detailing", query: "auto detailing" },
-  { label: "moving company", query: "moving company" },
-  { label: "pressure washing", query: "pressure washing service" },
-  { label: "landscaping", query: "landscaping company" },
-  { label: "restaurant", query: "restaurant" },
-] as const;
-
-const BASIC_WEBSITE_HOSTS = [
-  "facebook.com",
-  "instagram.com",
-  "linktr.ee",
-  "wixsite.com",
-  "weebly.com",
-  "godaddysites.com",
-  "square.site",
-  "business.site", // Google Business Profile's own placeholder site
-  "sites.google.com",
-];
-
-export interface FoundBusiness {
-  placeId: string;
-  name: string;
-  phone: string | null;
-  website: string | null;
-  websiteIsBasic: boolean;
-  rating: number | null;
-  reviewCount: number;
-  distanceMiles: number;
-  category: string;
-}
-
-function haversineMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 3958.8; // Earth radius in miles
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.asin(Math.sqrt(a));
-}
-
-function isBasicWebsite(url: string): boolean {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    return BASIC_WEBSITE_HOSTS.some((basic) => host === basic || host.endsWith(`.${basic}`));
-  } catch {
-    return false;
-  }
-}
 
 interface PlacesApiResult {
   id: string;
@@ -148,11 +92,13 @@ export async function searchCategory(category: { label: string; query: string })
       if (website && !websiteIsBasic) continue; // has a real, non-placeholder website — skip
 
       results.push({
-        placeId: place.id,
+        source: "google_places",
+        externalId: place.id,
         name,
         phone: place.nationalPhoneNumber ?? place.internationalPhoneNumber ?? null,
         website,
         websiteIsBasic,
+        websiteChecked: true,
         rating,
         reviewCount,
         distanceMiles,

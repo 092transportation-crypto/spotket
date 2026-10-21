@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyCronAuth } from "@/lib/auth";
-import { LEAD_FINDER_CATEGORIES, searchCategory } from "@/lib/google-places";
+import { LEAD_FINDER_CATEGORIES } from "@/lib/lead-finder-shared";
 import type { FoundBusiness } from "@/lib/lead-finder-shared";
-import { searchCategoryYelp } from "@/lib/yelp";
+import { searchCategoryRapidApi } from "@/lib/rapidapi-local-business";
 import {
-  existingGooglePlaceIds,
   existingPhoneNumbers,
-  existingYelpBusinessIds,
+  existingRapidApiBusinessIds,
   insertLead,
   isAgentEnabled,
   logActivity,
@@ -23,29 +22,20 @@ function normalizePhone(phone: string): string {
 }
 
 function summarize(b: FoundBusiness): string {
-  const sourceLabel = b.source === "google_places" ? "Google Places" : "Yelp";
   const ratingPart = b.rating !== null ? `${b.rating.toFixed(1)}★ (${b.reviewCount} review${b.reviewCount === 1 ? "" : "s"})` : "no rating";
-  const sitePart = !b.websiteChecked
-    ? "website not checked (Yelp has no website data)"
-    : !b.website
-      ? "no website"
-      : b.websiteIsBasic
-        ? "basic/placeholder website only"
-        : "has a website";
-  return `Found via ${sourceLabel}: ${ratingPart} · ${sitePart} · ${b.distanceMiles.toFixed(1)}mi from Laurel, MD`;
+  const sitePart = !b.website ? "no website" : b.websiteIsBasic ? "basic/placeholder website only" : "has a website";
+  return `Found via RapidAPI (Local Business Data): ${ratingPart} · ${sitePart} · ${b.distanceMiles.toFixed(1)}mi from Laurel, MD`;
 }
 
 /**
- * Daily, 7am: searches Google Places + Yelp (official APIs, not scraping)
- * across 10 service categories within 50mi of Laurel, MD 20723 for small,
- * underserved businesses (≤50 reviews, rating <4.0 — Google results are
- * also filtered to no/basic-only website, Yelp's API has no website data
- * so that filter doesn't apply to Yelp results). Skips anything already in
- * the leads table by per-source id (google_place_id / yelp_business_id) or
- * by phone number (the same real business can have different ids on each
- * platform), and inserts up to 20 new leads/day tagged "Auto-Found"
- * (source = lead_finder_agent). See lib/google-places.ts and lib/yelp.ts
- * for the full honesty notes on radius and website-data limitations.
+ * Daily, 7am: searches RapidAPI's Local Business Data API across 10
+ * service categories within 50mi of Laurel, MD 20723 for small,
+ * underserved businesses (≤50 reviews, rating <4.0, no or basic-only
+ * website), skips anything already in the leads table (by
+ * rapidapi_business_id, or by phone number as a secondary check), and
+ * inserts up to 20 new leads/day tagged "Auto-Found" (source =
+ * lead_finder_agent). See lib/rapidapi-local-business.ts for the honesty
+ * notes on the field-mapping and radius limitations.
  */
 export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request.headers.get("authorization"))) {
@@ -58,18 +48,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ skipped: true });
   }
 
-  const googleConfigured = Boolean(process.env.GOOGLE_PLACES_API_KEY);
-  const yelpConfigured = Boolean(process.env.YELP_API_KEY);
-  if (!googleConfigured && !yelpConfigured) {
-    await logActivity("lead_finder_agent", "Skipped — neither GOOGLE_PLACES_API_KEY nor YELP_API_KEY configured", "warn");
+  if (!process.env.RAPIDAPI_KEY) {
+    await logActivity("lead_finder_agent", "Skipped — RAPIDAPI_KEY not configured", "warn");
     return NextResponse.json({ skipped: true });
   }
 
-  const [existingPlaceIds, existingYelpIds, existingPhones] = await Promise.all([
-    existingGooglePlaceIds(),
-    existingYelpBusinessIds(),
-    existingPhoneNumbers(),
-  ]);
+  const [existingIds, existingPhones] = await Promise.all([existingRapidApiBusinessIds(), existingPhoneNumbers()]);
   const seenPhonesThisRun = new Set<string>();
   const seenIdsThisRun = new Set<string>();
   const picked: FoundBusiness[] = [];
@@ -78,28 +62,22 @@ export async function GET(request: NextRequest) {
     if (!b.phone) return false;
     const phoneKey = normalizePhone(b.phone);
     if (!phoneKey || existingPhones.has(phoneKey) || seenPhonesThisRun.has(phoneKey)) return false;
-    if (b.source === "google_places" && existingPlaceIds.has(b.externalId)) return false;
-    if (b.source === "yelp" && existingYelpIds.has(b.externalId)) return false;
-    if (seenIdsThisRun.has(`${b.source}:${b.externalId}`)) return false;
+    if (existingIds.has(b.externalId) || seenIdsThisRun.has(b.externalId)) return false;
     return true;
   }
 
   function claim(b: FoundBusiness) {
     picked.push(b);
-    seenIdsThisRun.add(`${b.source}:${b.externalId}`);
+    seenIdsThisRun.add(b.externalId);
     if (b.phone) seenPhonesThisRun.add(normalizePhone(b.phone));
   }
 
-  // First pass: up to PER_CATEGORY_FIRST_PASS per category, for variety —
-  // pooling both sources per category before moving to the next one.
+  // First pass: up to PER_CATEGORY_FIRST_PASS per category, for variety.
   const byCategory = new Map<string, FoundBusiness[]>();
   for (const category of LEAD_FINDER_CATEGORIES) {
     if (picked.length >= DAILY_TARGET) break;
-    const [googleResults, yelpResults] = await Promise.all([
-      googleConfigured ? searchCategory(category) : Promise.resolve([]),
-      yelpConfigured ? searchCategoryYelp(category) : Promise.resolve([]),
-    ]);
-    const fresh = [...googleResults, ...yelpResults].filter(isFresh);
+    const results = await searchCategoryRapidApi(category);
+    const fresh = results.filter(isFresh);
     byCategory.set(category.label, fresh);
     for (const b of fresh.slice(0, PER_CATEGORY_FIRST_PASS)) {
       if (picked.length >= DAILY_TARGET) break;
@@ -128,16 +106,14 @@ export async function GET(request: NextRequest) {
       business_type: business.category,
       website_url: business.website ?? undefined,
       message: summarize(business),
-      google_place_id: business.source === "google_places" ? business.externalId : undefined,
-      yelp_business_id: business.source === "yelp" ? business.externalId : undefined,
+      rapidapi_business_id: business.externalId,
     });
     if (ok) inserted += 1;
   }
 
-  const sources = [googleConfigured && "Google Places", yelpConfigured && "Yelp"].filter(Boolean).join(" + ");
   await logActivity(
     "lead_finder_agent",
-    `Found ${picked.length} qualifying business(es) via ${sources} across ${LEAD_FINDER_CATEGORIES.length} categories, inserted ${inserted} new lead(s)`,
+    `Found ${picked.length} qualifying business(es) via RapidAPI across ${LEAD_FINDER_CATEGORIES.length} categories, inserted ${inserted} new lead(s)`,
   );
 
   return NextResponse.json({ found: picked.length, inserted });

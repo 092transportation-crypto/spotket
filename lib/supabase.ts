@@ -173,6 +173,7 @@ export interface NewLead {
   message?: string;
   google_place_id?: string;
   yelp_business_id?: string;
+  rapidapi_business_id?: string;
 }
 
 export const LEAD_STATUSES = ["New", "Called", "Interested", "Closed", "Lost"] as const;
@@ -275,28 +276,16 @@ export async function deleteLead(id: string): Promise<boolean> {
   }
 }
 
-/** Every google_place_id already in the leads table — the Lead Finder Agent's dedup key. */
-export async function existingGooglePlaceIds(): Promise<Set<string>> {
+/** Every rapidapi_business_id already in the leads table — the Lead Finder Agent's dedup key. */
+export async function existingRapidApiBusinessIds(): Promise<Set<string>> {
   const client = getClient();
   if (!client) return new Set();
-  const { data, error } = await client.from("leads").select("google_place_id").not("google_place_id", "is", null);
+  const { data, error } = await client.from("leads").select("rapidapi_business_id").not("rapidapi_business_id", "is", null);
   if (error) {
-    console.error("existingGooglePlaceIds failed:", error.message);
+    console.error("existingRapidApiBusinessIds failed:", error.message);
     return new Set();
   }
-  return new Set((data ?? []).map((row) => row.google_place_id as string));
-}
-
-/** Every yelp_business_id already in the leads table — the Lead Finder Agent's Yelp-side dedup key. */
-export async function existingYelpBusinessIds(): Promise<Set<string>> {
-  const client = getClient();
-  if (!client) return new Set();
-  const { data, error } = await client.from("leads").select("yelp_business_id").not("yelp_business_id", "is", null);
-  if (error) {
-    console.error("existingYelpBusinessIds failed:", error.message);
-    return new Set();
-  }
-  return new Set((data ?? []).map((row) => row.yelp_business_id as string));
+  return new Set((data ?? []).map((row) => row.rapidapi_business_id as string));
 }
 
 /**

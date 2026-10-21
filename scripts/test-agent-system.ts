@@ -161,29 +161,18 @@ async function run() {
     stripeLib.constructWebhookEvent("{}", "sig") === null,
   );
 
-  // --- lib/google-places.ts: no GOOGLE_PLACES_API_KEY configured ---
-  delete process.env.GOOGLE_PLACES_API_KEY;
-  const places = await import("../lib/google-places");
+  // --- lib/rapidapi-local-business.ts: no RAPIDAPI_KEY configured ---
+  delete process.env.RAPIDAPI_KEY;
+  const rapidapi = await import("../lib/rapidapi-local-business");
+  const { LEAD_FINDER_CATEGORIES } = await import("../lib/lead-finder-shared");
   check(
-    "searchCategory: returns [] when GOOGLE_PLACES_API_KEY unset",
-    (await places.searchCategory(places.LEAD_FINDER_CATEGORIES[0])).length === 0,
+    "searchCategoryRapidApi: returns [] when RAPIDAPI_KEY unset",
+    (await rapidapi.searchCategoryRapidApi(LEAD_FINDER_CATEGORIES[0])).length === 0,
   );
-  check("LEAD_FINDER_CATEGORIES: has all 10 requested categories", places.LEAD_FINDER_CATEGORIES.length === 10);
+  check("LEAD_FINDER_CATEGORIES: has all 10 requested categories", LEAD_FINDER_CATEGORIES.length === 10);
   check(
-    "existingGooglePlaceIds: returns an empty Set when unconfigured",
-    (await supa.existingGooglePlaceIds()).size === 0,
-  );
-
-  // --- lib/yelp.ts: no YELP_API_KEY configured ---
-  delete process.env.YELP_API_KEY;
-  const yelp = await import("../lib/yelp");
-  check(
-    "searchCategoryYelp: returns [] when YELP_API_KEY unset",
-    (await yelp.searchCategoryYelp(places.LEAD_FINDER_CATEGORIES[0])).length === 0,
-  );
-  check(
-    "existingYelpBusinessIds: returns an empty Set when unconfigured",
-    (await supa.existingYelpBusinessIds()).size === 0,
+    "existingRapidApiBusinessIds: returns an empty Set when unconfigured",
+    (await supa.existingRapidApiBusinessIds()).size === 0,
   );
   check(
     "existingPhoneNumbers: returns an empty Set when unconfigured",

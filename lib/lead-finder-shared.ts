@@ -1,8 +1,8 @@
 /**
- * Shared constants/types/helpers for the Lead Finder Agent's sources
- * (lib/google-places.ts, lib/yelp.ts). Kept separate so both sources agree
- * on the same categories, radius math, and "basic website" heuristic
- * instead of drifting apart.
+ * Shared constants/types/helpers for the Lead Finder Agent
+ * (lib/rapidapi-local-business.ts). Kept separate from the cron route so
+ * the search categories, radius math, and "basic website" heuristic live
+ * in one place.
  */
 
 export const LAUREL_MD = { lat: 39.0993, lng: -76.8483 };
@@ -53,14 +53,11 @@ export function haversineMiles(lat1: number, lng1: number, lat2: number, lng2: n
 }
 
 export interface FoundBusiness {
-  source: "google_places" | "yelp";
   externalId: string;
   name: string;
   phone: string | null;
   website: string | null;
   websiteIsBasic: boolean;
-  /** False when this source has no website field at all (Yelp) — the website filter wasn't applied, not "confirmed none." */
-  websiteChecked: boolean;
   rating: number | null;
   reviewCount: number;
   distanceMiles: number;

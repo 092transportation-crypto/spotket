@@ -36,15 +36,22 @@ alter table leads add column if not exists message text;
 alter table leads add column if not exists status text not null default 'New';
 alter table leads add column if not exists notes text;
 
--- Added for the Lead Finder Agent (Google Places + Yelp). Nullable + partial
--- unique indexes — only rows the agent inserts ever set these, and each is
--- the exact per-source key used to skip businesses already in the table on
--- every run. A phone-number index backs a looser cross-source dedup check
--- (the same real business can have a different id on each platform).
+-- Added for the Lead Finder Agent. Nullable + partial unique index — only
+-- rows the agent inserts ever set this, and it's the exact dedup key used
+-- to skip businesses already in the table on every run. A phone-number
+-- index backs a looser secondary dedup check.
+--
+-- google_place_id/yelp_business_id are leftover from this agent's first
+-- two data sources (Google Places, then Yelp Fusion), since replaced by
+-- RapidAPI's Local Business Data API — kept here only so any leads
+-- already inserted under those sources keep their dedup key; nothing
+-- writes to these two columns anymore.
 alter table leads add column if not exists google_place_id text;
 alter table leads add column if not exists yelp_business_id text;
+alter table leads add column if not exists rapidapi_business_id text;
 create unique index if not exists leads_google_place_id_idx on leads (google_place_id) where google_place_id is not null;
 create unique index if not exists leads_yelp_business_id_idx on leads (yelp_business_id) where yelp_business_id is not null;
+create unique index if not exists leads_rapidapi_business_id_idx on leads (rapidapi_business_id) where rapidapi_business_id is not null;
 create index if not exists leads_phone_idx on leads (phone) where phone is not null;
 
 create table if not exists agent_activity_log (

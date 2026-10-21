@@ -77,26 +77,24 @@ the suggested default per the original request.
   payments created here still track as "pending" until you mark them paid
   by hand in the Payments tab — the webhook is what makes that automatic.
 
-### 6. Lead Finder Agent sources (Google Places + Yelp)
+### 6. Lead Finder Agent source (RapidAPI Local Business Data)
 
-Both are official APIs, not scraping — see "Lead Finder Agent" below for
-why scraping Google Maps/Yelp/Yellow Pages directly was explicitly
-rejected. Either var alone is enough for the agent to run (it just skips
-whichever source isn't configured); both together means more coverage per
-category.
+Third revision of this agent's data source — see "Lead Finder Agent"
+below for the full history (direct scraping was requested and rejected;
+Google Places + Yelp came next; this RapidAPI product replaced both).
 
-- `GOOGLE_PLACES_API_KEY` — needs **Places API (New)** enabled (not the
-  legacy Places API) on a Google Cloud project with billing enabled (Places
-  API has no billing-free tier, even within quota — though at this agent's
-  volume, ~300 calls/month, you likely stay within Google's $200/month
-  free credit).
-- `YELP_API_KEY` — a Yelp Fusion API key (free developer signup at
-  yelp.com/developers). Yelp's free tier has its own daily call quota —
-  check your Yelp developer dashboard for the exact number, it's changed
-  over time.
+- `RAPIDAPI_KEY` — your RapidAPI account's key, subscribed to the "Local
+  Business Data" API.
+- `RAPIDAPI_HOST` — `local-business-data.p.rapidapi.com` (defaults to this
+  if unset, but set it explicitly to match the product you're subscribed
+  to).
 
-Without either var set, the Lead Finder Agent cron logs "skipped" and
+Without `RAPIDAPI_KEY` set, the Lead Finder Agent cron logs "skipped" and
 inserts nothing — no fake leads are ever generated.
+
+`GOOGLE_PLACES_API_KEY` / `YELP_API_KEY`, if you set either while this
+agent used those sources, are simply unused now — safe to leave set or
+remove, nothing in this repo reads them anymore.
 
 ### Already set (done for you, not something you need to do)
 
@@ -117,7 +115,7 @@ inserts nothing — no fake leads are ever generated.
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
 | Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
 | Email Campaign Agent | Daily cron, 1pm (`/api/cron/email-campaign-agent`) | Sends up to 100 AI-personalized campaign emails/day across every "sending" campaign, then 3-day no-reply follow-ups with whatever allowance is left |
-| Lead Finder Agent | Daily cron, 7am (`/api/cron/lead-finder-agent`) | Searches Google Places + Yelp (official APIs) across 10 service categories within 50mi of Laurel, MD 20723 for small/underserved businesses, inserts up to 20 new leads/day tagged **Auto-Found** |
+| Lead Finder Agent | Daily cron, 7am (`/api/cron/lead-finder-agent`) | Searches RapidAPI's Local Business Data API across 10 service categories within 50mi of Laurel, MD 20723 for small/underserved businesses, inserts up to 20 new leads/day tagged **Auto-Found** |
 
 Every agent checks `agent_settings` in Supabase before running — toggle any
 of them off from `/admin` and it logs "skipped" instead of running, on its
@@ -199,67 +197,77 @@ Payments, Agents.
 
 ## Lead Finder Agent: read before trusting its output
 
-**Why this uses two official APIs instead of scraping Google Maps, Yelp,
-or Yellow Pages:** that was the first version requested, and it was
-rejected. All three explicitly prohibit automated scraping in their Terms
-of Service, all three have active bot-detection that breaks naive scraping
-within days, and running it as a *daily, scheduled, unattended* job is the
-sustained-automated-access pattern these platforms actively enforce
-against — not a one-off manual pull. Google Places API (New) and Yelp
-Fusion are each the platform's own sanctioned, ToS-compliant way to get
-this data; `lib/google-places.ts` and `lib/yelp.ts` call those APIs
-directly, never yelp.com/google.com/yellowpages.com HTML.
+**Data source history, in order:** (1) direct scraping of Google Maps,
+Yelp, and Yellow Pages was requested first and rejected — all three
+explicitly prohibit automated scraping in their Terms of Service, have
+active bot-detection that breaks naive scraping within days, and running
+it as a *daily, scheduled, unattended* job is the sustained-automated-
+access pattern these platforms actively enforce against, not a one-off
+manual pull. (2) Google Places API (New) + Yelp Fusion — each platform's
+own sanctioned API — replaced that. (3) **RapidAPI's "Local Business
+Data" API, the current source**, replaced both of those at your request.
+`lib/rapidapi-local-business.ts` calls that one documented REST endpoint;
+nothing in this repo scrapes google.com/yelp.com/yellowpages.com HTML.
 
-- **Either source alone is enough to run** — the agent checks
-  `GOOGLE_PLACES_API_KEY` and `YELP_API_KEY` independently and just skips
-  whichever one isn't set (only skipping the whole run if *neither* is
-  configured). Running both gets more candidates per category than either
-  alone.
-- **The 50-mile radius isn't a hard guarantee from either API.** Google
-  Places caps `locationBias.circle.radius` at 50,000m (~31mi); Yelp's
-  `radius` param caps even tighter, at 40,000m (~25mi) — neither lets us
-  ask for a true 50-mile radius. We clamp to each API's max and then
-  re-filter every result ourselves by real haversine distance against the
-  true 50-mile cutoff, so nothing *outside* 50mi ever gets inserted from
-  either source — but because each bias only pulls ranking toward its own
-  inner radius, coverage of the 25–50mi ring is partial/best-effort, and
-  thinner from Yelp than from Google.
-- **The website filter only applies to Google results.** Places API can
-  tell us whether a `websiteUri` exists at all — exact, not a quality
-  judgment. We approximate "basic" as the website being a Facebook/
-  Instagram page or a known free site-builder subdomain (Wix, Weebly,
-  GoDaddy Sites, Square, Google Business Profile's own placeholder,
-  Linktree) — see `BASIC_WEBSITE_HOSTS` in `lib/lead-finder-shared.ts`. A
-  real, custom-domain site that just looks dated to a human will NOT be
-  flagged; there's no API for that judgment from either source. **Yelp's
-  Business Search response has no website field at all** — not "no
-  website," just no data — so the website criterion is skipped entirely
-  for Yelp-sourced leads; their summary note says "website not checked"
-  rather than implying one way or the other.
-- **Leads with no phone number are skipped entirely**, from either source —
-  the whole Leads CRM workflow (call, mark Called/Interested, convert) is
-  phone-first.
-- **No email is ever set** on these leads — neither API returns one.
-  They're meant to be called, not emailed; `email` stays null until/unless
-  someone adds it by hand.
-- **Dedup has two layers.** Exact: each inserted lead stores its source's
-  own id (`google_place_id` or `yelp_business_id`); the agent skips
-  anything already in `leads` by that id, per source. Looser cross-source
-  backstop: phone number (normalized to digits), since the *same real
-  business* can have a different id on Google vs. Yelp but the same phone
-  — a business found by both in the same run, or already in `leads` from
-  either source, is only inserted once. Two different listings for the
-  same business with *different* phone numbers on file (a real data-
-  quality issue on both platforms) won't be caught by either check.
-- **Categories are free-text queries, not either platform's formal
-  category taxonomy** — several of the requested categories (HVAC,
-  pressure washing, moving, auto detailing) don't map cleanly onto
-  Google's `types` enum or Yelp's category aliases, so every category
-  searches as free text (`"<category> near Laurel, MD"` for Google,
-  `term=<category>` + `location=Laurel, MD 20723` for Yelp) instead of a
-  type/category filter. Supported, normal usage for both APIs — just
-  worth knowing if result quality varies category to category or source
-  to source.
+**Worth being clear-eyed about:** RapidAPI's Local Business Data is a
+*third-party vendor's* product, not Google's or Yelp's own API. We
+haven't audited how that vendor sources the data on their end — that's a
+vendor relationship the business already holds (`RAPIDAPI_KEY` was
+already configured before this was built), not something assessed here.
+Calling a documented, API-key-authenticated endpoint is categorically
+different from writing our own scraper against a target site, which is
+why this was built without the same objection — but it's a different kind
+of trust (in the vendor's own compliance), not zero risk.
+
+**The field mapping was written from documentation/memory, not verified
+against a live call** — there's no network access to RapidAPI from where
+this was built. `lib/rapidapi-local-business.ts` reads several plausible
+field-name variants defensively (e.g. `review_count` or `reviews_count`
+or `reviews`) and logs the *full* raw response on anything that doesn't
+look like the expected shape, specifically so a mismatch is loud and
+debuggable instead of silently returning zero results forever. **After
+your first real run** (wait for 7am, or manually `curl` the cron route
+with the right `Authorization: Bearer $CRON_SECRET` header), check this
+agent's activity log in `/admin` → Agents. If it logs a shape/field
+warning, send the actual logged response back so the field names can be
+corrected against real data.
+
+- **The 50-mile radius isn't a hard guarantee.** This API takes a map
+  `zoom` level, not a radius in miles, as its area hint — zoom 9 here is
+  an approximation of a wide viewport, not a precise 50-mile circle. We
+  don't trust that approximation either way: every result is re-filtered
+  by real haversine distance against the true 50-mile cutoff before it's
+  considered, so nothing outside 50mi is ever inserted, but coverage
+  toward the edge of that radius depends on how the underlying zoom-based
+  search actually behaves, which hasn't been verified live.
+- **"No website or basic/outdated website"** — assumed this API returns a
+  `website` field the same way Google Places' did; if it doesn't, every
+  result would get wrongly treated as "has no website" and the targeting
+  would be too loose. Same honesty gap as the Google Places version for
+  what "basic" means: a Facebook/Instagram page or known free site-builder
+  subdomain (Wix, Weebly, GoDaddy Sites, Square, Linktree) — see
+  `BASIC_WEBSITE_HOSTS` in `lib/lead-finder-shared.ts` — not an actual
+  design-quality judgment; a real, custom-domain site that looks dated to
+  a human won't be flagged.
+- **Leads with no phone number are skipped entirely** — the whole Leads
+  CRM workflow (call, mark Called/Interested, convert) is phone-first.
+- **No email is ever set** on these leads — this API doesn't return one
+  either. They're meant to be called, not emailed; `email` stays null
+  until/unless someone adds it by hand.
+- **Dedup has two layers.** Exact: each inserted lead stores
+  `rapidapi_business_id`; the agent skips anything already in `leads` by
+  that id. Looser backstop: phone number (normalized to digits) — catches
+  the case where this vendor assigns a different id to what's actually
+  the same business. The `google_place_id`/`yelp_business_id` columns from
+  this agent's earlier two sources are still in the schema (so any leads
+  already inserted under those sources keep their original dedup key),
+  but nothing writes to them anymore.
+- **Categories are free-text queries, not a formal category taxonomy** —
+  every category searches as `"<category> near Laurel, MD"` rather than
+  a type/category filter, since several of the requested categories
+  (HVAC, pressure washing, moving, auto detailing) are unlikely to map
+  cleanly onto whatever fixed category list this API has, if it has one
+  at all — this wasn't verified either.
 
 ## Honesty notes in the code
 

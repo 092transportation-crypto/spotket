@@ -28,12 +28,24 @@ interface ChatMessage {
   content: string;
 }
 
-export function ClientWorkspace({ client, onClose, onUpdated }: { client: Client; onClose: () => void; onUpdated: () => void }) {
+export function ClientWorkspace({
+  client,
+  onClose,
+  onUpdated,
+  onDeleted,
+}: {
+  client: Client;
+  onClose: () => void;
+  onUpdated: () => void;
+  onDeleted: () => void;
+}) {
   const [current, setCurrent] = useState(client);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [linkStatus, setLinkStatus] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,6 +84,23 @@ export function ClientWorkspace({ client, onClose, onUpdated }: { client: Client
     setLinkStatus(data.emailed ? `Sent to ${current.email}.` : `Link created: ${data.link?.url ?? ""}`);
   }
 
+  async function deleteClient() {
+    if (!window.confirm(`Delete ${current.business_name || current.name || "this client"}? This can't be undone.`)) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/admin/clients/${current.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setDeleteError(data.detail || "Could not delete client.");
+        return;
+      }
+      onDeleted();
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function sendChatMessage() {
     const message = input.trim();
     if (!message || sending) return;
@@ -103,10 +132,20 @@ export function ClientWorkspace({ client, onClose, onUpdated }: { client: Client
               <h2 className="text-lg font-bold text-white">{current.business_name || current.name}</h2>
               <p className="text-sm text-neutral-400">{current.name}</p>
             </div>
-            <button onClick={onClose} className="rounded-lg border border-white/15 px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/5">
-              Close
-            </button>
+            <div className="flex shrink-0 gap-2">
+              <button
+                onClick={deleteClient}
+                disabled={deleting}
+                className="rounded-lg border border-red-500/30 px-2.5 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+              <button onClick={onClose} className="rounded-lg border border-white/15 px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/5">
+                Close
+              </button>
+            </div>
           </div>
+          {deleteError && <p className="mt-2 text-xs text-red-400">{deleteError}</p>}
 
           <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
             <div>

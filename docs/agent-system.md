@@ -149,16 +149,30 @@ handler actually does).
 Payments, Agents.
 
 - **Leads** — search/filter, per-call notes, CSV export (client-side, no
-  extra route), and a **Convert to Client** button on each lead's profile
-  (picks a plan, creates the `clients` row, marks the lead `Closed`).
+  extra route), a **Delete** button on each lead's profile, and a
+  **Convert to Client** button (picks a plan, creates the `clients` row,
+  marks the lead `Closed`) — blocked with a 409 if a client already
+  exists with the same phone or email (see **Duplicate guard** below).
 - **Clients** — click a row to open the **Client Workspace**: edit
-  plan/payment/client status, send a Stripe payment link, and chat with a
-  Claude-powered assistant scoped to that one client. Two chat commands
-  actually execute (`send_payment_link`, `send_monthly_report` — real
-  Stripe/SMTP calls); everything else ("build their website", "write
-  blogs for them") is drafted as text in the reply, not deployed anywhere
-  — there's no live website builder or per-client CMS connected here, and
-  the assistant is told to say so rather than pretend.
+  plan/payment/client status, send a Stripe payment link, **Delete** the
+  client, and chat with a Claude-powered assistant scoped to that one
+  client. Two chat commands actually execute (`send_payment_link`,
+  `send_monthly_report` — real Stripe/SMTP calls); everything else
+  ("build their website", "write blogs for them") is drafted as text in
+  the reply, not deployed anywhere — there's no live website builder or
+  per-client CMS connected here, and the assistant is told to say so
+  rather than pretend. Deleting a client cascades its `payments` and
+  `client_chat_messages` rows (DB-level `on delete cascade`); the lead it
+  was converted from, if any, just loses the link (`lead_id` → null), it
+  isn't deleted.
+- **Duplicate guard** — both "Convert Lead to Client" and the (currently
+  API-only, no UI form yet) "Add Client" endpoint check
+  `findClientByPhoneOrEmail` first and return a 409 if a client already
+  exists with the same phone or email, instead of silently creating a
+  second row for the same business. This only guards client creation —
+  nothing stops importing the same business twice as two separate
+  *leads* (that's intentionally looser; leads are disposable prospects,
+  clients are billing records).
 - **Email Campaigns** — CSV import (`business_name, contact_name, email,
   website_url, notes` header row; no quoted-comma support — keep fields
   comma-free), one AI-personalized email per recipient via

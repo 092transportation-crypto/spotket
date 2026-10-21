@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { CLIENT_PLANS, insertClient, listClients, logActivity, type ClientPlan } from "@/lib/supabase";
+import { CLIENT_PLANS, findClientByPhoneOrEmail, insertClient, listClients, logActivity, type ClientPlan } from "@/lib/supabase";
 
 export async function GET() {
   const clients = await listClients();
@@ -29,6 +29,17 @@ export async function POST(request: NextRequest) {
   if (!isClientPlan(body.plan)) {
     return NextResponse.json({ detail: `plan must be one of: ${CLIENT_PLANS.join(", ")}` }, { status: 400 });
   }
+
+  const duplicate = await findClientByPhoneOrEmail(body.phone, body.email);
+  if (duplicate) {
+    return NextResponse.json(
+      {
+        detail: `A client already exists with the same phone or email: ${duplicate.business_name || duplicate.name || duplicate.id}`,
+      },
+      { status: 409 },
+    );
+  }
+
   const client = await insertClient({ ...body, plan: body.plan });
   if (!client) {
     return NextResponse.json({ detail: "Could not create client — Supabase may not be configured yet" }, { status: 502 });

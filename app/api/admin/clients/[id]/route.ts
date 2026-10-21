@@ -4,6 +4,7 @@ import {
   CLIENT_PLANS,
   CLIENT_STATUSES,
   PAYMENT_STATUSES,
+  deleteClient,
   getClientById,
   updateClient,
   type ClientPlan,
@@ -65,5 +66,12 @@ export async function PATCH(request: NextRequest, { params }: Props) {
 
   const ok = await updateClient(id, updates);
   if (!ok) return NextResponse.json({ detail: "Could not update — Supabase may not be configured yet" }, { status: 502 });
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(_request: NextRequest, { params }: Props) {
+  const { id } = await params;
+  const ok = await deleteClient(id);
+  if (!ok) return NextResponse.json({ detail: "Could not delete — Supabase may not be configured yet" }, { status: 502 });
   return NextResponse.json({ ok: true });
 }

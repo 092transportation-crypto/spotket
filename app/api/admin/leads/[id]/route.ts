@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { LEAD_STATUSES, updateLead, type LeadStatus } from "@/lib/supabase";
+import { LEAD_STATUSES, deleteLead, updateLead, type LeadStatus } from "@/lib/supabase";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -36,6 +36,15 @@ export async function PATCH(request: NextRequest, { params }: Props) {
   const ok = await updateLead(id, updates);
   if (!ok) {
     return NextResponse.json({ detail: "Could not update — Supabase may not be configured yet" }, { status: 502 });
+  }
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(_request: NextRequest, { params }: Props) {
+  const { id } = await params;
+  const ok = await deleteLead(id);
+  if (!ok) {
+    return NextResponse.json({ detail: "Could not delete — Supabase may not be configured yet" }, { status: 502 });
   }
   return NextResponse.json({ ok: true });
 }

@@ -76,11 +76,13 @@ function LeadProfileModal({
   onClose,
   onSave,
   onConverted,
+  onDeleted,
 }: {
   lead: Lead;
   onClose: () => void;
   onSave: (id: string, updates: { status?: LeadStatus; notes?: string }) => Promise<void>;
   onConverted: () => void;
+  onDeleted: () => void;
 }) {
   const [notes, setNotes] = useState(lead.notes ?? "");
   const [status, setStatus] = useState<LeadStatus>(lead.status);
@@ -88,6 +90,7 @@ function LeadProfileModal({
   const [plan, setPlan] = useState<ClientPlan>("Standard");
   const [converting, setConverting] = useState(false);
   const [converted, setConverted] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function save() {
@@ -117,6 +120,23 @@ function LeadProfileModal({
     }
   }
 
+  async function deleteLead() {
+    if (!window.confirm(`Delete ${lead.name || lead.business_name || "this lead"}? This can't be undone.`)) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/leads/${lead.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.detail || "Could not delete lead.");
+        return;
+      }
+      onDeleted();
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
@@ -131,9 +151,18 @@ function LeadProfileModal({
             </h2>
             <p className="text-sm text-neutral-400">{lead.business_name || "—"}</p>
           </div>
-          <button onClick={onClose} className="rounded-lg border border-white/15 px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/5">
-            Close
-          </button>
+          <div className="flex shrink-0 gap-2">
+            <button
+              onClick={deleteLead}
+              disabled={deleting}
+              className="rounded-lg border border-red-500/30 px-2.5 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+            >
+              {deleting ? "Deleting…" : "Delete"}
+            </button>
+            <button onClick={onClose} className="rounded-lg border border-white/15 px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/5">
+              Close
+            </button>
+          </div>
         </div>
 
         <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -401,6 +430,10 @@ export function AdminLeadsTable() {
           onClose={() => setOpenLead(null)}
           onSave={saveLeadProfile}
           onConverted={() => {
+            setOpenLead(null);
+            setRefreshNonce((n) => n + 1);
+          }}
+          onDeleted={() => {
             setOpenLead(null);
             setRefreshNonce((n) => n + 1);
           }}

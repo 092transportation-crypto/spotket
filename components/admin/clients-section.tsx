@@ -105,6 +105,10 @@ export function ClientsSection() {
           client={openClient}
           onClose={() => setOpenClient(null)}
           onUpdated={() => setRefreshNonce((n) => n + 1)}
+          onDeleted={() => {
+            setOpenClient(null);
+            setRefreshNonce((n) => n + 1);
+          }}
         />
       )}
     </div>

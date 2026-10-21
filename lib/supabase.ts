@@ -259,6 +259,22 @@ export async function updateLead(
   }
 }
 
+export async function deleteLead(id: string): Promise<boolean> {
+  const client = getClient();
+  if (!client) return false;
+  try {
+    const { error } = await client.from("leads").delete().eq("id", id);
+    if (error) {
+      console.error("deleteLead failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("deleteLead threw:", (err as Error).message);
+    return false;
+  }
+}
+
 /** Every google_place_id already in the leads table — the Lead Finder Agent's dedup key. */
 export async function existingGooglePlaceIds(): Promise<Set<string>> {
   const client = getClient();
@@ -546,6 +562,46 @@ export async function updateClient(
     return false;
   }
   return true;
+}
+
+export async function deleteClient(id: string): Promise<boolean> {
+  const client = getClient();
+  if (!client) return false;
+  try {
+    const { error } = await client.from("clients").delete().eq("id", id);
+    if (error) {
+      console.error("deleteClient failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("deleteClient threw:", (err as Error).message);
+    return false;
+  }
+}
+
+/**
+ * Finds an existing client by phone OR email (either match counts) — the
+ * duplicate guard for both "Add Client" and "Convert Lead to Client".
+ * Returns null when neither value is given, Supabase isn't configured, or
+ * no match exists; never throws.
+ */
+export async function findClientByPhoneOrEmail(phone?: string | null, email?: string | null): Promise<Client | null> {
+  const client = getClient();
+  if (!client || (!phone && !email)) return null;
+  const filters = [phone && `phone.eq.${phone}`, email && `email.eq.${email}`].filter(Boolean).join(",");
+  if (!filters) return null;
+  try {
+    const { data, error } = await client.from("clients").select("*").or(filters).limit(1).maybeSingle();
+    if (error) {
+      console.error("findClientByPhoneOrEmail failed:", error.message);
+      return null;
+    }
+    return data as Client | null;
+  } catch (err) {
+    console.error("findClientByPhoneOrEmail threw:", (err as Error).message);
+    return null;
+  }
 }
 
 /** Converts a lead into an active client (one click from the Leads CRM). Marks the source lead Closed. */

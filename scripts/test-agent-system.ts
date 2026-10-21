@@ -110,6 +110,16 @@ async function run() {
     "convertLeadToClient: returns null when unconfigured",
     (await supa.convertLeadToClient("x", { plan: "Standard" })) === null,
   );
+  check("deleteClient: returns false (no-op) when unconfigured", (await supa.deleteClient("x")) === false);
+  check("deleteLead: returns false (no-op) when unconfigured", (await supa.deleteLead("x")) === false);
+  check(
+    "findClientByPhoneOrEmail: returns null when unconfigured",
+    (await supa.findClientByPhoneOrEmail("5551234567", "a@b.com")) === null,
+  );
+  check(
+    "findClientByPhoneOrEmail: returns null when neither phone nor email given",
+    (await supa.findClientByPhoneOrEmail(undefined, undefined)) === null,
+  );
   check("listPayments: returns [] when unconfigured", (await supa.listPayments()).length === 0);
   check("listPaymentsEnriched: returns [] when unconfigured", (await supa.listPaymentsEnriched()).length === 0);
   check(

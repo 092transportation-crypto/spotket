@@ -23,6 +23,7 @@ const AGENT_LABELS: Record<string, string> = {
   landing_page_agent: "Landing Page Agent",
   lead_follow_up_agent: "Lead Follow-Up Agent",
   email_campaign_agent: "Email Campaign Agent",
+  lead_finder_agent: "Lead Finder Agent",
 };
 
 function relativeTime(iso: string): string {
@@ -63,6 +64,8 @@ function nextCronRun(agent: string): string | null {
     return next;
   }
   switch (agent) {
+    case "lead_finder_agent":
+      return untilText(nextDailyUTC(7));
     case "blog_agent":
       return untilText(nextDailyUTC(6));
     case "lead_follow_up_agent":

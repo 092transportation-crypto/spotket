@@ -24,6 +24,7 @@ const AGENT_LABELS: Record<string, string> = {
   landing_page_agent: "Landing Page Agent",
   lead_follow_up_agent: "Lead Follow-Up Agent",
   email_campaign_agent: "Email Campaign Agent",
+  lead_finder_agent: "Lead Finder Agent",
 };
 
 function relativeTime(iso: string): string {

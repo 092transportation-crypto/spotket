@@ -151,6 +151,19 @@ async function run() {
     stripeLib.constructWebhookEvent("{}", "sig") === null,
   );
 
+  // --- lib/google-places.ts: no GOOGLE_PLACES_API_KEY configured ---
+  delete process.env.GOOGLE_PLACES_API_KEY;
+  const places = await import("../lib/google-places");
+  check(
+    "searchCategory: returns [] when GOOGLE_PLACES_API_KEY unset",
+    (await places.searchCategory(places.LEAD_FINDER_CATEGORIES[0])).length === 0,
+  );
+  check("LEAD_FINDER_CATEGORIES: has all 10 requested categories", places.LEAD_FINDER_CATEGORIES.length === 10);
+  check(
+    "existingGooglePlaceIds: returns an empty Set when unconfigured",
+    (await supa.existingGooglePlaceIds()).size === 0,
+  );
+
   // --- lib/anthropic.ts: no API key configured ---
   delete process.env.ANTHROPIC_API_KEY;
   const { callAnthropic, extractText, slugify } = await import("../lib/anthropic");

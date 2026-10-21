@@ -31,7 +31,8 @@ export type AgentName =
   | "blog_agent"
   | "landing_page_agent"
   | "lead_follow_up_agent"
-  | "email_campaign_agent";
+  | "email_campaign_agent"
+  | "lead_finder_agent";
 
 export const AGENT_NAMES: AgentName[] = [
   "sales_agent",
@@ -39,6 +40,7 @@ export const AGENT_NAMES: AgentName[] = [
   "landing_page_agent",
   "lead_follow_up_agent",
   "email_campaign_agent",
+  "lead_finder_agent",
 ];
 
 export function isAgentName(value: string): value is AgentName {
@@ -169,6 +171,7 @@ export interface NewLead {
   biggest_challenge?: string;
   heard_about_us?: string;
   message?: string;
+  google_place_id?: string;
 }
 
 export const LEAD_STATUSES = ["New", "Called", "Interested", "Closed", "Lost"] as const;
@@ -184,6 +187,7 @@ export interface Lead {
   recommended_package: string | null;
   status: LeadStatus;
   notes: string | null;
+  source: string | null;
   created_at: string;
 }
 
@@ -199,7 +203,7 @@ export async function listLeads(limit = 200): Promise<Lead[]> {
   try {
     const { data, error } = await client
       .from("leads")
-      .select("id, name, business_name, business_type, phone, email, recommended_package, status, notes, created_at")
+      .select("id, name, business_name, business_type, phone, email, recommended_package, status, notes, source, created_at")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (!error) return (data ?? []) as Lead[];
@@ -210,7 +214,7 @@ export async function listLeads(limit = 200): Promise<Lead[]> {
   try {
     const { data, error } = await client
       .from("leads")
-      .select("id, name, business_name, business_type, phone, email, recommended_package, created_at")
+      .select("id, name, business_name, business_type, phone, email, recommended_package, source, created_at")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error) {
@@ -252,6 +256,18 @@ export async function updateLead(
     console.error("updateLead threw:", (err as Error).message);
     return false;
   }
+}
+
+/** Every google_place_id already in the leads table — the Lead Finder Agent's dedup key. */
+export async function existingGooglePlaceIds(): Promise<Set<string>> {
+  const client = getClient();
+  if (!client) return new Set();
+  const { data, error } = await client.from("leads").select("google_place_id").not("google_place_id", "is", null);
+  if (error) {
+    console.error("existingGooglePlaceIds failed:", error.message);
+    return new Set();
+  }
+  return new Set((data ?? []).map((row) => row.google_place_id as string));
 }
 
 export async function insertLead(lead: NewLead): Promise<boolean> {

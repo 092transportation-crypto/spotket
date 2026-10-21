@@ -77,6 +77,14 @@ the suggested default per the original request.
   payments created here still track as "pending" until you mark them paid
   by hand in the Payments tab — the webhook is what makes that automatic.
 
+### 6. Google Places API (Lead Finder Agent)
+
+- `GOOGLE_PLACES_API_KEY` — needs **Places API (New)** enabled (not the
+  legacy Places API) on a Google Cloud project with billing enabled (Places
+  API has no billing-free tier, even within quota). Without this var, the
+  Lead Finder Agent cron logs "skipped" and inserts nothing — no fake leads
+  are ever generated.
+
 ### Already set (done for you, not something you need to do)
 
 - `ADMIN_DASHBOARD_PASSWORD` — set via Vercel CLI, value is the password
@@ -96,6 +104,7 @@ the suggested default per the original request.
 | Landing Page Agent | Weekly cron, Monday 6am (`/api/cron/landing-page-agent`) | Generates 3 pages (AI automation / chatbot / SEO, per business type) at `/lp/<slug>`, added to sitemap |
 | Lead Follow-Up Agent | Daily cron, noon (`/api/cron/lead-follow-up-agent`) | Emails leads 24h+ old with no response, marks them followed-up |
 | Email Campaign Agent | Daily cron, 1pm (`/api/cron/email-campaign-agent`) | Sends up to 100 AI-personalized campaign emails/day across every "sending" campaign, then 3-day no-reply follow-ups with whatever allowance is left |
+| Lead Finder Agent | Daily cron, 7am (`/api/cron/lead-finder-agent`) | Searches Google Places across 10 service categories within 50mi of Laurel, MD 20723 for small/underserved businesses, inserts up to 20 new leads/day tagged **Auto-Found** |
 
 Every agent checks `agent_settings` in Supabase before running — toggle any
 of them off from `/admin` and it logs "skipped" instead of running, on its
@@ -160,6 +169,43 @@ Payments, Agents.
   sells runs on each *client's own* site, not inside this admin's
   database; wiring that up would mean every client deployment reporting
   activity back here, which doesn't exist yet.
+
+## Lead Finder Agent: read before trusting its output
+
+- **The 50-mile radius isn't a hard Google guarantee.** Google Places API
+  (New) caps `locationBias.circle.radius` at 50,000m (~31 miles) — there's
+  no way to ask it for a true 50-mile radius. We clamp to Google's max and
+  then re-filter every result ourselves by real distance against the true
+  50-mile cutoff, so nothing *outside* 50mi ever gets inserted — but
+  because the bias itself only pulls ranking toward the inner ~31mi,
+  coverage of the 31–50mi ring is partial/best-effort, not exhaustive.
+- **"No website or basic/outdated website" is two different things, and
+  only the first is real.** Places API can tell us whether a `websiteUri`
+  exists at all — that part is exact. It has no signal whatsoever for
+  "outdated" or "low quality." We approximate "basic" as the website being
+  a Facebook/Instagram page or a known free site-builder subdomain (Wix,
+  Weebly, GoDaddy Sites, Square, Google Business Profile's own placeholder,
+  Linktree) — see `BASIC_WEBSITE_HOSTS` in `lib/google-places.ts`. A real,
+  custom-domain site that just looks dated to a human will NOT be flagged;
+  there's no API for that judgment.
+- **Leads with no phone number are skipped entirely** — the whole Leads CRM
+  workflow (call, mark Called/Interested, convert) is phone-first, so a
+  business Google has no phone number for isn't inserted at all.
+- **No email is ever set** on these leads — Places API doesn't return one.
+  They're meant to be called, not emailed; `email` stays null until/unless
+  someone adds it by hand.
+- **Dedup is exact, not fuzzy.** Each inserted lead stores Google's
+  `place_id` in the new `google_place_id` column; the agent skips anything
+  already in `leads` by that id. Two different Google listings for what's
+  actually the same business (a common Places data-quality issue) won't be
+  caught — only a literal re-find of the same `place_id` is.
+- **Categories are free-text queries, not Google's formal place-type
+  taxonomy** — several of the requested categories (HVAC, pressure
+  washing, moving, auto detailing) don't map cleanly to Google's official
+  `types` enum, so every category searches via Text Search
+  (`"<category> near Laurel, MD"`) instead of a type filter. This is a
+  supported, normal way to use the API, just worth knowing if result
+  quality varies category to category.
 
 ## Honesty notes in the code
 

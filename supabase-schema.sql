@@ -36,6 +36,12 @@ alter table leads add column if not exists message text;
 alter table leads add column if not exists status text not null default 'New';
 alter table leads add column if not exists notes text;
 
+-- Added for the Lead Finder Agent (Google Places). Nullable + partial
+-- unique index — only rows the agent inserts ever set this, and it's the
+-- exact key used to skip businesses already in the table on every run.
+alter table leads add column if not exists google_place_id text;
+create unique index if not exists leads_google_place_id_idx on leads (google_place_id) where google_place_id is not null;
+
 create table if not exists agent_activity_log (
   id uuid primary key default gen_random_uuid(),
   agent_name text not null,
@@ -137,7 +143,8 @@ insert into agent_settings (agent_name, enabled) values
   ('blog_agent', true),
   ('landing_page_agent', true),
   ('lead_follow_up_agent', true),
-  ('email_campaign_agent', true)
+  ('email_campaign_agent', true),
+  ('lead_finder_agent', true)
 on conflict (agent_name) do nothing;
 
 create index if not exists leads_follow_up_idx on leads (created_at) where followed_up = false and contacted = false;

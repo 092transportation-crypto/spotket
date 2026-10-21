@@ -20,7 +20,16 @@ interface Lead {
   recommended_package: string | null;
   status: LeadStatus;
   notes: string | null;
+  source: string | null;
   created_at: string;
+}
+
+function AutoFoundTag() {
+  return (
+    <span className="ml-2 rounded-full border border-brand/40 bg-brand/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-light">
+      Auto-Found
+    </span>
+  );
 }
 
 const statusDot: Record<LeadStatus, string> = {
@@ -116,7 +125,10 @@ function LeadProfileModal({
       >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">{lead.name || "Unnamed lead"}</h2>
+            <h2 className="text-lg font-bold text-white">
+              {lead.name || "Unnamed lead"}
+              {lead.source === "lead_finder_agent" && <AutoFoundTag />}
+            </h2>
             <p className="text-sm text-neutral-400">{lead.business_name || "—"}</p>
           </div>
           <button onClick={onClose} className="rounded-lg border border-white/15 px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/5">
@@ -326,7 +338,10 @@ export function AdminLeadsTable() {
             <tbody>
               {filtered.map((lead) => (
                 <tr key={lead.id} className="border-b border-white/5 align-top last:border-0">
-                  <td className="px-4 py-3 font-medium text-white">{lead.name || "—"}</td>
+                  <td className="px-4 py-3 font-medium text-white">
+                    {lead.name || "—"}
+                    {lead.source === "lead_finder_agent" && <AutoFoundTag />}
+                  </td>
                   <td className="px-4 py-3 text-neutral-300">{lead.business_name || "—"}</td>
                   <td className="px-4 py-3">
                     {lead.phone ? (

@@ -65,7 +65,7 @@ export function ChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Open chat"}
-        className="btn-shimmer fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg shadow-black/40"
+        className="btn-shimmer fixed bottom-24 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg shadow-black/40 md:bottom-6 md:right-6"
       >
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -83,7 +83,7 @@ export function ChatWidget() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 flex h-[28rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-2xl">
+        <div className="fixed bottom-[10.5rem] right-4 z-50 flex h-[28rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-2xl md:bottom-24 md:right-6">
           <div className="border-b border-white/10 bg-gradient-to-r from-brand to-accent px-4 py-3">
             <p className="text-sm font-semibold text-white">Spotket AI</p>
           </div>

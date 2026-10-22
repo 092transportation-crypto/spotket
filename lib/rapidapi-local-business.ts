@@ -27,7 +27,8 @@
 import { LAUREL_MD, SEARCH_RADIUS_MILES, haversineMiles, isBasicWebsite, type FoundBusiness } from "./lead-finder-shared";
 
 const DEFAULT_HOST = "local-business-data.p.rapidapi.com";
-const SEARCH_ZOOM = 9; // approximates a wide, ~50mi-ish viewport; we re-filter by real distance regardless
+const SEARCH_ZOOM = 7; // approximates a wide, ~100mi-ish viewport; we re-filter by real distance regardless
+const RESULTS_LIMIT = 500; // the API's documented max per request
 
 interface RapidApiBusiness {
   business_id?: string;
@@ -54,8 +55,9 @@ function num(value: unknown): number | undefined {
 
 /**
  * Searches one category via RapidAPI's Local Business Data /search
- * endpoint, already filtered to this agent's targeting rules (≤50
- * reviews, rating <4.0, no/basic website, within 50mi of Laurel MD).
+ * endpoint, already filtered to this agent's targeting rules (no/basic
+ * website only, within 100mi of Laurel MD — rating and review-count are no
+ * longer filtered on, just recorded as metadata, to cast a wider net).
  * Returns [] (never throws) when unconfigured or the call fails.
  */
 export async function searchCategoryRapidApi(category: { label: string; query: string }): Promise<FoundBusiness[]> {
@@ -72,7 +74,7 @@ export async function searchCategoryRapidApi(category: { label: string; query: s
       lat: String(LAUREL_MD.lat),
       lng: String(LAUREL_MD.lng),
       zoom: String(SEARCH_ZOOM),
-      limit: "20",
+      limit: String(RESULTS_LIMIT),
       language: "en",
       region: "us",
     });
@@ -107,11 +109,11 @@ export async function searchCategoryRapidApi(category: { label: string; query: s
       const distanceMiles = haversineMiles(LAUREL_MD.lat, LAUREL_MD.lng, lat, lng);
       if (distanceMiles > SEARCH_RADIUS_MILES) continue;
 
+      // Rating/review-count filters removed — casting a wider net for ANY
+      // small business, not just under-reviewed/under-rated ones. Still
+      // captured as metadata below for the lead record.
       const reviewCount = num(row.review_count) ?? num(row.reviews_count) ?? num(row.reviews) ?? 0;
-      if (reviewCount > 50) continue;
-
       const rating = num(row.rating) ?? null;
-      if (rating === null || rating >= 4.0) continue;
 
       const website = row.website ?? row.site ?? null;
       const websiteIsBasic = website ? isBasicWebsite(website) : false;

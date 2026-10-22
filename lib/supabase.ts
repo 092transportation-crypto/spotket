@@ -276,14 +276,22 @@ export async function deleteLead(id: string): Promise<boolean> {
   }
 }
 
-/** Every rapidapi_business_id already in the leads table — the Lead Finder Agent's dedup key. */
-export async function existingRapidApiBusinessIds(): Promise<Set<string>> {
+/**
+ * Every rapidapi_business_id already in the leads table — the Lead Finder
+ * Agent's dedup key. Returns `null` (not an empty Set) when the lookup
+ * query itself fails, so callers can tell "nothing exists yet" apart from
+ * "we couldn't check" — treating a failed check as "nothing exists" was a
+ * real bug: it let the agent re-find and try to re-insert businesses
+ * already in the table, which then silently failed on the table's unique
+ * index (found-but-not-inserted).
+ */
+export async function existingRapidApiBusinessIds(): Promise<Set<string> | null> {
   const client = getClient();
   if (!client) return new Set();
   const { data, error } = await client.from("leads").select("rapidapi_business_id").not("rapidapi_business_id", "is", null);
   if (error) {
     console.error("existingRapidApiBusinessIds failed:", error.message);
-    return new Set();
+    return null;
   }
   return new Set((data ?? []).map((row) => row.rapidapi_business_id as string));
 }
@@ -293,30 +301,39 @@ export async function existingRapidApiBusinessIds(): Promise<Set<string>> {
  * Looser cross-source dedup backstop for the Lead Finder Agent — the same
  * real business can have a different id on Google vs. Yelp, but the same
  * phone number, so this catches what the per-source id checks can't.
+ * Returns `null` on a failed lookup — see existingRapidApiBusinessIds.
  */
-export async function existingPhoneNumbers(): Promise<Set<string>> {
+export async function existingPhoneNumbers(): Promise<Set<string> | null> {
   const client = getClient();
   if (!client) return new Set();
   const { data, error } = await client.from("leads").select("phone").not("phone", "is", null);
   if (error) {
     console.error("existingPhoneNumbers failed:", error.message);
-    return new Set();
+    return null;
   }
   return new Set((data ?? []).map((row) => String(row.phone).replace(/\D/g, "")).filter(Boolean));
 }
 
-export async function insertLead(lead: NewLead): Promise<boolean> {
+/**
+ * `agentForErrorLog` additionally writes a failed insert's real error
+ * message to agent_activity_log (visible in /admin) instead of only
+ * console.error, which otherwise requires `vercel logs` to ever see.
+ */
+export async function insertLead(lead: NewLead, agentForErrorLog?: AgentName): Promise<boolean> {
   const client = getClient();
   if (!client) return false;
   try {
     const { error } = await client.from("leads").insert(lead);
     if (error) {
       console.error("insertLead failed:", error.message);
+      if (agentForErrorLog) await logActivity(agentForErrorLog, `insertLead failed: ${error.message}`, "error");
       return false;
     }
     return true;
   } catch (err) {
-    console.error("insertLead threw:", (err as Error).message);
+    const message = (err as Error).message;
+    console.error("insertLead threw:", message);
+    if (agentForErrorLog) await logActivity(agentForErrorLog, `insertLead threw: ${message}`, "error");
     return false;
   }
 }

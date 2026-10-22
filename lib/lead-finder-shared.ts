@@ -6,7 +6,7 @@
  */
 
 export const LAUREL_MD = { lat: 39.0993, lng: -76.8483 };
-export const SEARCH_RADIUS_MILES = 50;
+export const SEARCH_RADIUS_MILES = 100;
 
 export const LEAD_FINDER_CATEGORIES = [
   { label: "limo service", query: "limo service" },
@@ -19,6 +19,11 @@ export const LEAD_FINDER_CATEGORIES = [
   { label: "pressure washing", query: "pressure washing service" },
   { label: "landscaping", query: "landscaping company" },
   { label: "restaurant", query: "restaurant" },
+  { label: "plumber", query: "plumber" },
+  { label: "electrician", query: "electrician" },
+  { label: "dentist", query: "dentist" },
+  { label: "gym", query: "gym" },
+  { label: "car wash", query: "car wash" },
 ] as const;
 
 const BASIC_WEBSITE_HOSTS = [

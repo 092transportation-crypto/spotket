@@ -174,14 +174,14 @@ async function run() {
     "searchCategoryRapidApi: returns [] when RAPIDAPI_KEY unset",
     (await rapidapi.searchCategoryRapidApi(LEAD_FINDER_CATEGORIES[0])).length === 0,
   );
-  check("LEAD_FINDER_CATEGORIES: has all 10 requested categories", LEAD_FINDER_CATEGORIES.length === 10);
+  check("LEAD_FINDER_CATEGORIES: has all 15 requested categories", LEAD_FINDER_CATEGORIES.length === 15);
   check(
     "existingRapidApiBusinessIds: returns an empty Set when unconfigured",
-    (await supa.existingRapidApiBusinessIds()).size === 0,
+    (await supa.existingRapidApiBusinessIds())?.size === 0,
   );
   check(
     "existingPhoneNumbers: returns an empty Set when unconfigured",
-    (await supa.existingPhoneNumbers()).size === 0,
+    (await supa.existingPhoneNumbers())?.size === 0,
   );
 
   // --- lib/anthropic.ts: no API key configured ---

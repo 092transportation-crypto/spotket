@@ -28,12 +28,12 @@ function summarize(b: FoundBusiness): string {
 }
 
 /**
- * Daily, 7am: searches RapidAPI's Local Business Data API across 10
- * service categories within 50mi of Laurel, MD 20723 for small,
- * underserved businesses (≤50 reviews, rating <4.0, no or basic-only
- * website), skips anything already in the leads table (by
- * rapidapi_business_id, or by phone number as a secondary check), and
- * inserts up to 20 new leads/day tagged "Auto-Found" (source =
+ * Daily, 7am: searches RapidAPI's Local Business Data API across 15
+ * service categories within 100mi of Laurel, MD 20723 for small
+ * businesses with no or basic-only website (no rating/review-count filter
+ * — cast as wide a net as possible), skips anything already in the leads
+ * table (by rapidapi_business_id, or by phone number as a secondary
+ * check), and inserts up to 20 new leads/day tagged "Auto-Found" (source =
  * lead_finder_agent). See lib/rapidapi-local-business.ts for the honesty
  * notes on the field-mapping and radius limitations.
  */
@@ -53,7 +53,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ skipped: true });
   }
 
-  const [existingIds, existingPhones] = await Promise.all([existingRapidApiBusinessIds(), existingPhoneNumbers()]);
+  const [existingIdsResult, existingPhonesResult] = await Promise.all([existingRapidApiBusinessIds(), existingPhoneNumbers()]);
+  if (existingIdsResult === null || existingPhonesResult === null) {
+    // A failed dedup lookup used to fall back to an empty Set, silently
+    // treating "we couldn't check" as "nothing exists yet" — that let the
+    // agent re-find businesses already in the table and try to re-insert
+    // them, which then failed on the table's unique index with no
+    // visible error (the "found 1, inserted 0" bug). Abort instead.
+    await logActivity("lead_finder_agent", "Aborted — could not load existing leads for dedup", "error");
+    return NextResponse.json({ skipped: true, detail: "dedup lookup failed" }, { status: 500 });
+  }
+  const existingIds: Set<string> = existingIdsResult;
+  const existingPhones: Set<string> = existingPhonesResult;
   const seenPhonesThisRun = new Set<string>();
   const seenIdsThisRun = new Set<string>();
   const picked: FoundBusiness[] = [];
@@ -98,16 +109,19 @@ export async function GET(request: NextRequest) {
 
   let inserted = 0;
   for (const business of picked) {
-    const ok = await insertLead({
-      name: business.name,
-      business_name: business.name,
-      phone: business.phone as string,
-      source: "lead_finder_agent",
-      business_type: business.category,
-      website_url: business.website ?? undefined,
-      message: summarize(business),
-      rapidapi_business_id: business.externalId,
-    });
+    const ok = await insertLead(
+      {
+        name: business.name,
+        business_name: business.name,
+        phone: business.phone as string,
+        source: "lead_finder_agent",
+        business_type: business.category,
+        website_url: business.website ?? undefined,
+        message: summarize(business),
+        rapidapi_business_id: business.externalId,
+      },
+      "lead_finder_agent",
+    );
     if (ok) inserted += 1;
   }
 

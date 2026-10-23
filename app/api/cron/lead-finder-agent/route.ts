@@ -58,13 +58,23 @@ export async function GET(request: NextRequest) {
     // A failed dedup lookup used to fall back to an empty Set, silently
     // treating "we couldn't check" as "nothing exists yet" — that let the
     // agent re-find businesses already in the table and try to re-insert
-    // them, which then failed on the table's unique index with no
-    // visible error (the "found 1, inserted 0" bug). Abort instead.
-    await logActivity("lead_finder_agent", "Aborted — could not load existing leads for dedup", "error");
-    return NextResponse.json({ skipped: true, detail: "dedup lookup failed" }, { status: 500 });
+    // them, which used to fail on the table's unique index with no visible
+    // error (the "found 1, inserted 0" bug). That gap is now closed at the
+    // source: insertLead() below catches a failed insert (including a
+    // unique-index violation) and logs the real error to
+    // agent_activity_log via agentForErrorLog, instead of swallowing it.
+    // So a stale/failed dedup check can at worst cause a visible, logged,
+    // no-op re-insert attempt — not silent corruption — and isn't worth
+    // aborting the whole run over. Continue with whichever side succeeded
+    // and an empty Set for the side that failed.
+    await logActivity(
+      "lead_finder_agent",
+      `Dedup lookup partially failed (ids: ${existingIdsResult === null ? "failed" : "ok"}, phones: ${existingPhonesResult === null ? "failed" : "ok"}) — continuing without full dedup`,
+      "warn",
+    );
   }
-  const existingIds: Set<string> = existingIdsResult;
-  const existingPhones: Set<string> = existingPhonesResult;
+  const existingIds: Set<string> = existingIdsResult ?? new Set();
+  const existingPhones: Set<string> = existingPhonesResult ?? new Set();
   const seenPhonesThisRun = new Set<string>();
   const seenIdsThisRun = new Set<string>();
   const picked: FoundBusiness[] = [];

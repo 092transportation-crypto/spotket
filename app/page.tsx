@@ -34,7 +34,7 @@ const exploreLinks = LANDING_PAGES.filter((page) =>
 export const metadata = pageMetadata(
   "/",
   "Spotket | AI Automation That Gets Small Businesses More Customers",
-  "We build AI chatbots, booking automation, and custom websites for small businesses. Stop missing inquiries. Start getting more customers. Plans from $300/month.",
+  "We build custom websites, AI chatbots, and AI receptionists for small businesses — plus monthly SEO to grow your Google rankings. Stop missing inquiries. $500/month, no contracts.",
 );
 
 const localBusinessSchema = {
@@ -46,7 +46,7 @@ const localBusinessSchema = {
   email: CONTACT_EMAIL,
   image: `${SITE_URL}/spotket-logo.png`,
   areaServed: { "@type": "State", name: "Maryland" },
-  priceRange: "$200-$1000",
+  priceRange: "$500/month",
 };
 
 export default function HomePage() {
@@ -88,7 +88,7 @@ export default function HomePage() {
               className="animate-fade-up mt-4 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand-light"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-brand-light" />
-              Starting at $200/month
+              $500/month, flat rate
             </p>
             <LetterFadeHeading
               text="Stop Missing Inquiries. Start Getting More Customers."
@@ -169,18 +169,18 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <Reveal className="text-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
-              Plans
+              Pricing
             </p>
             <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-              Four plans. No long-term contracts.
+              One flat plan. No long-term contracts.
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {PRICING_TIERS.map((tier, i) => (
-              <Reveal key={tier.name} delay={i * 80}>
+          <div className="mx-auto mt-12 max-w-md">
+            {PRICING_TIERS.map((tier) => (
+              <Reveal key={tier.name}>
                 <div
-                  className={`flex h-full flex-col rounded-2xl border p-6 ${
+                  className={`flex h-full flex-col rounded-2xl border p-7 ${
                     tier.featured
                       ? "border-brand/50 bg-gradient-to-b from-brand/15 via-navy-900 to-navy-900"
                       : "border-white/10 bg-navy-900/60"
@@ -204,18 +204,26 @@ export default function HomePage() {
                   <p className="mt-2 text-sm leading-relaxed text-neutral-400">
                     {tier.description}
                   </p>
+                  <ul className="mt-6 space-y-3">
+                    {tier.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex gap-3 text-sm leading-relaxed text-neutral-300"
+                      >
+                        <span className="mt-0.5 text-brand-light">✓</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/contact"
+                    className="btn-shimmer mt-8 inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95"
+                  >
+                    Get Started
+                  </Link>
                 </div>
               </Reveal>
             ))}
-          </div>
-
-          <div className="mt-10 text-center">
-            <Link
-              href="/services"
-              className="text-sm font-semibold text-brand-light transition-colors hover:text-white"
-            >
-              See full plan details &rarr;
-            </Link>
           </div>
         </div>
       </section>

@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata(
   "/services",
   "Services",
-  "AI automation for small business and AI chatbots for limo companies — AI receptionist, booking automation, and automated review requests. Plans from $200/month.",
+  "AI automation for small business and AI chatbots for limo companies — custom website, AI chatbot, AI receptionist, instant lead alerts, and monthly SEO. $500/month flat.",
 );
 
 const servicesFaqSchema = {
@@ -37,8 +37,8 @@ export default function ServicesPage() {
           Everything you need to automate growth
         </h1>
         <p className="mt-4 text-base leading-relaxed text-neutral-400">
-          Four plans built to run on their own. No long-term contracts.
-          Cancel any time.
+          One flat monthly plan, built to run on its own. No long-term
+          contracts. Cancel any time.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export default function ServicesPage() {
         </h2>
       </div>
 
-      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto mt-10 grid max-w-md grid-cols-1 gap-6">
         {PRICING_TIERS.map((tier, i) => (
           <Reveal key={tier.name} delay={i * 80}>
             <div

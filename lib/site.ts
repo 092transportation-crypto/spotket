@@ -19,90 +19,24 @@ export const NAV_LINKS = [
 
 export const PRICING_TIERS = [
   {
-    name: "Starter",
-    price: 300,
-    description: "A 24/7 front line for businesses that just need to stop missing leads.",
-    features: [
-      "AI chatbot on your website",
-      "Instant email alerts for every inquiry",
-      "Basic FAQ + business hours setup",
-      "Monthly performance summary",
-    ],
-    featured: false,
-    icon: "chatbot",
-  },
-  {
     name: "Standard",
     price: 500,
-    description: "The full automation suite plus a website — our most popular plan.",
+    description:
+      "The complete automation suite for local businesses — website, AI chatbot, AI receptionist, and ongoing SEO, all in one flat monthly plan.",
     features: [
-      "Everything in Starter",
-      "Custom built website included",
-      "Booking automation across text, chat, and email",
-      "Automatic review requests after every service",
-      "Lead routing to the right person",
-      "Ongoing website edits",
-      "Priority support",
+      "Custom website built for your business",
+      "AI chatbot that answers customer questions 24/7",
+      "AI receptionist that answers calls and texts automatically",
+      "Never miss an inquiry — instant alerts + automated follow up",
+      "Monthly SEO — blog posts and landing pages to increase Google rankings",
+      "No contracts — cancel anytime",
     ],
     featured: true,
     icon: "rocket",
   },
-  {
-    name: "Premium",
-    price: 1000,
-    description: "The full growth stack — deeper automation and a dedicated strategist.",
-    features: [
-      "Everything in Standard",
-      "Advanced automations (reminders, follow-ups, re-engagement)",
-      "Dedicated monthly strategy call",
-      "Full AI system management",
-    ],
-    featured: false,
-    icon: "crown",
-  },
-  {
-    name: "AI Receptionist",
-    price: 200,
-    description: "A dedicated AI voice receptionist that answers every call, 24/7.",
-    features: [
-      "AI answers and screens every incoming call",
-      "Call summaries & transcripts sent instantly",
-      "Custom greeting and FAQ script",
-      "Missed-call text-back",
-    ],
-    featured: false,
-    icon: "phone",
-  },
 ] as const;
 
 export const FEATURE_HIGHLIGHTS = [
-  {
-    name: "AI Chatbot",
-    description:
-      "Answers customer questions instantly, 24/7 — pricing, availability, hours, and more — so no inquiry ever goes unanswered.",
-    image: {
-      src: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=75&w=1200&auto=format&fit=crop",
-      alt: "A sleek white robotic hand reaching outward, representing an AI assistant",
-    },
-  },
-  {
-    name: "Booking Automation",
-    description:
-      "Instant alerts and scheduling the moment a customer reaches out, so you respond in minutes instead of hours.",
-    image: {
-      src: "https://images.unsplash.com/photo-1649433391719-2e784576d044?q=75&w=1200&auto=format&fit=crop",
-      alt: "A close-up of an online calendar interface used to schedule and manage bookings",
-    },
-  },
-  {
-    name: "Review Generation",
-    description:
-      "Automatic review requests sent after every service, turning happy customers into 5-star ratings on autopilot.",
-    image: {
-      src: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?q=75&w=1200&auto=format&fit=crop",
-      alt: "A row of yellow five-star ratings representing a glowing customer review",
-    },
-  },
   {
     name: "Custom Website",
     description:
@@ -113,12 +47,39 @@ export const FEATURE_HIGHLIGHTS = [
     },
   },
   {
+    name: "AI Chatbot",
+    description:
+      "Answers customer questions instantly, 24/7 — pricing, availability, hours, and more — so no inquiry ever goes unanswered.",
+    image: {
+      src: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=75&w=1200&auto=format&fit=crop",
+      alt: "A sleek white robotic hand reaching outward, representing an AI assistant",
+    },
+  },
+  {
     name: "AI Receptionist",
     description:
-      "A dedicated AI voice receptionist that answers every call, books appointments, and never puts a customer on hold.",
+      "A dedicated AI voice receptionist that answers every call and text automatically — no more voicemail, no more missed walk-ins.",
     image: {
       src: "https://images.unsplash.com/photo-1758876204242-787309002a8f?q=75&w=1200&auto=format&fit=crop",
       alt: "A man talking on the phone at his desk while working on a laptop",
+    },
+  },
+  {
+    name: "Instant Alerts & Follow-Up",
+    description:
+      "The moment a customer reaches out, you get an instant alert — and automated follow-up makes sure no inquiry ever slips through the cracks.",
+    image: {
+      src: "https://images.unsplash.com/photo-1557200134-90327ee9fafa?q=75&w=1200&auto=format&fit=crop",
+      alt: "A laptop screen showing an email inbox with new message alerts",
+    },
+  },
+  {
+    name: "Monthly SEO",
+    description:
+      "Fresh blog posts and landing pages published every month, built to climb Google rankings and bring in new organic traffic.",
+    image: {
+      src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=75&w=1200&auto=format&fit=crop",
+      alt: "A laptop displaying website traffic and SEO analytics charts",
     },
   },
 ] as const;
@@ -380,7 +341,7 @@ export const HOME_FAQ = [
   {
     question: "What does Spotket actually build for my business?",
     answer:
-      "An AI chatbot and/or AI receptionist that answers every customer instantly, booking automation that alerts your team the moment a lead comes in, automatic review requests after every job, and — on the Standard and Premium plans — a custom website.",
+      "A custom website, an AI chatbot and AI receptionist that answer every customer instantly, instant alerts and automated follow-up the moment a lead comes in, and ongoing monthly SEO to grow your Google rankings — all in one flat monthly plan.",
   },
   {
     question: "How is this different from hiring a receptionist?",

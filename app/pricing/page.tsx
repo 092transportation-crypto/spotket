@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata(
   "/pricing",
   "Pricing",
-  "AI automation for small business starting at $200/month — AI chatbot, AI receptionist, booking automation, and automated review requests. No long-term contracts.",
+  "AI automation for small business — $500/month flat. Custom website, AI chatbot, AI receptionist, instant lead alerts, and monthly SEO. No long-term contracts.",
 );
 
 export default function PricingPage() {
@@ -25,7 +25,7 @@ export default function PricingPage() {
         </p>
       </div>
 
-      <div className="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto mt-16 grid max-w-md grid-cols-1 gap-6">
         {PRICING_TIERS.map((tier) => (
           <div
             key={tier.name}
@@ -78,7 +78,7 @@ export default function PricingPage() {
 
       <div className="mx-auto mt-16 max-w-xl text-center">
         <p className="text-sm text-neutral-400">
-          Not sure which plan fits your business?
+          Not sure if this is right for your business?
         </p>
         <div className="mt-6">
           <Link

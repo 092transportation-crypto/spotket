@@ -1,8 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
-import { TierIcon } from "@/components/icons";
-import { CONTACT_IMAGE, FEATURE_HIGHLIGHTS, PRICING_TIERS, SERVICES_FAQ } from "@/lib/site";
+import { TierIcon, StepIcon } from "@/components/icons";
+import {
+  CONTACT_IMAGE,
+  FEATURE_HIGHLIGHTS,
+  PHOTO_ENHANCEMENT,
+  PRICING_TIERS,
+  SERVICES_FAQ,
+} from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -156,6 +162,44 @@ export default function ServicesPage() {
             </div>
           </Reveal>
         ))}
+      </div>
+
+      <div className="mx-auto mt-20 max-w-3xl">
+        <Reveal>
+          <div className="card-glow overflow-hidden rounded-2xl border border-white/10 bg-navy-900/60 p-8 sm:p-10">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <StepIcon icon="camera" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+                  Add-On Service
+                </p>
+                <h2 className="mt-1 text-2xl font-bold text-white">
+                  {PHOTO_ENHANCEMENT.name}
+                </h2>
+              </div>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-neutral-400">
+              {PHOTO_ENHANCEMENT.shortDescription}
+            </p>
+            <p className="mt-3 text-xs text-neutral-500">
+              {PHOTO_ENHANCEMENT.disclaimer}
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/contact"
+                className="btn-shimmer inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95"
+              >
+                Get a Free Sample
+              </Link>
+              <Link
+                href="/services/photo-enhancement"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/5"
+              >
+                See Pricing &amp; Details
+              </Link>
+            </div>
+          </div>
+        </Reveal>
       </div>
 
       <div className="mx-auto mt-20 max-w-3xl">

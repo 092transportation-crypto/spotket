@@ -135,7 +135,24 @@ function ChartIcon() {
   );
 }
 
-export type StepIconName = "audit" | "build" | "launch" | "support";
+function CameraIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6"
+    >
+      <path d="M4 8.5a1.5 1.5 0 0 1 1.5-1.5h2l1.2-2h6.6l1.2 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5z" />
+      <circle cx="12" cy="13" r="3.3" />
+    </svg>
+  );
+}
+
+export type StepIconName = "audit" | "build" | "launch" | "support" | "camera";
 
 const TIER_ICONS: Record<TierIconName, () => ReactElement> = {
   chatbot: ChatbotIcon,
@@ -149,6 +166,7 @@ const STEP_ICONS: Record<StepIconName, () => ReactElement> = {
   build: WrenchIcon,
   launch: RocketIcon,
   support: ChartIcon,
+  camera: CameraIcon,
 };
 
 export function TierIcon({

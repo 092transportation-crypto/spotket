@@ -28,6 +28,12 @@ const CHALLENGES = [
 
 const HEARD_ABOUT_US = ["Google", "Instagram", "Cold call", "Referral", "Other"] as const;
 
+const SERVICE_INTERESTS = [
+  "AI Automation Plan",
+  "AI Listing Photo Enhancement",
+  "Not sure yet",
+] as const;
+
 type Status = "idle" | "submitting" | "sent" | "error";
 
 export function ContactForm() {
@@ -42,6 +48,7 @@ export function ContactForm() {
       name: String(data.get("name") ?? "").trim(),
       business_name: String(data.get("business_name") ?? "").trim(),
       business_type: String(data.get("business_type") ?? "").trim(),
+      service_interest: String(data.get("service_interest") ?? "").trim(),
       phone: String(data.get("phone") ?? "").trim(),
       email: String(data.get("email") ?? "").trim(),
       website_url: String(data.get("website_url") ?? "").trim(),
@@ -142,6 +149,28 @@ export function ContactForm() {
           {BUSINESS_TYPES.map((t) => (
             <option key={t} value={t}>
               {t}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="service_interest" className={labelCls}>
+          Which service are you interested in?
+        </label>
+        <select
+          id="service_interest"
+          name="service_interest"
+          required
+          defaultValue=""
+          className={selectCls}
+        >
+          <option value="" disabled>
+            Select a service
+          </option>
+          {SERVICE_INTERESTS.map((s) => (
+            <option key={s} value={s}>
+              {s}
             </option>
           ))}
         </select>

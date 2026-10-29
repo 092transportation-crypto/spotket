@@ -9,6 +9,7 @@ interface ContactInquiryBody {
   name?: string;
   business_name?: string;
   business_type?: string;
+  service_interest?: string;
   phone?: string;
   email?: string;
   website_url?: string;
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
     name: clip(body.name, 100),
     business_name: clip(body.business_name, 150),
     business_type: clip(body.business_type, 60),
+    service_interest: clip(body.service_interest, 60),
     phone: clip(body.phone, 30),
     email: clip(body.email, 150),
     website_url: clip(body.website_url, 300),
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
   if (!lead.name) missing.push("name");
   if (!lead.business_name) missing.push("business_name");
   if (!lead.business_type) missing.push("business_type");
+  if (!lead.service_interest) missing.push("service_interest");
   if (!lead.phone) missing.push("phone");
   if (!lead.email) missing.push("email");
   if (!lead.biggest_challenge) missing.push("biggest_challenge");
@@ -64,6 +67,7 @@ export async function POST(request: NextRequest) {
     { label: "Name", value: lead.name },
     { label: "Business", value: lead.business_name },
     { label: "Business type", value: lead.business_type },
+    { label: "Interested in", value: lead.service_interest },
     { label: "Phone", value: lead.phone },
     { label: "Email", value: lead.email },
     { label: "Website", value: lead.website_url },
@@ -74,10 +78,14 @@ export async function POST(request: NextRequest) {
   ]);
   const confirmation = buildContactConfirmationEmail(lead.name);
 
+  // service_interest has no column of its own — it's stored as recommended_package
+  // so it shows up tagged under "Service" on the admin leads dashboard.
+  const { service_interest, ...leadForDb } = lead;
+
   const [alertResult, confirmResult, dbResult] = await Promise.allSettled([
     alertTo ? sendEmail(alertTo, alert.subject, alert.text, alert.html) : Promise.resolve(false),
     sendEmail(lead.email, confirmation.subject, confirmation.text, confirmation.html),
-    insertLead({ ...lead, source: "contact_form" }),
+    insertLead({ ...leadForDb, recommended_package: service_interest, source: "contact_form" }),
     logActivity("sales_agent", `Contact form inquiry from ${lead.name} (${lead.business_name})`),
   ]);
 

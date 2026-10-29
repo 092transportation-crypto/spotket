@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { TierIcon } from "@/components/icons";
+import { TierIcon, StepIcon } from "@/components/icons";
 import { FaqSection } from "@/components/faq-section";
-import { PRICING_FAQ, PRICING_TIERS } from "@/lib/site";
+import {
+  PHOTO_ENHANCEMENT,
+  PHOTO_ENHANCEMENT_ADD_ON_NOTE,
+  PHOTO_ENHANCEMENT_PRICING,
+  PRICING_FAQ,
+  PRICING_TIERS,
+} from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -74,6 +80,58 @@ export default function PricingPage() {
             </Link>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto mt-20 max-w-3xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-light">
+          One-Time Service
+        </p>
+        <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+          {PHOTO_ENHANCEMENT.name}
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-neutral-400">
+          {PHOTO_ENHANCEMENT.shortDescription}
+        </p>
+      </div>
+
+      <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3">
+        {PHOTO_ENHANCEMENT_PRICING.map((tier) => (
+          <div
+            key={tier.name}
+            className="flex h-full flex-col rounded-2xl border border-white/10 bg-navy-900/60 p-7"
+          >
+            <StepIcon icon="camera" />
+            <h3 className="mt-4 text-lg font-semibold text-white">
+              {tier.name}
+            </h3>
+            <p className="mt-3 flex items-baseline gap-1">
+              <span className="text-4xl font-bold text-white">
+                ${tier.price}
+              </span>
+              <span className="text-sm text-neutral-400">one-time</span>
+            </p>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-neutral-400">
+              {tier.description}
+            </p>
+            <Link
+              href="/contact"
+              className="mt-8 inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02] hover:bg-white/5 active:scale-95"
+            >
+              Get Started
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      <div className="mx-auto mt-8 max-w-2xl text-center">
+        <p className="text-xs text-neutral-500">{PHOTO_ENHANCEMENT.disclaimer}</p>
+        <p className="mt-4 text-sm text-neutral-400">{PHOTO_ENHANCEMENT_ADD_ON_NOTE}</p>
+        <Link
+          href="/services/photo-enhancement"
+          className="mt-4 inline-block text-sm font-semibold text-brand-light transition-colors hover:text-white"
+        >
+          See pricing &amp; details &rarr;
+        </Link>
       </div>
 
       <div className="mx-auto mt-16 max-w-xl text-center">

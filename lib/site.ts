@@ -1233,6 +1233,65 @@ export const LANDING_PAGES = [
   },
 ] as const;
 
+export const PHOTO_ENHANCEMENT = {
+  name: "AI Listing Photo Enhancement",
+  shortDescription:
+    "Better photos for Airbnb, Zillow, and realtor listings, delivered in 24-48 hours.",
+  disclaimer:
+    "We only enhance lighting, color, and cleanup. We never alter the actual space.",
+} as const;
+
+export const PHOTO_ENHANCEMENT_PRICING = [
+  {
+    name: "5 Photos",
+    price: 50,
+    description: "Lighting, color, and cleanup enhancement for 5 listing photos.",
+  },
+  {
+    name: "15 Photos",
+    price: 120,
+    description: "Lighting, color, and cleanup enhancement for 15 listing photos.",
+  },
+  {
+    name: "Photos + Walkthrough Video",
+    price: 200,
+    description: "15 enhanced photos plus a polished walkthrough video for your listing.",
+  },
+] as const;
+
+export const PHOTO_ENHANCEMENT_ADD_ON_NOTE =
+  "Already on a Spotket monthly plan? Add AI Listing Photo Enhancement any time — just mention it on your next check-in and it's billed alongside your flat rate.";
+
+export const PHOTO_ENHANCEMENT_FAQ = [
+  {
+    question: "Will the photos still look like my actual listing?",
+    answer:
+      "Yes. We only enhance lighting, color, and cleanup — we never alter the actual space.",
+  },
+  {
+    question: "How fast will I get my photos back?",
+    answer: "Within 24-48 hours of us receiving your originals.",
+  },
+  {
+    question: "Can this be added to my monthly plan?",
+    answer:
+      "Yes — it's available as a one-time service or as an add-on to any Spotket monthly plan.",
+  },
+] as const;
+
+/**
+ * Before/after sample gallery for the photo enhancement page. Keep this
+ * false until real client samples replace the placeholder slots — flip it
+ * to true (and swap in real images) to publish the section.
+ */
+export const PHOTO_GALLERY_PUBLISHED = false;
+
+export const PHOTO_GALLERY_PLACEHOLDERS = [
+  { id: "sample-1", label: "Living Room" },
+  { id: "sample-2", label: "Kitchen" },
+  { id: "sample-3", label: "Exterior" },
+] as const;
+
 export type LandingPageSlug = (typeof LANDING_PAGES)[number]["slug"];
 
 /** A handful of landing pages linked from the footer on every page for crawl depth. */

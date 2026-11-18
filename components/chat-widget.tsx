@@ -10,7 +10,7 @@ interface Message {
 
 const GREETING: Message = {
   role: "assistant",
-  content: "Hi! I'm Spotket AI. What type of business do you run?",
+  content: "Hi! I'm Spotket AI. Ask me about our services, pricing, or how to get started.",
 };
 
 export function ChatWidget() {
@@ -50,6 +50,7 @@ export function ChatWidget() {
         body: JSON.stringify({ messages: next }),
       });
       const data = await res.json();
+      if (typeof data.reply !== "string" || !data.reply) throw new Error("empty reply");
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
       if (data.leadCaptured) setLeadCaptured(true);
     } catch {
@@ -92,7 +93,7 @@ export function ChatWidget() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
+                className={`max-w-[85%] whitespace-pre-wrap break-words rounded-xl px-3 py-2 text-sm leading-relaxed ${
                   m.role === "user"
                     ? "ml-auto bg-brand text-white"
                     : "bg-navy-800 text-neutral-200"
@@ -115,6 +116,8 @@ export function ChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               placeholder={leadCaptured ? "Anything else I can help with?" : "Type a message…"}
               disabled={loading}
+              maxLength={1000}
+              aria-label="Message Spotket AI"
               className="flex-1 rounded-lg border border-white/15 bg-navy-900/60 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-brand"
             />
             <button

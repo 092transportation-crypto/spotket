@@ -1076,6 +1076,32 @@ export async function insertClientChatMessage(clientId: string, role: "user" | "
 }
 
 /** Test-only escape hatch to reset the cached client between test cases. */
+/**
+ * Atomically counts one hit for `key` in a fixed window (see
+ * chat_rate_limit_hit in supabase-schema.sql). Returns true if still within
+ * `limit`, false if over, or null when Supabase/the function isn't available
+ * so the caller can fall back to its in-memory limiter.
+ */
+export async function rateLimitHit(key: string, limit: number, windowSeconds: number): Promise<boolean | null> {
+  const client = getClient();
+  if (!client) return null;
+  try {
+    const { data, error } = await client.rpc("chat_rate_limit_hit", {
+      p_key: key,
+      p_limit: limit,
+      p_window_seconds: windowSeconds,
+    });
+    if (error || typeof data !== "boolean") {
+      if (error) console.error("rateLimitHit failed:", error.message);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.error("rateLimitHit threw:", (err as Error).message);
+    return null;
+  }
+}
+
 export function _resetSupabaseClientForTests(): void {
   cachedClient = undefined;
 }

@@ -179,3 +179,36 @@ create index if not exists payments_created_idx on payments (created_at desc);
 create index if not exists email_recipients_campaign_idx on email_recipients (campaign_id);
 create index if not exists email_recipients_follow_up_idx on email_recipients (sent_at) where status = 'sent' and follow_up_sent = false;
 create index if not exists client_chat_messages_client_idx on client_chat_messages (client_id, created_at);
+
+-- Rate limiting for the public chat widget (/api/chat). Fixed windows keyed
+-- by rule + hashed client IP (or "all" for the global daily cap). Only the
+-- service role calls this; RLS is on with no policies, so anon can't read it.
+create table if not exists chat_rate_limits (
+  key text primary key,
+  count integer not null default 0,
+  window_start timestamptz not null default now()
+);
+alter table chat_rate_limits enable row level security;
+
+create or replace function chat_rate_limit_hit(p_key text, p_limit integer, p_window_seconds integer)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  current_count integer;
+begin
+  insert into chat_rate_limits as r (key, count, window_start)
+  values (p_key, 1, now())
+  on conflict (key) do update set
+    count = case when r.window_start <= now() - make_interval(secs => p_window_seconds) then 1 else r.count + 1 end,
+    window_start = case when r.window_start <= now() - make_interval(secs => p_window_seconds) then now() else r.window_start end
+  returning count into current_count;
+  return current_count <= p_limit;
+end;
+$$;
+revoke execute on function chat_rate_limit_hit(text, integer, integer) from public, anon, authenticated;
+
+-- Optional cleanup of stale windows (safe to run any time):
+-- delete from chat_rate_limits where window_start < now() - interval '2 days';

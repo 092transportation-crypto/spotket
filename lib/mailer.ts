@@ -124,7 +124,7 @@ export function buildFollowUpEmail(
     "",
     "We did this for 92 Transportation in Maryland and they picked up 5 extra bookings per month just from responding faster than competitors.",
     "",
-    "It takes 48 hours to set up and starts at $300/month with no contracts.",
+    "It takes 48 hours to set up and is $500/month with no contracts.",
     "",
     "Would you be open to a quick 10 minute call this week?",
     "",
@@ -138,7 +138,7 @@ export function buildFollowUpEmail(
       `<p style="font-size:15px;line-height:1.6;">I wanted to follow up on your interest in Spotket.</p>` +
       `<p style="font-size:15px;line-height:1.6;">I help small businesses like yours get more customers using AI — we build a custom website, set up a chatbot that responds 24/7, and automatically collect Google reviews after every job.</p>` +
       `<p style="font-size:15px;line-height:1.6;">We did this for <strong>92 Transportation</strong> in Maryland and they picked up <strong>5 extra bookings per month</strong> just from responding faster than competitors.</p>` +
-      `<p style="font-size:15px;line-height:1.6;">It takes 48 hours to set up and starts at <strong>$300/month</strong> with no contracts.</p>` +
+      `<p style="font-size:15px;line-height:1.6;">It takes 48 hours to set up and is <strong>$500/month</strong> with no contracts.</p>` +
       `<p style="font-size:15px;line-height:1.6;">Would you be open to a quick 10 minute call this week?</p>` +
       `<div style="text-align:center;margin:24px 0;">` +
       `<a href="${BOOKING_URL}" style="display:inline-block;background:linear-gradient(100deg,#6366f1,#4f46e5 55%,#a855f7);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:999px;">Book a Call</a>` +

@@ -421,7 +421,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for barbershops",
     metaTitle: "AI Automation for Barbershops | Spotket Digital",
     metaDescription:
-      "AI automation for barbershops — an AI chatbot and receptionist that answers every call and booking request, 24/7, so you never lose a walk-in. From $200/month.",
+      "AI automation for barbershops — an AI chatbot and receptionist that answers every call and booking request, 24/7, so you never lose a walk-in. $500/month.",
     h1: "AI Automation for Barbershops",
     heroSubheading:
       "Stop losing walk-ins and bookings to a phone that rings while you're mid-cut.",
@@ -463,7 +463,7 @@ export const LANDING_PAGES = [
     keyword: "AI chatbot for limo companies",
     metaTitle: "AI Chatbot for Limo Companies | Spotket Digital",
     metaDescription:
-      "An AI chatbot for limo companies that answers quote requests instantly, 24/7 — built for airport runs, weddings, and corporate accounts. From $200/month.",
+      "An AI chatbot for limo companies that answers quote requests instantly, 24/7 — built for airport runs, weddings, and corporate accounts. $500/month.",
     h1: "AI Chatbot for Limo Companies",
     heroSubheading:
       "Give every quote request an instant answer — even at 2am before an airport run.",
@@ -506,7 +506,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for cleaning companies",
     metaTitle: "AI Automation for Cleaning Companies | Spotket Digital",
     metaDescription:
-      "AI automation for cleaning companies — instant quote responses, booking alerts, and automatic review requests, 24/7. Plans from $200/month.",
+      "AI automation for cleaning companies — instant quote responses, booking alerts, and automatic review requests, 24/7. $500/month.",
     h1: "AI Automation for Cleaning Companies",
     heroSubheading:
       "Quote requests don't wait for business hours — now your response doesn't either.",
@@ -547,7 +547,7 @@ export const LANDING_PAGES = [
     keyword: "AI receptionist for small business",
     metaTitle: "AI Receptionist for Small Business | Spotket Digital",
     metaDescription:
-      "A dedicated AI receptionist for small business that answers every call, 24/7 — no hold music, no voicemail, no missed customers. From $200/month.",
+      "A dedicated AI receptionist for small business that answers every call, 24/7 — no hold music, no voicemail, no missed customers. $500/month.",
     h1: "AI Receptionist for Small Business",
     heroSubheading:
       "A dedicated AI voice receptionist that answers every call, 24/7 — no hold music, no voicemail.",
@@ -590,7 +590,7 @@ export const LANDING_PAGES = [
     keyword: "automated review requests for small business",
     metaTitle: "Automated Review Requests for Small Business | Spotket Digital",
     metaDescription:
-      "Automated review requests for small business — turn every completed job into a 5-star Google review automatically. Plans from $200/month.",
+      "Automated review requests for small business — turn every completed job into a 5-star Google review automatically. $500/month.",
     h1: "Automated Review Requests for Small Business",
     heroSubheading:
       "Turn every completed job into a 5-star Google review — without lifting a finger.",
@@ -632,7 +632,7 @@ export const LANDING_PAGES = [
     keyword: "website and AI automation Maryland",
     metaTitle: "Website and AI Automation for Maryland Businesses | Spotket",
     metaDescription:
-      "Website and AI automation for Maryland small businesses — a custom website plus a 24/7 AI chatbot that never misses an inquiry. Plans from $200/month.",
+      "Website and AI automation for Maryland small businesses — a custom website plus a 24/7 AI chatbot that never misses an inquiry. $500/month.",
     h1: "Website and AI Automation for Maryland Small Businesses",
     heroSubheading:
       "A custom website plus a 24/7 AI chatbot — built for small businesses across Maryland.",
@@ -674,7 +674,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for nail salons",
     metaTitle: "AI Automation for Nail Salons | Spotket Digital",
     metaDescription:
-      "AI automation for nail salons — an AI chatbot that answers booking questions instantly so you stop losing clients to voicemail. From $200/month.",
+      "AI automation for nail salons — an AI chatbot that answers booking questions instantly so you stop losing clients to voicemail. $500/month.",
     h1: "AI Automation for Nail Salons",
     heroSubheading: "Stop losing bookings to voicemail between appointments.",
     painPoints: [
@@ -715,7 +715,7 @@ export const LANDING_PAGES = [
     keyword: "get more Google reviews automatically",
     metaTitle: "Get More Google Reviews Automatically | Spotket Digital",
     metaDescription:
-      "Get more Google reviews automatically with a system that asks every customer right after their experience, while it's still fresh. From $200/month.",
+      "Get more Google reviews automatically with a system that asks every customer right after their experience, while it's still fresh. $500/month.",
     h1: "Get More Google Reviews Automatically",
     heroSubheading:
       "A system that asks every customer for a review right after their experience — while it's still fresh.",
@@ -757,7 +757,7 @@ export const LANDING_PAGES = [
     keyword: "AI chatbot for restaurants",
     metaTitle: "AI Chatbot for Restaurants | Spotket Digital",
     metaDescription:
-      "An AI chatbot for restaurants that answers reservation and menu questions instantly — even during the dinner rush. Plans from $200/month.",
+      "An AI chatbot for restaurants that answers reservation and menu questions instantly — even during the dinner rush. $500/month.",
     h1: "AI Chatbot for Restaurants",
     heroSubheading:
       "Answer reservation and menu questions instantly — even during the dinner rush.",
@@ -798,7 +798,7 @@ export const LANDING_PAGES = [
     keyword: "booking automation for small business",
     metaTitle: "Booking Automation for Small Business | Spotket Digital",
     metaDescription:
-      "Booking automation for small business — every request gets an instant response and an immediate alert to your team, 24/7. Plans from $200/month.",
+      "Booking automation for small business — every request gets an instant response and an immediate alert to your team, 24/7. $500/month.",
     h1: "Booking Automation for Small Business",
     heroSubheading:
       "Every booking request gets an instant response and an immediate alert to your team.",
@@ -838,7 +838,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for dentists",
     metaTitle: "AI Automation for Dental Practices | Spotket Digital",
     metaDescription:
-      "AI automation for dentists — patients get instant answers on appointments and hours, any time of day, with automatic booking alerts. From $200/month.",
+      "AI automation for dentists — patients get instant answers on appointments and hours, any time of day, with automatic booking alerts. $500/month.",
     h1: "AI Automation for Dental Practices",
     heroSubheading:
       "Patients get instant answers about appointments and office hours, any time of day.",
@@ -878,7 +878,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for auto repair shops",
     metaTitle: "AI Automation for Auto Repair Shops | Spotket Digital",
     metaDescription:
-      "AI automation for auto repair shops — instant answers on estimates and appointment availability, 24/7, plus automatic review requests. From $200/month.",
+      "AI automation for auto repair shops — instant answers on estimates and appointment availability, 24/7, plus automatic review requests. $500/month.",
     h1: "AI Automation for Auto Repair Shops",
     heroSubheading:
       "Give every customer an instant answer on estimates and appointment availability.",
@@ -918,7 +918,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for HVAC companies",
     metaTitle: "AI Automation for HVAC Companies | Spotket Digital",
     metaDescription:
-      "AI automation for HVAC companies — never miss an emergency repair call again, even at 2am. Instant answers and booking alerts. From $200/month.",
+      "AI automation for HVAC companies — never miss an emergency repair call again, even at 2am. Instant answers and booking alerts. $500/month.",
     h1: "AI Automation for HVAC Companies",
     heroSubheading: "Never miss an emergency repair call again — even at 2am.",
     painPoints: [
@@ -957,7 +957,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for plumbers",
     metaTitle: "AI Automation for Plumbers | Spotket Digital",
     metaDescription:
-      "AI automation for plumbers — answer every leak, clog, and emergency call instantly, day or night, with automatic booking alerts. From $200/month.",
+      "AI automation for plumbers — answer every leak, clog, and emergency call instantly, day or night, with automatic booking alerts. $500/month.",
     h1: "AI Automation for Plumbers",
     heroSubheading: "Answer every leak, clog, and emergency call instantly — day or night.",
     painPoints: [
@@ -996,7 +996,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for real estate agents",
     metaTitle: "AI Automation for Real Estate Agents | Spotket Digital",
     metaDescription:
-      "AI automation for real estate agents — instant answers for showing requests and listing questions, even while you're with another client. From $200/month.",
+      "AI automation for real estate agents — instant answers for showing requests and listing questions, even while you're with another client. $500/month.",
     h1: "AI Automation for Real Estate Agents",
     heroSubheading:
       "Instant answers for showing requests and listing questions, even while you're with another client.",
@@ -1036,7 +1036,7 @@ export const LANDING_PAGES = [
     keyword: "AI chatbot for salons and spas",
     metaTitle: "AI Chatbot for Salons and Spas | Spotket Digital",
     metaDescription:
-      "An AI chatbot for salons and spas that answers booking and service questions instantly, even when every stylist is with a client. From $200/month.",
+      "An AI chatbot for salons and spas that answers booking and service questions instantly, even when every stylist is with a client. $500/month.",
     h1: "AI Chatbot for Salons and Spas",
     heroSubheading:
       "Answer booking and service questions instantly, even when every stylist is with a client.",
@@ -1076,7 +1076,7 @@ export const LANDING_PAGES = [
     keyword: "24/7 AI receptionist for small business",
     metaTitle: "24/7 AI Receptionist for Small Business | Spotket Digital",
     metaDescription:
-      "A 24/7 AI receptionist for small business — every call answered, every hour of every day, without hiring a night shift. Plans from $200/month.",
+      "A 24/7 AI receptionist for small business — every call answered, every hour of every day, without hiring a night shift. $500/month.",
     h1: "24/7 AI Receptionist for Small Business",
     heroSubheading:
       "Every call answered, every hour of every day — without hiring a night shift.",
@@ -1116,7 +1116,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for landscaping companies",
     metaTitle: "AI Automation for Landscaping Companies | Spotket Digital",
     metaDescription:
-      "AI automation for landscaping companies — quote requests don't stop when your crew is out mowing, and now your response doesn't either. From $200/month.",
+      "AI automation for landscaping companies — quote requests don't stop when your crew is out mowing, and now your response doesn't either. $500/month.",
     h1: "AI Automation for Landscaping Companies",
     heroSubheading:
       "Quote requests don't stop when your crew is out mowing — now your response doesn't either.",
@@ -1156,7 +1156,7 @@ export const LANDING_PAGES = [
     keyword: "custom website for small business",
     metaTitle: "Custom Website for Small Business | Spotket Digital",
     metaDescription:
-      "A custom website for small business, built fast and mobile-optimized, paired with an AI chatbot that works while you don't. Plans from $300/month.",
+      "A custom website for small business, built fast and mobile-optimized, paired with an AI chatbot that works while you don't. $500/month.",
     h1: "Custom Website for Small Business",
     heroSubheading:
       "A fast, mobile-optimized website built around your services — paired with an AI chatbot that works while you don't.",
@@ -1196,7 +1196,7 @@ export const LANDING_PAGES = [
     keyword: "AI automation for law firms",
     metaTitle: "AI Automation for Law Firms | Spotket Digital",
     metaDescription:
-      "AI automation for law firms — give every potential client an instant response before they call the next firm on the list. Plans from $200/month.",
+      "AI automation for law firms — give every potential client an instant response before they call the next firm on the list. $500/month.",
     h1: "AI Automation for Law Firms",
     heroSubheading:
       "Give every potential client an instant response — before they call the next firm on the list.",
